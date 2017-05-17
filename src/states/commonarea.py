@@ -38,10 +38,13 @@ class CommonArea(State):
 
 
     def setup_enemies(self):
-        self.enemy_group = pg.sprite.Group()
+        enemy1 = enemy.Enemy(100, 100)
+        enemy2 = enemy.Enemy(130, 130)
 
-        enemy1 = enemy.Enemy(100, 100, enemy.EnemyType.TURTLE, self.enemy_group)
-        enemy2 = enemy.Enemy(130, 130, enemy.EnemyType.FISH, self.enemy_group)
+        self.enemy_group = pg.sprite.Group(
+                enemy1,
+                enemy2
+                )
 
 
     def setup_player(self):

@@ -13,8 +13,6 @@ class Control:
         self.quit = False
 
         self.screen = pg.display.get_surface()
-        if self.screen is None:
-            print(" ** Screen is none. Wtf am I doing? ** ")
 
         self.fps = 20
         pg.display.set_caption(caption)
