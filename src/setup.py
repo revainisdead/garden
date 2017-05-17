@@ -7,8 +7,8 @@ from . import constants as c
 
 
 pg.init()
-pg.display.set_mode(c.SCREEN_SIZE)
+SCREEN = pg.display.set_mode(c.SCREEN_SIZE)
+SCREEN_RECT = SCREEN.get_rect()
 
 GFX = tools.load_gfx(os.path.join("data", "graphics"))
 FONTS = tools.load_fonts(os.path.join("data", "fonts"))
-

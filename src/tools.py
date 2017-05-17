@@ -1,6 +1,11 @@
 import os
 
 import pygame as pg
+from PIL import Image
+
+
+class InvalidFont(Exception): pass
+class InvalidGFX(Exception): pass
 
 
 class Control:
@@ -8,6 +13,8 @@ class Control:
         self.quit = False
 
         self.screen = pg.display.get_surface()
+        if self.screen is None:
+            print(" ** Screen is none. Wtf am I doing? ** ")
 
         self.fps = 20
         pg.display.set_caption(caption)
@@ -15,7 +22,6 @@ class Control:
 
         self.keys = pg.key.get_pressed()
 
-        # State stuff
         self.state = None
         self.state_name = None
         self.state_dict = {}
@@ -25,10 +31,7 @@ class Control:
         while not self.quit:
             self.event_loop()
 
-            # Drawing updates
             self.update()
-
-            # audio?
             pg.display.update()
 
             self.clock.tick(self.fps)
@@ -110,49 +113,78 @@ class State:
         raise NotImplementedError
 
 
-def __load_stuff(path, accept):
-    stuff = {}
-
-    # List of everything in path
-    for item in os.listdir(path):
-        # Unpack filename and ext
-        name, ext = os.path.splitext(item)
-
-        if ext.lower() in accept:
-            stuff[name] = os.path.join(path, item)
-
-    return stuff
+def strip_png(img):
+    r, g, b, a = img.split()
+    img = Image.merge("RGB", (r, g, b))
+    return img
 
 
-def load_gfx(path, accept=(".png")):
+def convert_png(name_path, convert_to_ext=".bmp"):
+    # Name here should include the extension
+    original_name = name_path
+    if os.path.exists(original_name):
+        img = Image.open(original_name)
+
+        name, ext = os.path.splitext(original_name)
+        joined = name + convert_to_ext
+
+        img = strip_png(img)
+
+        img.save(joined)
+        print(" ** Removing {} **".format(original_name))
+        os.unlink(original_name)
+
+
+def load_gfx(path, accept=(".bmp")):
     colorkey = (255, 0, 255)
     graphics = {}
 
+    # Convert images in directory first, then load them.
     for pic in os.listdir(path):
+        pic_path = os.path.join(path, pic)
+        name, ext = os.path.splitext(pic_path)
+        if ext.lower() not in accept:
+            convert_png(pic_path)
+
+    for pic in os.listdir(path):
+        pic_path = os.path.join(path, pic)
         name, ext = os.path.splitext(pic)
 
         if ext.lower() in accept:
-            img = pg.image.load(os.path.join(path, pic))
+            img = pg.image.load(pic_path)
 
             if img.get_alpha():
                 img = img.convert_alpha()
             else:
+                print("Setting color key for {}: {}".format(ext, [key for key in colorkey]))
                 img = img.convert()
                 img.set_colorkey(colorkey)
-        else:
-            print("Got unexpected graphic format: {}".format(ext))
 
-        graphics[name] = img
+            graphics[name] = img
+
+        else:
+            raise InvalidGFX("Got unexpected gfx format. {}".format(ext))
+
+    # sanity check
+    if not graphics:
+        print("No graphics loaded.")
 
     return graphics
 
+
 def load_fonts(path, accept=(".ttf")):
-    return __load_stuff(path, accept)
+    fonts = {}
+
+    for font in os.listdir(path):
+        name, ext = os.path.splitext(font)
+
+        if ext.lower() in accept:
+            fonts[name] = os.path.join(path, font)
+        else:
+            raise InvalidFont("Received invalid font. {}".format(font))
+
+    return fonts
 
 
-def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
-    pass
-
-
-def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")):
-    pass
+def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")): pass
+def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")): pass

@@ -2,17 +2,17 @@ from . import constants as c
 from . import setup
 from . import tools
 
-from . states import common_area
+from . states import commonarea
 
 
 def main():
     state_dict = {
-        c.States.COMMON_AREA: common_area.CommonArea(),
+        c.States.COMMONAREA: commonarea.CommonArea(),
     }
 
     control = tools.Control("Game Caption")
 
-    control.setup_states(state_dict, c.States.COMMON_AREA)
+    control.setup_states(state_dict, c.States.COMMONAREA)
     control.game_loop()
 
 
