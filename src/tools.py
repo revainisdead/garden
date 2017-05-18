@@ -156,7 +156,7 @@ def load_gfx(path, accept=(".png", ".bmp")):
             if img.get_alpha():
                 img = img.convert_alpha()
             else:
-                print("Setting color key for {}: {}".format(ext, [key for key in colorkey]))
+                print("Setting color key for {}: {}".format(ext, colorkey))
                 img = img.convert()
                 img.set_colorkey(colorkey)
 
