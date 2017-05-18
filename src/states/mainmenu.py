@@ -34,7 +34,7 @@ class MainMenu(State):
 
 
     def set_next_state(self):
-        return c.States.COMMONAREA
+        return c.MainState.COMMONAREA
 
 
     def update(self, surface, keys):
@@ -47,3 +47,5 @@ class MainMenu(State):
     def handle_update(self, keys):
         if keys[c.binds["enter"]]:
             self.state_done = True
+        if keys[c.binds["escape"]]:
+            self.quit = True

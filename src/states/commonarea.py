@@ -22,7 +22,7 @@ class CommonArea(State):
         self.setup_enemies()
         self.setup_player()
 
-        self.state = c.States.COMMONAREA
+        self.state = c.MainState.COMMONAREA
 
 
     def setup_background(self):
@@ -56,21 +56,21 @@ class CommonArea(State):
         """Update the state every frame"""
         self.surface = surface
 
-        self.handle_update(keys)
+        self.handle_states(keys)
         self.blit_images(surface)
 
 
-    def handle_update(self, keys):
-        if keys[c.binds["up"]]:
-            print("Up pressed.")
-        if keys[c.binds["down"]]:
-            print("Down pressed.")
-        if keys[c.binds["right"]]:
-            print("Right pressed.")
-        if keys[c.binds["left"]]:
-            print("Left pressed.")
-        if keys[c.binds["escape"]]:
-            self.quit = True
+    def handle_states(self, keys):
+        # Handle OTHER states (not level states)
+        # Like running, paused, dead
+
+        # if self.time_state == c.TimeState.RUNNING:
+        self.update_sprites(keys)
+
+    def update_sprites(self, keys):
+        self.enemy_group.update()
+        self.player_group.update(keys)
+
 
 
     def blit_images(self, surface):

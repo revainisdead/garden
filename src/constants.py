@@ -3,9 +3,21 @@ import enum
 import pygame as pg
 
 
-class States(enum.Enum):
+class MainState(enum.Enum):
     MAINMENU = 0
     COMMONAREA = 1
+
+
+class Direction(enum.Enum):
+    LEFT = 0
+    RIGHT = 1
+    UP = 2
+    DOWN = 3
+
+
+class TimeState(enum.Enum):
+    RUNNING = 0
+    PAUSED = 1
 
 
 binds = {
