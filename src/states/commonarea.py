@@ -13,13 +13,16 @@ class CommonArea(State):
         # XXX Implement only startup when the state is switched to.
         # Currently startup is called in parent class
 
+        # The first state should call startup itself
+        self.startup()
+
+
+    def startup(self):
         self.setup_background()
         self.setup_enemies()
         self.setup_player()
 
-
-    def startup(self):
-        pass
+        self.state = c.States.COMMONAREA
 
 
     def setup_background(self):
@@ -67,7 +70,7 @@ class CommonArea(State):
         if keys[c.binds["left"]]:
             print("Left pressed.")
         if keys[c.binds["escape"]]:
-            self.state_done = True
+            self.quit = True
 
 
     def blit_images(self, surface):

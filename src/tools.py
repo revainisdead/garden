@@ -98,8 +98,8 @@ class State:
         # Quit this state
         self.state_done = False
 
-        self.nxt = None
-        self.prev = None
+        self.next = None
+        self.previous = None
 
 
     def startup(self):

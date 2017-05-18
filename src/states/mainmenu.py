@@ -9,13 +9,19 @@ from .. tools import State
 class MainMenu(State):
     def __init__(self):
         super().__init__()
-        self.setup_background()
+
+        self.startup()
+
 
     def startup(self):
-        pass
+        """Called each time the state is entered"""
+        self.next = self.set_next_state()
+
+        self.setup_background()
+
 
     def setup_background(self):
-        self.background = setup.GFX["level_1"]
+        self.background = setup.GFX["tile_map_silver"]
         self.background_rect = self.background.get_rect()
 
         width = self.background_rect.width
@@ -24,24 +30,20 @@ class MainMenu(State):
         self.entire_area = pg.Surface((width, height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
 
+        self.viewport = setup.SCREEN.get_rect(bottom=setup.SCREEN_RECT.bottom)
 
-    def next_state(self):
-        return c.States.MAINMENU
+
+    def set_next_state(self):
+        return c.States.COMMONAREA
 
 
     def update(self, surface, keys):
         """Update the state every frame"""
-        self.surface = surface
-
         self.handle_update(keys)
-        self.blit_images(surface)
+
+        surface.blit(self.background, self.viewport, self.viewport)
 
 
     def handle_update(self, keys):
         if keys[c.binds["enter"]]:
             self.state_done = True
-
-
-    def blit_images(self, surface):
-        self.entire_area.blit(self.background, (0, 0), (0, 0))
-        surface.blit(self.entire_area, (0, 0), (0, 0))
