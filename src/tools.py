@@ -77,11 +77,12 @@ class Control:
 
 
     def flip_state(self):
-        # Simultaneous state flip to next
-        previous = self.state_name = self.state_name, self.state.next
+        previous, self.state_name = self.state_name, self.state.next
+        self.state = self.state_dict[self.state_name]
 
         # Startup state when switching to it
         self.state.startup()
+        print("State switched to: {}".format(self.state_name))
 
         self.state.previous = previous
 
@@ -95,12 +96,8 @@ class State:
         # Quit this state
         self.state_done = False
 
-        # Until states flow into each other, run statup manually
-        self.startup()
-
-        # State machine???
-        self.next = None
-        self.previous = None
+        self.nxt = None
+        self.prev = None
 
 
     def startup(self):
@@ -137,7 +134,7 @@ def load_gfx(path, accept=(".bmp")):
     colorkey = (255, 0, 255)
     graphics = {}
 
-    # Convert images in directory first, then load them.
+    # Loop through images and convert them to bmp if needed
     for pic in os.listdir(path):
         pic_path = os.path.join(path, pic)
         name, ext = os.path.splitext(pic_path)

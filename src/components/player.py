@@ -21,6 +21,7 @@ class Player(pg.sprite.Sprite):
         image = pg.Surface([width, height])
         rect = image.get_rect()
 
+        image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         #image.set_colorkey(c.YELLOW)
 
         return image

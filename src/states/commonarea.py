@@ -1,11 +1,10 @@
-import enum
+import pygame as pg
 
-from .. import setup
 from .. import constants as c
+from .. import setup
+
 from .. components import player, enemy
 from .. tools import State
-
-import pygame as pg
 
 
 class CommonArea(State):
@@ -15,12 +14,12 @@ class CommonArea(State):
         # Currently startup is called in parent class
 
         self.setup_background()
-        self.setup_player()
         self.setup_enemies()
+        self.setup_player()
 
 
     def startup(self):
-        self.setup_enemies()
+        pass
 
 
     def setup_background(self):
@@ -41,14 +40,13 @@ class CommonArea(State):
         enemy1 = enemy.Enemy(100, 100)
         enemy2 = enemy.Enemy(130, 130)
 
-        self.enemy_group = pg.sprite.Group(
-                enemy1,
-                enemy2
-                )
+        self.enemy_group = pg.sprite.Group(enemy1, enemy2)
 
 
     def setup_player(self):
-        p = player.Player(200, 200)
+        self.player = player.Player(50, 50)
+
+        self.player_group = pg.sprite.Group(self.player)
 
 
     def update(self, surface, keys):
@@ -68,11 +66,13 @@ class CommonArea(State):
             print("Right pressed.")
         if keys[c.binds["left"]]:
             print("Left pressed.")
+        if keys[c.binds["escape"]]:
+            self.state_done = True
 
 
     def blit_images(self, surface):
         self.entire_area.blit(self.background, self.viewport, self.viewport)
+        self.player_group.draw(self.entire_area)
         self.enemy_group.draw(self.entire_area)
 
         surface.blit(self.entire_area, (0, 0), self.viewport)
-
