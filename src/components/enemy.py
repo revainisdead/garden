@@ -10,7 +10,7 @@ class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
 
-        self.sprite_sheet = setup.GFX["enemies"]
+        self.sprite_sheet = setup.GFX["enemies_by_o_fiveasone_o_88"]
         self.image = self.get_image(180, 8, 34, 40)
 
         # Get image's rect
@@ -24,7 +24,6 @@ class Enemy(pg.sprite.Sprite):
     def get_image(self, x, y, width, height):
         """Extracts from sprite sheet"""
         image = pg.Surface([width, height]).convert()
-        print("Enemy alpha value: {}".format(image.get_alpha()))
 
         rect = image.get_rect()
 
@@ -32,7 +31,8 @@ class Enemy(pg.sprite.Sprite):
 
         # THIS IS THE COLOR YOU WANT TO BE TRANSPARENT
         # HINT: The background color of the sprite sheet bmp
-        #image.set_colorkey(c.WHITE)
+        image.set_colorkey(c.SAPPHIRE)
+
 
         return image
 

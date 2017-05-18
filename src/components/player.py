@@ -7,7 +7,7 @@ from .. import constants as c
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.sprite_sheet = setup.GFX["enemies"]
+        self.sprite_sheet = setup.GFX["enemies_by_o_fiveasone_o_88"]
 
         self.image = self.get_image(14, 7, 35, 42)
 

@@ -3,6 +3,8 @@ import os
 import pygame as pg
 from PIL import Image
 
+from . import constants as c
+
 
 class InvalidFont(Exception): pass
 class InvalidGFX(Exception): pass
@@ -108,12 +110,14 @@ class State:
         raise NotImplementedError
 
 
+# XXX Unused
 def strip_png(img):
     r, g, b, a = img.split()
     img = Image.merge("RGB", (r, g, b))
     return img
 
 
+# XXX Unused
 def convert_png(name_path, convert_to_ext=".bmp"):
     # Name here should include the extension
     original_name = name_path
@@ -130,16 +134,17 @@ def convert_png(name_path, convert_to_ext=".bmp"):
         os.unlink(original_name)
 
 
-def load_gfx(path, accept=(".bmp")):
-    colorkey = (255, 0, 255)
-    graphics = {}
-
+def load_gfx(path, accept=(".png", ".bmp")):
+    """
     # Loop through images and convert them to bmp if needed
     for pic in os.listdir(path):
         pic_path = os.path.join(path, pic)
         name, ext = os.path.splitext(pic_path)
         if ext.lower() not in accept:
             convert_png(pic_path)
+    """
+    colorkey = c.PURPLE # The likelihood of a background being purple is quite low
+    graphics = {}
 
     for pic in os.listdir(path):
         pic_path = os.path.join(path, pic)

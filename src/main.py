@@ -6,15 +6,17 @@ from . states import commonarea
 from . states import mainmenu
 
 
+#c.States.MAINMENU: mainmenu.MainMenu(),
+
 def main():
     state_dict = {
-        c.States.MAINMENU: mainmenu.MainMenu(),
         c.States.COMMONAREA: commonarea.CommonArea(),
     }
 
     control = tools.Control("Garden")
 
-    control.setup_states(state_dict, c.States.MAINMENU)
+    #control.setup_states(state_dict, c.States.MAINMENU)
+    control.setup_states(state_dict, c.States.COMMONAREA)
     control.game_loop()
 
 

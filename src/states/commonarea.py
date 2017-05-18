@@ -24,7 +24,7 @@ class CommonArea(State):
 
     def setup_background(self):
         """Draw background"""
-        self.background = setup.GFX["level_1"]
+        self.background = setup.GFX["tile_map_silver"]
         self.background_rect = self.background.get_rect()
 
         # This area will be the entire background
