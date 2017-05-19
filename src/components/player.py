@@ -21,6 +21,10 @@ class Player(pg.sprite.Sprite):
 
 
     def set_velocity(self):
+        # Before setting new velocity, reset to 0
+        self.x_vel = 0
+        self.y_vel = 0
+
         if self.direction == c.Direction.LEFT:
             self.x_vel = -2
         elif self.direction == c.Direction.RIGHT:
@@ -28,6 +32,18 @@ class Player(pg.sprite.Sprite):
         elif self.direction == c.Direction.UP:
             self.y_vel = -2
         elif self.direction == c.Direction.DOWN:
+            self.y_vel = 2
+        elif self.direction == c.Direction.LEFTUP:
+            self.x_vel = -2
+            self.y_vel = -2
+        elif self.direction == c.Direction.LEFTDOWN:
+            self.x_vel = -2
+            self.y_vel = 2
+        elif self.direction == c.Direction.RIGHTUP:
+            self.x_vel = 2
+            self.y_vel = -2
+        elif self.direction == c.Direction.RIGHTDOWN:
+            self.x_vel = 2
             self.y_vel = 2
 
 
@@ -50,12 +66,28 @@ class Player(pg.sprite.Sprite):
         self.rect.y += self.y_vel
 
 
-    def handle_state(self, keys):
+    def handle_state(self, keys) -> bool:
         if keys[c.binds["left"]]:
-            self.direction = c.Direction.LEFT
+            if keys[c.binds["up"]]:
+                self.direction = c.Direction.LEFTUP
+
+            elif keys[c.binds["down"]]:
+                self.direction = c.Direction.LEFTDOWN
+
+            else:
+                self.direction = c.Direction.LEFT
+
             self.walk()
         elif keys[c.binds["right"]]:
-            self.direction = c.Direction.RIGHT
+            if keys[c.binds["up"]]:
+                self.direction = c.Direction.RIGHTUP
+
+            elif keys[c.binds["down"]]:
+                self.direction = c.Direction.RIGHTDOWN
+
+            else:
+                self.direction = c.Direction.RIGHT
+
             self.walk()
         elif keys[c.binds["up"]]:
             self.direction = c.Direction.UP

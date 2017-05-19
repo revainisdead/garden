@@ -13,6 +13,10 @@ class Direction(enum.Enum):
     RIGHT = 1
     UP = 2
     DOWN = 3
+    LEFTUP = 4
+    LEFTDOWN = 5
+    RIGHTUP = 6
+    RIGHTDOWN = 7
 
 
 class TimeState(enum.Enum):
