@@ -65,6 +65,10 @@ class CommonArea(State):
         # Like running, paused, dead
 
         # if self.time_state == c.TimeState.RUNNING:
+        if keys[c.binds["escape"]]:
+            self.quit = True
+
+
         self.update_sprites(keys)
 
     def update_sprites(self, keys):
