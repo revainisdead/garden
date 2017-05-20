@@ -37,7 +37,7 @@ class MainMenu(State):
         return c.MainState.COMMONAREA
 
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, current_time):
         """Update the state every frame"""
         self.handle_update(keys)
 

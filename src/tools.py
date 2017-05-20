@@ -16,6 +16,7 @@ class Control:
 
         self.screen = pg.display.get_surface()
 
+        self.current_time = 0.0
         self.fps = 20
         pg.display.set_caption(caption)
         self.clock = pg.time.Clock()
@@ -49,25 +50,15 @@ class Control:
 
     def update(self):
         """Connects to the main game loop.
-
         Do any updates needed
         """
-        # Allow quitting the main game loop from the state object
+        self.current_time = pg.time.get_ticks()
         if self.state.quit:
             self.quit = True
         elif self.state.state_done:
             self.flip_state()
 
-
-        # Implement flipping (aka going to the next) states.
-        #   * Initial screen
-        #   * Loading screen
-        #   * Level 1
-        #   * Level 2
-        #   * ...
-        #   * Game over
-
-        self.state.update(self.screen, self.keys)
+        self.state.update(self.screen, self.keys, self.current_time)
 
 
     def setup_states(self, state_dict, start_state):
@@ -84,10 +75,9 @@ class Control:
 
         # Startup state when switching to it
         self.state.startup()
-        print("State switched to: {}".format(self.state_name))
+        print("Level state switched to: {}".format(self.state_name))
 
         self.state.previous = previous
-
 
 
 class State:
@@ -106,7 +96,7 @@ class State:
         raise NotImplementedError
 
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, current_time):
         raise NotImplementedError
 
 

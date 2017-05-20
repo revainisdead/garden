@@ -11,7 +11,9 @@ class Enemy(pg.sprite.Sprite):
         super().__init__()
 
         self.sprite_sheet = setup.GFX["enemies_by_o_fiveasone_o_88"]
-        self.image = self.get_image(180, 8, 34, 40)
+        self.frames = self.load_images_from_sheet()
+        self.frame_index = 0
+        self.image = self.frames[self.frame_index]
 
         # Get image's rect
         self.rect = self.image.get_rect()
@@ -24,6 +26,17 @@ class Enemy(pg.sprite.Sprite):
         self.set_velocity()
 
         self.change_interval = 0
+
+
+    def load_images_from_sheet(self):
+        images = []
+
+        images.append(self.get_image(57, 8, 34, 40))
+        images.append(self.get_image(95, 8, 34, 40))
+        images.append(self.get_image(135, 8, 34, 40))
+        images.append(self.get_image(180, 8, 34, 40))
+
+        return images
 
 
     def set_velocity(self):
@@ -71,7 +84,7 @@ class Enemy(pg.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         image.set_colorkey(c.SAPPHIRE)
 
-        size_delta = (int(rect.width*1.75), int(rect.height*1.75))
+        size_delta = (int(rect.width*1.5), int(rect.height*1.5))
         image = pg.transform.scale(image, size_delta)
 
         return image
@@ -95,10 +108,26 @@ class Enemy(pg.sprite.Sprite):
     def handle_state(self):
         # AI States
         # - Dead
-        # - Attacking
+        # - Attacking        # Increment first, then check if out of range.
         # - Etc
         self.auto_walk()
 
 
     def update(self):
         self.handle_state()
+        self.animate_door()
+
+
+    def animate_door(self):
+        self.frame_index += 1
+        if self.frame_index >= len(self.frames):
+            self.frame_index = 0
+
+        self.image = self.frames[self.frame_index]
+
+
+    def full_animation(self):
+        # Can work if based on time
+        #for i in len(self.frames):
+            #self.image[i]
+        pass

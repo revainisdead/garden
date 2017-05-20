@@ -16,6 +16,10 @@ class CommonArea(State):
         # The first state should call startup itself
         self.startup()
 
+        self.game_info = {
+            "current_time": 0.0,
+        }
+
 
     def startup(self):
         self.setup_background()
@@ -33,32 +37,31 @@ class CommonArea(State):
         size_delta = (int(self.background_rect.width*2.65), int(self.background_rect.height*2.65))
         self.background = pg.transform.scale(self.background, size_delta)
 
-        # This area will be the entire background
-        width = self.background_rect.width
-        height = self.background_rect.height
-        self.entire_area = pg.Surface((width, height)).convert()
+        self.background_rect = self.background.get_rect()
+        self.entire_area = pg.Surface((self.background_rect.width, self.background_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
 
         self.viewport = setup.SCREEN.get_rect(bottom=self.entire_area_rect.bottom)
-        self.viewport.x = 200
+        #self.viewport.x = ???
 
 
     def setup_enemies(self):
-        enemy1 = enemy.Enemy(100, 100)
-        enemy2 = enemy.Enemy(130, 130)
+        enemy1 = enemy.Enemy(300, 300)
+        enemy2 = enemy.Enemy(350, 350)
 
         self.enemy_group = pg.sprite.Group(enemy1, enemy2)
 
 
     def setup_player(self):
-        self.player = player.Player(50, 50)
+        self.player = player.Player(600, 600)
 
         self.player_group = pg.sprite.Group(self.player)
 
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, current_time):
         """Update the state every frame"""
         self.surface = surface
+        self.game_info["current_time"] = current_time
 
         self.handle_states(keys)
         self.blit_images(surface)
@@ -71,9 +74,8 @@ class CommonArea(State):
         # if self.time_state == c.TimeState.RUNNING:
         if keys[c.binds["escape"]]:
             self.quit = True
-
-
         self.update_sprites(keys)
+
 
     def update_sprites(self, keys):
         self.enemy_group.update()

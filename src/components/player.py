@@ -55,7 +55,7 @@ class Player(pg.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         image.set_colorkey(c.SAPPHIRE)
 
-        size_delta = (int(rect.width*1.75), int(rect.height*1.75))
+        size_delta = (int(rect.width*1.5), int(rect.height*1.5))
         image = pg.transform.scale(image, size_delta)
         return image
 
