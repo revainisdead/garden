@@ -30,6 +30,9 @@ class CommonArea(State):
         self.background = setup.GFX["tile_map_silver"]
         self.background_rect = self.background.get_rect()
 
+        size_delta = (int(self.background_rect.width*2.65), int(self.background_rect.height*2.65))
+        self.background = pg.transform.scale(self.background, size_delta)
+
         # This area will be the entire background
         width = self.background_rect.width
         height = self.background_rect.height
@@ -37,6 +40,7 @@ class CommonArea(State):
         self.entire_area_rect = self.entire_area.get_rect()
 
         self.viewport = setup.SCREEN.get_rect(bottom=self.entire_area_rect.bottom)
+        self.viewport.x = 200
 
 
     def setup_enemies(self):
@@ -74,7 +78,6 @@ class CommonArea(State):
     def update_sprites(self, keys):
         self.enemy_group.update()
         self.player_group.update(keys)
-
 
 
     def blit_images(self, surface):

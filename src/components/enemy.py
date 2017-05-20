@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 
 from .. import setup
@@ -21,8 +23,11 @@ class Enemy(pg.sprite.Sprite):
         self.direction = c.Direction.UP
         self.set_velocity()
 
+        self.change_interval = 0
+
 
     def set_velocity(self):
+        """
         if self.direction == c.Direction.LEFT:
             self.x_vel = -2
         elif self.direction == c.Direction.RIGHT:
@@ -31,6 +36,31 @@ class Enemy(pg.sprite.Sprite):
             self.y_vel = -2
         elif self.direction == c.Direction.DOWN:
             self.y_vel = 2
+        """
+        self.x_vel = 0
+        self.y_vel = 0
+
+        if self.direction == c.Direction.LEFT:
+            self.x_vel = -2
+        elif self.direction == c.Direction.RIGHT:
+            self.x_vel = 2
+        elif self.direction == c.Direction.UP:
+            self.y_vel = -2
+        elif self.direction == c.Direction.DOWN:
+            self.y_vel = 2
+        elif self.direction == c.Direction.LEFTUP:
+            self.x_vel = -2
+            self.y_vel = -2
+        elif self.direction == c.Direction.LEFTDOWN:
+            self.x_vel = -2
+            self.y_vel = 2
+        elif self.direction == c.Direction.RIGHTUP:
+            self.x_vel = 2
+            self.y_vel = -2
+        elif self.direction == c.Direction.RIGHTDOWN:
+            self.x_vel = 2
+            self.y_vel = 2
+
 
 
     def get_image(self, x, y, width, height):
@@ -47,13 +77,28 @@ class Enemy(pg.sprite.Sprite):
         return image
 
 
-    def autowalk(self):
-        pass
+    def auto_walk(self):
+        self.change_interval += 1
 
+        if self.change_interval == 10:
+            direction = random.randint(0, 7)
+            self.change_interval = 0
+
+            for ea in c.Direction:
+                if direction == ea.value:
+                    self.direction = ea
+                    self.set_velocity()
+
+        self.rect.x += self.x_vel
+        self.rect.y += self.y_vel
 
     def handle_state(self):
-        pass
+        # AI States
+        # - Dead
+        # - Attacking
+        # - Etc
+        self.auto_walk()
 
 
     def update(self):
-        pass
+        self.handle_state()
