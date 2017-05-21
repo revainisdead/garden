@@ -33,10 +33,10 @@ class CommonArea(State):
 
     def setup_background(self):
         """Draw background"""
-        self.background = setup.GFX["tile_map_silver"]
+        self.background = setup.GFX["cloud_background"]
         self.background_rect = self.background.get_rect()
 
-        size_delta = (int(self.background_rect.width*2.65), int(self.background_rect.height*2.65))
+        size_delta = (int(self.background_rect.width*c.BACKGROUND_MULT), int(self.background_rect.height*c.BACKGROUND_MULT))
         self.background = pg.transform.scale(self.background, size_delta)
 
         self.background_rect = self.background.get_rect()
@@ -55,7 +55,7 @@ class CommonArea(State):
 
 
     def setup_player(self):
-        self.player = player.Player(600, 600)
+        self.player = player.Player(500, 400)
 
         self.player_group = pg.sprite.Group(self.player)
 

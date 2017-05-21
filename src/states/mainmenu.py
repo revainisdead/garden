@@ -22,13 +22,13 @@ class MainMenu(State):
 
 
     def setup_background(self):
-        self.background = setup.GFX["tile_map_silver"]
+        self.background = setup.GFX["cloud_background"]
         self.background_rect = self.background.get_rect()
 
-        width = self.background_rect.width
-        height = self.background_rect.height
+        size_delta = (int(self.background_rect.width*c.BACKGROUND_MULT), int(self.background_rect.height*c.BACKGROUND_MULT))
+        self.background = pg.transform.scale(self.background, size_delta)
 
-        self.entire_area = pg.Surface((width, height)).convert()
+        self.entire_area = pg.Surface((self.background_rect.width, self.background_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
 
         self.viewport = setup.SCREEN.get_rect(bottom=setup.SCREEN_RECT.bottom)

@@ -12,3 +12,4 @@ SCREEN_RECT = SCREEN.get_rect()
 
 GFX = tools.load_gfx(os.path.join("data", "graphics"))
 FONTS = tools.load_fonts(os.path.join("data", "fonts"))
+SFX = tools.load_sfx(os.path.join("data", "sounds"))

@@ -122,6 +122,7 @@ def convert_png(name_path, convert_to_ext=".bmp"):
 
 def colorize(image, color):
     image = image.copy()
+    #image.fill((0, 0, 0, 255), None, pg.BLEND_RGBA_MULT)
     image.fill(color[0:3] + (0,), None, pg.BLEND_RGBA_ADD)
     return image
 
@@ -190,7 +191,6 @@ def load_gfx(path):
 
 def load_fonts(path, accept=(".ttf")):
     fonts = {}
-
     for font in os.listdir(path):
         name, ext = os.path.splitext(font)
 
@@ -202,8 +202,17 @@ def load_fonts(path, accept=(".ttf")):
     return fonts
 
 
-def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")): pass
+def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")):
+    sounds = {}
+    for sound in os.listdir(path):
+        name, ext = os.path.splitext(sound)
 
+        if ext.lower() in accept:
+            sounds[name] = os.path.join(path, sound)
+        else:
+            print("Received invalid sound effect. {}".format(sound))
+
+    return sounds
 
 
 def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):

@@ -24,16 +24,11 @@ class TimeState(enum.Enum):
     PAUSED = 1
 
 
-SCREEN_HEIGHT = 600
-SCREEN_WIDTH = 800
-SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
-
-
-#            R, G, B
 # Extract colors using: labs.tineye.com/color/
 # (TIP: Uncheck "Exclude background color from extracted colors")
 # Convert hex color to r,g,b using: www.rapidtables.com/convert/color/
 # Sprites: getspritexy.com, spritecow.com
+#            R, G, B
 RED =       (255, 0, 0)
 GREEN =     (0, 255, 0)
 BLUE =      (0, 0, 255)
@@ -43,3 +38,10 @@ GRAY =      (100, 100, 100)
 BLACK =     (0, 0, 0)
 WHITE =     (255, 255, 255)
 SAPPHIRE =  (5, 35, 94)
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
+
+# Multipliers.
+BACKGROUND_MULT = 2.5
