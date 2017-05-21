@@ -65,6 +65,7 @@ class CommonArea(State):
         self.surface = surface
         self.game_info["current_time"] = current_time
 
+        self.update_sprites(keys)
         self.handle_states(keys)
         self.blit_images(surface)
 
@@ -76,7 +77,6 @@ class CommonArea(State):
         # if self.time_state == c.TimeState.RUNNING:
         if keys[binds.keybinds["escape"]]:
             self.quit = True
-        self.update_sprites(keys)
 
 
     def update_sprites(self, keys):

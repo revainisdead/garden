@@ -13,4 +13,6 @@ keybinds = {
     "right": pg.K_d,
     "escape": pg.K_ESCAPE,
     "enter": pg.K_RETURN,
+    "arrow_up": pg.K_UP,
+    "arrow_down": pg.K_DOWN,
 }
