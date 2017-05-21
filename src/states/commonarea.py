@@ -1,5 +1,6 @@
 import pygame as pg
 
+from .. import binds
 from .. import constants as c
 from .. import setup
 
@@ -25,6 +26,7 @@ class CommonArea(State):
         self.setup_background()
         self.setup_enemies()
         self.setup_player()
+        self.glaive_group = pg.sprite.Group()
 
         self.state = c.MainState.COMMONAREA
 
@@ -72,13 +74,15 @@ class CommonArea(State):
         # Like running, paused, dead
 
         # if self.time_state == c.TimeState.RUNNING:
-        if keys[c.binds["escape"]]:
+        if keys[binds.keybinds["escape"]]:
             self.quit = True
         self.update_sprites(keys)
 
 
     def update_sprites(self, keys):
         self.enemy_group.update(self.game_info["current_time"])
+        self.glaive_group.update()
+
         self.player_group.update(keys)
 
 

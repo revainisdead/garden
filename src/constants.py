@@ -24,16 +24,6 @@ class TimeState(enum.Enum):
     PAUSED = 1
 
 
-binds = {
-    "up": pg.K_w,
-    "down": pg.K_s,
-    "left": pg.K_a,
-    "right": pg.K_d,
-    "escape": pg.K_ESCAPE,
-    "enter": pg.K_RETURN,
-}
-
-
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 800
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)

@@ -1,7 +1,8 @@
 import pygame as pg
 
-from .. import setup
+from .. import binds
 from .. import constants as c
+from .. import setup
 
 
 class Player(pg.sprite.Sprite):
@@ -66,31 +67,31 @@ class Player(pg.sprite.Sprite):
 
 
     def handle_state(self, keys) -> bool:
-        if keys[c.binds["left"]]:
-            if keys[c.binds["up"]]:
+        if keys[binds.keybinds["left"]]:
+            if keys[binds.keybinds["up"]]:
                 self.direction = c.Direction.LEFTUP
-            elif keys[c.binds["down"]]:
+            elif keys[binds.keybinds["down"]]:
                 self.direction = c.Direction.LEFTDOWN
             else:
                 self.direction = c.Direction.LEFT
             self.walk()
 
-        elif keys[c.binds["right"]]:
-            if keys[c.binds["up"]]:
+        elif keys[binds.keybinds["right"]]:
+            if keys[binds.keybinds["up"]]:
                 self.direction = c.Direction.RIGHTUP
-            elif keys[c.binds["down"]]:
+            elif keys[binds.keybinds["down"]]:
                 self.direction = c.Direction.RIGHTDOWN
             else:
                 self.direction = c.Direction.RIGHT
             self.walk()
 
-        elif keys[c.binds["up"]]:
+        elif keys[binds.keybinds["up"]]:
             self.direction = c.Direction.UP
             self.walk()
-        elif keys[c.binds["down"]]:
+        elif keys[binds.keybinds["down"]]:
             self.direction = c.Direction.DOWN
             self.walk()
-        elif keys[c.binds["escape"]]:
+        elif keys[binds.keybinds["escape"]]:
             self.quit = True
 
 

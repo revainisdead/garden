@@ -197,7 +197,6 @@ class Enemy(pg.sprite.Sprite):
 
             # Setting shooting timer for the first time
             self.shooting_timer = self.current_time
-            print(self.frame_index)
         else:
             if self.current_time - self.shooting_timer > self.animation_speed:
                 self.frame_index += 1

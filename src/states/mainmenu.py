@@ -1,6 +1,7 @@
 import pygame as pg
 
 from .. import constants as c
+from .. import binds
 from .. import setup
 
 from .. tools import State
@@ -45,7 +46,7 @@ class MainMenu(State):
 
 
     def handle_update(self, keys):
-        if keys[c.binds["enter"]]:
+        if keys[binds.keybinds["enter"]]:
             self.state_done = True
-        if keys[c.binds["escape"]]:
+        if keys[binds.keybinds["escape"]]:
             self.quit = True
