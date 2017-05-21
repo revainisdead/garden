@@ -6,73 +6,143 @@ from .. import setup
 from .. import constants as c
 
 
+class Glaive(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+
+        self.sprite_sheet = setup.GFX["enemies_by_o_fiveasone_o_88"]
+        self.frames = self.load_sprites_from_sheet()
+        self.frame_index = 0
+        self.image = self.frames[self.frame_index]
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        self.current_time = 0
+        self.exists = True
+
+        self.direction = c.Direction.RIGHT
+        self.max_move_distance = 48
+        self.running_distance_total = 0
+
+
+    def load_sprites_from_sheet():
+        images = []
+        images.append(self.get_image(68, 65, 16, 20))
+        images.append(self.get_image(68, 65, 16, 20))
+        return images
+
+
+    def get_image(self, x, y, width, height):
+        """Extracts from sprite sheet"""
+        image = pg.Surface([width, height]).convert()
+        rect = image.get_rect()
+
+        image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
+        image.set_colorkey(c.SAPPHIRE)
+
+        size_delta = (int(rect.width*1.5), int(rect.height*1.5))
+        image = pg.transform.scale(image, size_delta)
+        return image
+
+
+    def set_velocity(self):
+        if self.direction == c.Direction.LEFT:
+            move = -12
+        elif self.direction == c.Direction.RIGHT:
+            move = 12
+
+        self.running_distance_total += move
+        if not running_distance_total > self.max_move_distance:
+            self.rect.x += move
+        else:
+            # Drawing is based on groups, if we remove the sprite
+            # from all groups, it should also stop drawing it.
+            self.kill()
+            self.exists = False
+
+
+    def handle_state(self):
+        self.animate_glaive()
+
+
+    def update(self, current_time):
+        self.current_time = current_time
+
+        if self.exists:
+            self.handle_state()
+
+
+    def animate_glaive():
+        pass
+
+
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
 
         self.sprite_sheet = setup.GFX["enemies_by_o_fiveasone_o_88"]
-        self.frames = self.load_images_from_sheet()
+        self.frames = self.load_sprites_from_sheet()
         self.frame_index = 0
         self.image = self.frames[self.frame_index]
 
-        # Get image's rect
         self.rect = self.image.get_rect()
-
-        # Set rect's position
         self.rect.x = x
         self.rect.y = y
 
+        self.walking_speed = 4
         self.direction = c.Direction.UP
         self.set_velocity()
+        self.walking_dir_change_interval = 0
 
-        self.change_interval = 0
+        self.current_time = 0
+        self.shooting_timer = 0
+        self.animation_speed = 80
 
 
-    def load_images_from_sheet(self):
+    def load_sprites_from_sheet(self):
         images = []
-
+        # Duplicate first image, use first image as a placeholder
+        # indicating that the animation hasn't ran yet
         images.append(self.get_image(57, 8, 34, 40))
+        images.append(images[0])
         images.append(self.get_image(95, 8, 34, 40))
         images.append(self.get_image(135, 8, 34, 40))
         images.append(self.get_image(180, 8, 34, 40))
-
+        # Reverse animation, close the enemy door.
+        images.append(images[3])
+        images.append(images[2])
+        # Original image, door is closed.
+        images.append(images[0])
         return images
 
 
     def set_velocity(self):
-        """
-        if self.direction == c.Direction.LEFT:
-            self.x_vel = -2
-        elif self.direction == c.Direction.RIGHT:
-            self.x_vel = 2
-        elif self.direction == c.Direction.UP:
-            self.y_vel = -2
-        elif self.direction == c.Direction.DOWN:
-            self.y_vel = 2
-        """
+        """Set the speed based on the direction"""
         self.x_vel = 0
         self.y_vel = 0
 
         if self.direction == c.Direction.LEFT:
-            self.x_vel = -2
+            self.x_vel = -self.walking_speed
         elif self.direction == c.Direction.RIGHT:
-            self.x_vel = 2
+            self.x_vel = self.walking_speed
         elif self.direction == c.Direction.UP:
-            self.y_vel = -2
+            self.y_vel = -self.walking_speed
         elif self.direction == c.Direction.DOWN:
-            self.y_vel = 2
+            self.y_vel = self.walking_speed
         elif self.direction == c.Direction.LEFTUP:
-            self.x_vel = -2
-            self.y_vel = -2
+            self.x_vel = -self.walking_speed
+            self.y_vel = -self.walking_speed
         elif self.direction == c.Direction.LEFTDOWN:
-            self.x_vel = -2
-            self.y_vel = 2
+            self.x_vel = -self.walking_speed
+            self.y_vel = self.walking_speed
         elif self.direction == c.Direction.RIGHTUP:
-            self.x_vel = 2
-            self.y_vel = -2
+            self.x_vel = self.walking_speed
+            self.y_vel = -self.walking_speed
         elif self.direction == c.Direction.RIGHTDOWN:
-            self.x_vel = 2
-            self.y_vel = 2
+            self.x_vel = self.walking_speed
+            self.y_vel = self.walking_speed
 
 
 
@@ -86,16 +156,15 @@ class Enemy(pg.sprite.Sprite):
 
         size_delta = (int(rect.width*1.5), int(rect.height*1.5))
         image = pg.transform.scale(image, size_delta)
-
         return image
 
 
     def auto_walk(self):
-        self.change_interval += 1
+        self.walking_dir_change_interval += 1
 
-        if self.change_interval == 10:
+        if self.walking_dir_change_interval == 10:
             direction = random.randint(0, 7)
-            self.change_interval = 0
+            self.walking_dir_change_interval = 0
 
             for ea in c.Direction:
                 if direction == ea.value:
@@ -108,26 +177,34 @@ class Enemy(pg.sprite.Sprite):
     def handle_state(self):
         # AI States
         # - Dead
-        # - Attacking        # Increment first, then check if out of range.
+        # - Attacking
         # - Etc
+
+        # if state == SHOOT:
+        self.animate_shoot()
         self.auto_walk()
 
 
-    def update(self):
+    def update(self, current_time):
+        self.current_time = current_time
+
         self.handle_state()
-        self.animate_door()
 
 
-    def animate_door(self):
-        self.frame_index += 1
-        if self.frame_index >= len(self.frames):
-            self.frame_index = 0
+    def animate_shoot(self):
+        if self.frame_index == 0:
+            self.frame_index += 1
+
+            # Setting shooting timer for the first time
+            self.shooting_timer = self.current_time
+            print(self.frame_index)
+        else:
+            if self.current_time - self.shooting_timer > self.animation_speed:
+                self.frame_index += 1
+                if self.frame_index >= len(self.frames):
+                    self.frame_index = 1
+                self.shooting_timer = self.current_time
 
         self.image = self.frames[self.frame_index]
 
 
-    def full_animation(self):
-        # Can work if based on time
-        #for i in len(self.frames):
-            #self.image[i]
-        pass

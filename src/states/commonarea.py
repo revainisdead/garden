@@ -17,7 +17,7 @@ class CommonArea(State):
         self.startup()
 
         self.game_info = {
-            "current_time": 0.0,
+            "current_time": 0,
         }
 
 
@@ -78,7 +78,7 @@ class CommonArea(State):
 
 
     def update_sprites(self, keys):
-        self.enemy_group.update()
+        self.enemy_group.update(self.game_info["current_time"])
         self.player_group.update(keys)
 
 

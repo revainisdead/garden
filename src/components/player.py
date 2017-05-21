@@ -16,8 +16,7 @@ class Player(pg.sprite.Sprite):
         self.rect.y = y
 
         self.direction = c.Direction.UP
-        #self.x_vel = 0
-        #self.y_vel = 0
+        self.walking_speed = 6
 
 
     def set_velocity(self):
@@ -26,25 +25,25 @@ class Player(pg.sprite.Sprite):
         self.y_vel = 0
 
         if self.direction == c.Direction.LEFT:
-            self.x_vel = -2
+            self.x_vel = -self.walking_speed
         elif self.direction == c.Direction.RIGHT:
-            self.x_vel = 2
+            self.x_vel = self.walking_speed
         elif self.direction == c.Direction.UP:
-            self.y_vel = -2
+            self.y_vel = -self.walking_speed
         elif self.direction == c.Direction.DOWN:
-            self.y_vel = 2
+            self.y_vel = self.walking_speed
         elif self.direction == c.Direction.LEFTUP:
-            self.x_vel = -2
-            self.y_vel = -2
+            self.x_vel = -self.walking_speed
+            self.y_vel = -self.walking_speed
         elif self.direction == c.Direction.LEFTDOWN:
-            self.x_vel = -2
-            self.y_vel = 2
+            self.x_vel = -self.walking_speed
+            self.y_vel = self.walking_speed
         elif self.direction == c.Direction.RIGHTUP:
-            self.x_vel = 2
-            self.y_vel = -2
+            self.x_vel = self.walking_speed
+            self.y_vel = -self.walking_speed
         elif self.direction == c.Direction.RIGHTDOWN:
-            self.x_vel = 2
-            self.y_vel = 2
+            self.x_vel = self.walking_speed
+            self.y_vel = self.walking_speed
 
 
     def get_image(self, x, y, width, height):
