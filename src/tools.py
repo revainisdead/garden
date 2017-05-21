@@ -6,10 +6,6 @@ from PIL import Image
 from . import constants as c
 
 
-class InvalidFont(Exception): pass
-class InvalidGFX(Exception): pass
-
-
 class Control:
     def __init__(self, caption):
         self.quit = False
@@ -124,16 +120,21 @@ def convert_png(name_path, convert_to_ext=".bmp"):
         os.unlink(original_name)
 
 
-def load_gfx(path, accept=(".png", ".bmp")):
+def colorize(image, color):
+    image = image.copy()
+    image.fill(color[0:3] + (0,), None, pg.BLEND_RGBA_ADD)
+    return image
+
+
+def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
     """
-    # Loop through images and convert them to bmp if needed
-    for pic in os.listdir(path):
-        pic_path = os.path.join(path, pic)
-        name, ext = os.path.splitext(pic_path)
-        if ext.lower() not in accept:
-            convert_png(pic_path)
+    Load graphics files.
+    This operates on a one folder at a time basis.
+
+    Note: An empty string doesn't count as invalid,
+    since that represents a folder name.
     """
-    colorkey = c.PURPLE # The likelihood of a background being purple is quite low
+    colorkey = c.PURPLE
     graphics = {}
 
     for pic in os.listdir(path):
@@ -146,14 +147,39 @@ def load_gfx(path, accept=(".png", ".bmp")):
             if img.get_alpha():
                 img = img.convert_alpha()
             else:
-                print("Setting color key for {}: {}".format(ext, colorkey))
                 img = img.convert()
                 img.set_colorkey(colorkey)
 
             graphics[name] = img
-
+            if name == "blueSheet":
+                print("Recursive working")
+        elif not ext:
+            pass
         else:
-            raise InvalidGFX("Got unexpected gfx format. {}".format(ext))
+            print("Got unexpected gfx format\n" \
+                    "Path: {}\n" \
+                    "Name: {}\n" \
+                    "Ext: {}\n".format(pic_path, name, ext))
+
+    return graphics
+
+
+def load_gfx(path):
+    """Loads all the files in the graphics folder
+    and also one more folder level deep.
+    Doesn't recurse files deeper than that."""
+    graphics = {}
+
+    for item in os.listdir(path):
+        item_path = os.path.join(path, item)
+        name, ext = os.path.splitext(item)
+
+        # If there is no extension, assume it's a folder.
+        if ext == "":
+            # WARNING: Update can overwrite existing keys
+            graphics.update(recursive_load_gfx(item_path))
+        else:
+            graphics.update(recursive_load_gfx(path))
 
     # sanity check
     if not graphics:
@@ -171,10 +197,14 @@ def load_fonts(path, accept=(".ttf")):
         if ext.lower() in accept:
             fonts[name] = os.path.join(path, font)
         else:
-            raise InvalidFont("Received invalid font. {}".format(font))
+            print("Received invalid font. {}".format(font))
 
     return fonts
 
 
-def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")): pass
 def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")): pass
+
+
+
+def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
+    pass
