@@ -24,5 +24,5 @@ make
     License: CC0
 
 ##### License Links
-CC0 (Public Domain):            http://creativecommons.org/publicdomain/zero/1.0/
-CC-BY 3.0 (Creative Commons):   https://creativecommons.org/licenses/by/3.0/
+    CC0 (Public Domain):            http://creativecommons.org/publicdomain/zero/1.0/
+    CC-BY 3.0 (Creative Commons):   https://creativecommons.org/licenses/by/3.0/
