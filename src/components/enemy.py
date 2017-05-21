@@ -22,15 +22,22 @@ class Glaive(pg.sprite.Sprite):
         self.current_time = 0
         self.exists = True
 
-        self.direction = c.Direction.RIGHT
-        self.max_move_distance = 48
+        self.direction = c.Direction.LEFT
+        self.max_move_distance = 120
         self.running_distance_total = 0
 
+        self.animation_timer = 0
+        self.animation_speed = 80
 
-    def load_sprites_from_sheet():
+
+    def load_sprites_from_sheet(self):
         images = []
         images.append(self.get_image(68, 65, 16, 20))
         images.append(self.get_image(68, 65, 16, 20))
+
+        images.append(self.get_image(32, 67, 21, 17))
+        images.append(self.get_image(54, 63, 12, 24))
+        images.append(self.get_image(8, 69, 24, 12))
         return images
 
 
@@ -42,19 +49,19 @@ class Glaive(pg.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         image.set_colorkey(c.SAPPHIRE)
 
-        size_delta = (int(rect.width*1.5), int(rect.height*1.5))
+        size_delta = (int(rect.width*1.25), int(rect.height*1.25))
         image = pg.transform.scale(image, size_delta)
         return image
 
 
     def set_velocity(self):
         if self.direction == c.Direction.LEFT:
-            move = -12
+            move = -10
         elif self.direction == c.Direction.RIGHT:
-            move = 12
+            move = 10
 
         self.running_distance_total += move
-        if not running_distance_total > self.max_move_distance:
+        if not self.running_distance_total > self.max_move_distance:
             self.rect.x += move
         else:
             # Drawing is based on groups, if we remove the sprite
@@ -64,6 +71,7 @@ class Glaive(pg.sprite.Sprite):
 
 
     def handle_state(self):
+        self.set_velocity()
         self.animate_glaive()
 
 
@@ -74,8 +82,21 @@ class Glaive(pg.sprite.Sprite):
             self.handle_state()
 
 
-    def animate_glaive():
-        pass
+    def animate_glaive(self):
+        if self.frame_index == 0:
+            self.frame_index += 1
+
+            # Setting shooting timer for the first time
+            self.shooting_timer = self.current_time
+        else:
+            if self.current_time - self.shooting_timer > self.animation_speed:
+                self.frame_index += 1
+
+                if self.frame_index >= len(self.frames):
+                    self.frame_index = 1
+                self.shooting_timer = self.current_time
+
+        self.image = self.frames[self.frame_index]
 
 
 class Enemy(pg.sprite.Sprite):
@@ -174,24 +195,24 @@ class Enemy(pg.sprite.Sprite):
         self.rect.x += self.x_vel
         self.rect.y += self.y_vel
 
-    def handle_state(self):
+    def handle_state(self, glaive_group):
         # AI States
         # - Dead
         # - Attacking
         # - Etc
 
         # if state == SHOOT:
-        self.animate_shoot()
+        self.animate_shoot(glaive_group)
         self.auto_walk()
 
 
-    def update(self, current_time):
+    def update(self, current_time, glaive_group):
         self.current_time = current_time
 
-        self.handle_state()
+        self.handle_state(glaive_group)
 
 
-    def animate_shoot(self):
+    def animate_shoot(self, glaive_group):
         if self.frame_index == 0:
             self.frame_index += 1
 
@@ -200,10 +221,20 @@ class Enemy(pg.sprite.Sprite):
         else:
             if self.current_time - self.shooting_timer > self.animation_speed:
                 self.frame_index += 1
+
+                # If the image is the shooting image, shoot glaive.
+                if self.frame_index == 4:
+                    self.shoot_glaive(glaive_group)
+
                 if self.frame_index >= len(self.frames):
                     self.frame_index = 1
                 self.shooting_timer = self.current_time
 
         self.image = self.frames[self.frame_index]
+
+
+    def shoot_glaive(self, glaive_group):
+        glaive = Glaive(self.rect.x, self.rect.y + self.rect.height/2)
+        glaive_group.add(glaive)
 
 

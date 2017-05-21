@@ -80,8 +80,8 @@ class CommonArea(State):
 
 
     def update_sprites(self, keys):
-        self.enemy_group.update(self.game_info["current_time"])
-        self.glaive_group.update()
+        self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
+        self.glaive_group.update(self.game_info["current_time"])
 
         self.player_group.update(keys)
 
@@ -90,5 +90,6 @@ class CommonArea(State):
         self.entire_area.blit(self.background, self.viewport, self.viewport)
         self.player_group.draw(self.entire_area)
         self.enemy_group.draw(self.entire_area)
+        self.glaive_group.draw(self.entire_area)
 
         surface.blit(self.entire_area, (0, 0), self.viewport)

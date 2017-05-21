@@ -33,6 +33,7 @@ SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 # Extract colors using: labs.tineye.com/color/
 # (TIP: Uncheck "Exclude background color from extracted colors")
 # Convert hex color to r,g,b using: www.rapidtables.com/convert/color/
+# Sprites: getspritexy.com, spritecow.com
 RED =       (255, 0, 0)
 GREEN =     (0, 255, 0)
 BLUE =      (0, 0, 255)
