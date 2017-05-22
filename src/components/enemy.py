@@ -27,18 +27,17 @@ class Glaive(pg.sprite.Sprite):
         self.running_distance_total = 0
 
         self.animation_timer = 0
-        self.animation_speed = 80
+        self.animation_speed = 65
 
 
     def load_sprites_from_sheet(self):
-        images = []
-        images.append(self.get_image(68, 65, 16, 20))
-        images.append(self.get_image(68, 65, 16, 20))
-
-        images.append(self.get_image(32, 67, 21, 17))
-        images.append(self.get_image(54, 63, 12, 24))
-        images.append(self.get_image(8, 69, 24, 12))
-        return images
+        frames = []
+        frames.append(self.get_image(68, 65, 16, 20))
+        frames.append(self.get_image(68, 65, 16, 20))
+        frames.append(self.get_image(32, 67, 21, 17))
+        frames.append(self.get_image(54, 63, 12, 24))
+        frames.append(self.get_image(8, 69, 24, 12))
+        return frames
 
 
     def get_image(self, x, y, width, height):
@@ -49,7 +48,7 @@ class Glaive(pg.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         image.set_colorkey(c.SAPPHIRE)
 
-        size_delta = (int(rect.width*1.25), int(rect.height*1.25))
+        size_delta = (int(rect.width*c.PROJECTILE_MULT), int(rect.height*c.PROJECTILE_MULT))
         image = pg.transform.scale(image, size_delta)
         return image
 
@@ -175,7 +174,7 @@ class Enemy(pg.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         image.set_colorkey(c.SAPPHIRE)
 
-        size_delta = (int(rect.width*1.5), int(rect.height*1.5))
+        size_delta = (int(rect.width*c.ENEMY_MULT), int(rect.height*c.ENEMY_MULT))
         image = pg.transform.scale(image, size_delta)
         return image
 

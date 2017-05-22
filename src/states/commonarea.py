@@ -62,7 +62,6 @@ class CommonArea(State):
 
     def update(self, surface, keys, current_time):
         """Update the state every frame"""
-        self.surface = surface
         self.game_info["current_time"] = current_time
 
         self.update_sprites(keys)

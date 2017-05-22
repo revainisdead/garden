@@ -13,12 +13,7 @@ class MainMenu(State):
         super().__init__()
         self.startup()
 
-        self.options = {
-            "play": 0,
-            "load_game": 0,
-            "exit": 0,
-        }
-
+        self.options = ["play", "load_game", "exit"]
         self.selection = "play"
 
 
@@ -36,21 +31,20 @@ class MainMenu(State):
         size_delta = (int(self.background_rect.width*c.BACKGROUND_MULT), int(self.background_rect.height*c.BACKGROUND_MULT))
         self.background = pg.transform.scale(self.background, size_delta)
 
-        self.entire_area = pg.Surface((self.background_rect.width, self.background_rect.height)).convert()
-        self.entire_area_rect = self.entire_area.get_rect()
+        #self.entire_area = pg.Surface((self.background_rect.width, self.background_rect.height)).convert()
+        #self.entire_area_rect = self.entire_area.get_rect()
 
         self.viewport = setup.SCREEN.get_rect(bottom=setup.SCREEN_RECT.bottom)
 
 
     def setup_menu(self):
         menu_height = 200
-        menu_separation = 40
-        #selection1 = menu.MenuSelection(self.entire_area_rect.width/2, menu_height, "play")
-        selection1 = menu.MenuSelection(200, 200, "play")
+        menu_separation = 80
+        selection1 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "play")
         menu_height += menu_separation
-        selection2 = menu.MenuSelection(self.entire_area_rect.width/2, menu_height, "load_game")
+        selection2 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "load_game")
         menu_height += menu_separation
-        selection3 = menu.MenuSelection(self.entire_area_rect.width/2, menu_height, "exit")
+        selection3 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "exit")
 
         self.menu_group = pg.sprite.Group(
                 selection1,
@@ -79,9 +73,19 @@ class MainMenu(State):
             elif self.selection == "exit":
                 self.quit = True
         elif keys[binds.keybinds["up"]] or keys[binds.keybinds["arrow_up"]]:
-            pass # Move selection up
+            index = self.options.index(self.selection)
+            if index == 0:
+                pass
+            else:
+                index -= 1
+                self.selection = self.options[index]
         elif keys[binds.keybinds["down"]] or keys[binds.keybinds["arrow_down"]]:
-            pass # Move select down
+            index = self.options.index(self.selection)
+            if index == len(self.options) - 1:
+                pass
+            else:
+                index += 1
+                self.selection = self.options[index]
         elif keys[binds.keybinds["escape"]]:
             self.quit = True
 
@@ -91,5 +95,6 @@ class MainMenu(State):
 
 
     def blit_images(self, surface):
-        surface.blit(self.background, self.viewport, self.viewport)
-        self.menu_group.draw(self.entire_area)
+        surface.blit(self.background, (0, 0), self.viewport)
+
+        self.menu_group.draw(surface)

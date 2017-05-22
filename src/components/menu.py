@@ -8,15 +8,17 @@ class MenuSelection(pg.sprite.Sprite):
     def __init__(self, x, y, name):
         super().__init__()
 
-        self.sprite = setup.GFX["green_button00"]
-        self.sprite_overlay = setup.GFX["green_button13"]
+        self.sprite = setup.GFX["green_button01"]
+        self.sprite_selected = setup.GFX["green_button00"]
 
         self.frames = self.load_sprites_from_sheet()
         self.frame_index = 0
         self.image = self.frames[self.frame_index]
 
         self.rect = self.image.get_rect()
-        self.rect.x = x
+
+        # To center the menu item, take half of the width away from x.
+        self.rect.x = x - self.rect.width/2
         self.rect.y = y
 
         self.name = name
@@ -24,10 +26,10 @@ class MenuSelection(pg.sprite.Sprite):
 
 
     def load_sprites_from_sheet(self):
-        images = []
-        images.append(self.get_image(0, 0, 190, 49, self.sprite))
-        images.append(self.get_image(0, 0, 190, 49, self.sprite_overlay))
-        return images
+        frames = []
+        frames.append(self.get_image(0, 0, 190, 49, self.sprite))
+        frames.append(self.get_image(0, 0, 190, 49, self.sprite_selected))
+        return frames
 
 
     def get_image(self, x, y, width, height, sprite):
@@ -36,7 +38,7 @@ class MenuSelection(pg.sprite.Sprite):
         rect = image.get_rect()
 
         image.blit(sprite, (0, 0), (x, y, width, height))
-        image.set_colorkey(c.SAPPHIRE)
+        image.set_colorkey(c.BLACK)
 
         size_delta = (int(rect.width*c.UI_MULT), int(rect.height*c.UI_MULT))
         image = pg.transform.scale(image, size_delta)
@@ -51,6 +53,8 @@ class MenuSelection(pg.sprite.Sprite):
         if selection == self.name:
             self.selected = True
             frame_index = 1
+            self.image = self.frames[frame_index]
         else:
             self.selected = False
             frame_index = 0
+            self.image = self.frames[frame_index]
