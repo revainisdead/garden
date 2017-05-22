@@ -150,10 +150,8 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
             else:
                 img = img.convert()
                 img.set_colorkey(colorkey)
-
             graphics[name] = img
-            if name == "blueSheet":
-                print("Recursive working")
+
         elif not ext:
             pass
         else:
@@ -195,7 +193,7 @@ def load_fonts(path, accept=(".ttf")):
         name, ext = os.path.splitext(font)
 
         if ext.lower() in accept:
-            fonts[name] = os.path.join(path, font)
+            fonts[name] = pg.font.Font(os.path.join(path, font), c.FONT_SIZE)
         else:
             print("Received invalid font. {}".format(font))
 
@@ -208,7 +206,7 @@ def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")):
         name, ext = os.path.splitext(sound)
 
         if ext.lower() in accept:
-            sounds[name] = os.path.join(path, sound)
+            sounds[name] = pg.mixer.Sound(os.path.join(path, sound))
         else:
             print("Received invalid sound effect. {}".format(sound))
 

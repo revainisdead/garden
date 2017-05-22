@@ -13,7 +13,7 @@ class MainMenu(State):
         super().__init__()
         self.startup()
 
-        self.options = ["play", "load_game", "exit"]
+        self.options = ["play", "load_game", "quit"]
         self.selection = "play"
 
 
@@ -44,7 +44,15 @@ class MainMenu(State):
         menu_height += menu_separation
         selection2 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "load_game")
         menu_height += menu_separation
-        selection3 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "exit")
+        selection3 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "quit")
+
+        # Create a list of the menu sprites, so ensure text gets
+        # drawn after the sprite group gets drawn.
+        self.menu_list = [
+            selection1,
+            selection2,
+            selection3
+        ]
 
         self.menu_group = pg.sprite.Group(
                 selection1,
@@ -70,7 +78,7 @@ class MainMenu(State):
             elif self.selection == "load_game":
                 # Load a saved json file into game_info
                 pass
-            elif self.selection == "exit":
+            elif self.selection == "quit":
                 self.quit = True
         elif keys[binds.keybinds["up"]] or keys[binds.keybinds["arrow_up"]]:
             index = self.options.index(self.selection)
@@ -98,3 +106,6 @@ class MainMenu(State):
         surface.blit(self.background, (0, 0), self.viewport)
 
         self.menu_group.draw(surface)
+
+        for menu_item in self.menu_list:
+            menu_item.render_name(surface)

@@ -7,6 +7,7 @@ from . import constants as c
 
 
 pg.init()
+pg.font.init()
 SCREEN = pg.display.set_mode(c.SCREEN_SIZE)
 SCREEN_RECT = SCREEN.get_rect()
 

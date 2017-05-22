@@ -4,6 +4,13 @@ from .. import constants as c
 from .. import setup
 
 
+labels = {
+    "play": "play",
+    "load_game": "load game",
+    "quit": "quit",
+}
+
+
 class MenuSelection(pg.sprite.Sprite):
     def __init__(self, x, y, name):
         super().__init__()
@@ -58,3 +65,10 @@ class MenuSelection(pg.sprite.Sprite):
             self.selected = False
             frame_index = 0
             self.image = self.frames[frame_index]
+
+    def render_name(self, surface):
+        font = setup.FONTS["kenvector_future"]
+        text = font.render(labels[self.name], True, c.BLACK)
+        #text_rect = text.get_rect(center=(self.rect.x/2, self.rect.y/2))
+        text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
+        surface.blit(text, text_rect)
