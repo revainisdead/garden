@@ -11,15 +11,23 @@ from .. tools import State
 class MainMenu(State):
     def __init__(self):
         super().__init__()
-        self.startup()
+        self.game_info = {
+            "current_time": 0,
+        }
+
+        self.startup(self.game_info)
 
         self.options = ["play", "load_game", "quit"]
         self.selection = "play"
         self.allow_input = True
 
 
-    def startup(self):
-        """Called each time the state is entered"""
+    def startup(self, game_info):
+        """Called each time the state is entered
+
+        Currently takes in game_info so that the main menu can
+        flipped back to from the main game."""
+        self.game_info = game_info
         self.next = self.set_next_state()
         self.setup_background()
         self.setup_menu()

@@ -13,7 +13,6 @@ def main():
     }
 
     control = tools.Control("Garden")
-
     control.setup_states(state_dict, c.MainState.MAINMENU)
     control.game_loop()
 

@@ -11,18 +11,11 @@ from .. tools import State
 class CommonArea(State):
     def __init__(self):
         super().__init__()
-        # XXX Implement only startup when the state is switched to.
-        # Currently startup is called in parent class
-
-        # The first state should call startup itself
-        self.startup()
-
-        self.game_info = {
-            "current_time": 0,
-        }
 
 
-    def startup(self):
+    def startup(self, game_info):
+        self.game_info = game_info
+
         self.setup_background()
         self.setup_enemies()
         self.setup_player()

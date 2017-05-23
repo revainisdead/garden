@@ -68,10 +68,12 @@ class Control:
 
     def flip_state(self):
         previous, self.state_name = self.state_name, self.state.next
+        # Get game_info before setting new state
+        game_info = self.state.dump_game_info()
         self.state = self.state_dict[self.state_name]
 
         # Startup state when switching to it
-        self.state.startup()
+        self.state.startup(game_info)
         print("Main state switched to: {}".format(self.state_name))
 
         self.state.previous = previous
@@ -87,13 +89,18 @@ class State:
 
         self.next = None
         self.previous = None
+        self.game_info = {}
+
+
+    def dump_game_info(self):
+        return self.game_info
 
 
     def startup(self):
         raise NotImplementedError
 
 
-    def update(self, surface, keys, current_time):
+    def update(self):
         raise NotImplementedError
 
 
