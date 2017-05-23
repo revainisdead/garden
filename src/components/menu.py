@@ -67,8 +67,11 @@ class MenuSelection(pg.sprite.Sprite):
             self.image = self.frames[frame_index]
 
     def render_name(self, surface):
-        font = setup.FONTS["kenvector_future"]
-        text = font.render(labels[self.name], True, c.BLACK)
-        #text_rect = text.get_rect(center=(self.rect.x/2, self.rect.y/2))
+        font = setup.FONTS["kenvector_future_thin"]
+        if self.selected:
+            text = font.render(labels[self.name], True, c.WHITE)
+        else:
+            text = font.render(labels[self.name], True, c.BLACK)
+
         text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)

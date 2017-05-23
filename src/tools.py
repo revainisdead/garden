@@ -1,4 +1,5 @@
 import os
+import time
 
 import pygame as pg
 from PIL import Image
@@ -12,7 +13,7 @@ class Control:
 
         self.screen = pg.display.get_surface()
 
-        self.current_time = 0.0
+        self.current_time = 0
         self.fps = 20
         pg.display.set_caption(caption)
         self.clock = pg.time.Clock()
@@ -71,7 +72,7 @@ class Control:
 
         # Startup state when switching to it
         self.state.startup()
-        print("Level state switched to: {}".format(self.state_name))
+        print("Main state switched to: {}".format(self.state_name))
 
         self.state.previous = previous
 

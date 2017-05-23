@@ -15,6 +15,7 @@ class MainMenu(State):
 
         self.options = ["play", "load_game", "quit"]
         self.selection = "play"
+        self.allow_input = True
 
 
     def startup(self):
@@ -72,30 +73,40 @@ class MainMenu(State):
 
 
     def handle_states(self, keys):
-        if keys[binds.keybinds["enter"]]:
-            if self.selection == "play":
-                self.state_done = True
-            elif self.selection == "load_game":
-                # Load a saved json file into game_info
-                pass
-            elif self.selection == "quit":
+        if self.allow_input:
+            if keys[binds.keybinds["enter"]]:
+                if self.selection == "play":
+                    self.state_done = True
+                elif self.selection == "load_game":
+                    # Load a saved json file into game_info
+                    pass
+                elif self.selection == "quit":
+                    self.quit = True
+            elif keys[binds.keybinds["up"]] or keys[binds.keybinds["arrow_up"]]:
+                index = self.options.index(self.selection)
+                if index == 0:
+                    pass # Don't exceed the beginning of the list
+                else:
+                    index -= 1
+                    self.selection = self.options[index]
+                self.allow_input = False
+            elif keys[binds.keybinds["down"]] or keys[binds.keybinds["arrow_down"]]:
+                index = self.options.index(self.selection)
+                if index == len(self.options) - 1:
+                    pass # Don't exceed the end of the list
+                else:
+                    index += 1
+                    self.selection = self.options[index]
+                self.allow_input = False
+            elif keys[binds.keybinds["escape"]]:
                 self.quit = True
-        elif keys[binds.keybinds["up"]] or keys[binds.keybinds["arrow_up"]]:
-            index = self.options.index(self.selection)
-            if index == 0:
-                pass
-            else:
-                index -= 1
-                self.selection = self.options[index]
-        elif keys[binds.keybinds["down"]] or keys[binds.keybinds["arrow_down"]]:
-            index = self.options.index(self.selection)
-            if index == len(self.options) - 1:
-                pass
-            else:
-                index += 1
-                self.selection = self.options[index]
-        elif keys[binds.keybinds["escape"]]:
-            self.quit = True
+
+        if (    not keys[binds.keybinds["up"]] and
+                not keys[binds.keybinds["down"]] and
+                not keys[binds.keybinds["arrow_up"]] and
+                not keys[binds.keybinds["arrow_down"]]):
+            self.allow_input = True
+
 
 
     def update_sprites(self, selection):
