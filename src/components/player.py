@@ -19,6 +19,8 @@ class Player(pg.sprite.Sprite):
         self.direction = c.Direction.UP
         self.walking_speed = 6
 
+        self.set_velocity()
+
 
     def set_velocity(self):
         # Before setting new velocity, reset to 0
