@@ -1,4 +1,4 @@
-.PHONY=all
+.PHONY=all clean
 
 all:
 	python3 -m src.main

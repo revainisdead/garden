@@ -68,7 +68,7 @@ class CommonArea(tools.State):
         pass
 
 
-    def update(self, surface, keys, current_time) -> None:
+    def update(self, surface: pg.Surface, keys: Tuple[int, ...], current_time: float) -> None:
         """Update the state every frame"""
         self.game_info["current_time"] = current_time
 
@@ -77,7 +77,7 @@ class CommonArea(tools.State):
         self.blit_images(surface)
 
 
-    def handle_states(self, keys: Tuple[int]) -> None:
+    def handle_states(self, keys: Tuple[int, ...]) -> None:
         if keys[binds.keybinds["left"]]:
             if keys[binds.keybinds["up"]]:
                 self.direction = c.Direction.LEFTUP
@@ -164,10 +164,11 @@ class CommonArea(tools.State):
             self.camera_x_vel = self.camera_speed
             self.camera_y_vel = self.camera_speed
 
-    def blit_images(self, surface) -> None:
+
+    def blit_images(self, surface: pg.Surface) -> None:
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)
 
-        self.tilemap.update(self.entire_area)
+        self.tilemap.update(self.entire_area, self.camera)
         #self.player_group.draw(self.entire_area)
         self.enemy_group.draw(self.entire_area)
         self.glaive_group.draw(self.entire_area)

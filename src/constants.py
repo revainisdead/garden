@@ -6,6 +6,7 @@ import pygame as pg
 # Debug flags.
 DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
 DEBUG_CAMERA = True
+DEBUG_ENEMY = False
 
 
 class MainState(enum.Enum):
@@ -24,6 +25,7 @@ class Direction(enum.Enum):
     RIGHTDOWN = 7
 
 
+# XXX Unused
 class TimeState(enum.Enum):
     RUNNING = 0
     PAUSED = 1
@@ -44,6 +46,8 @@ BLACK =     (0, 0, 0)
 WHITE =     (255, 255, 255)
 SAPPHIRE =  (5, 35, 94)
 
+
+# Sizes.
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -55,16 +59,19 @@ TILE_SIZE = 64
 
 FONT_SIZE = 22
 
+
 # Multipliers.
 BACKGROUND_MULT = 2.5
 ENEMY_MULT = 1.5
 PROJECTILE_MULT = 1.25
 UI_MULT = 1.15
-TILE_MULT = 1
 
-# Speeds
+
+# Speeds.
 speeds = {
     "player": 10,
-    "enemy": 30,
-    "camera": 100 if DEBUG_CAMERA else 10,
+    "enemy": 2 if not DEBUG_ENEMY else 30,
+    "projectile": 10,
+    "npc": 2,
+    "camera": 10 if not DEBUG_CAMERA else 100,
 }

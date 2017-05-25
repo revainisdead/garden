@@ -4,41 +4,33 @@ import random
 
 import pygame as pg
 
+from . import helpers
+
 from .. import constants as c
 from .. import setup
 
 
 class Tile(pg.sprite.Sprite):
-    def __init__(self, x, y, sprite_name):
+    def __init__(self, x, y, sprite_name) -> None:
         super().__init__()
 
-        self.sprite = setup.GFX[sprite_name]
-        self.image = self.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE)
+        # Private
+        sprite = setup.GFX[sprite_name]
+
+        # Public
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
 
-    def get_image(self, x, y, width, height):
-        image = pg.Surface([width, height]).convert()
-        rect = image.get_rect()
-
-        image.blit(self.sprite, (0, 0), (x, y, width, height))
-        image.set_colorkey(c.BLACK)
-
-        size_delta = (int(rect.width*c.TILE_MULT), int(rect.height*c.TILE_MULT))
-        image = pg.transform.scale(image, size_delta)
-        return image
-
-
 class Map:
-    def __init__(self):
+    def __init__(self) -> None:
         self.tile_names = [
             "grass_tile",
             "dirt_tile",
             "black_brick_tile",
-            "some_water",
-            "small_green_bush",
+            "water_bottom_right_corner_grass",
         ]
 
         width = int(c.MAP_WIDTH / c.TILE_SIZE)
@@ -60,6 +52,8 @@ class Map:
         return tiles
 
 
-    def update(self, surface):
+    def update(self, surface: pg.Surface, camera: pg.Rect) -> None:
+        #tiles = [tile for tile in self.tiles if camera.colliderect(tile))
         for tile in self.tiles:
-            surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
+            if camera.colliderect(tile):
+                surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))

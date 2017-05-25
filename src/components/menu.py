@@ -1,5 +1,7 @@
 import pygame as pg
 
+from . import helpers
+
 from .. import constants as c
 from .. import setup
 
@@ -18,6 +20,8 @@ class MenuSelection(pg.sprite.Sprite):
         self.sprite = setup.GFX["green_button01"]
         self.sprite_selected = setup.GFX["green_button00"]
 
+        self.font = setup.FONTS["kenvector_future_thin"]
+
         self.frames = self.load_sprites_from_sheet()
         self.frame_index = 0
         self.image = self.frames[self.frame_index]
@@ -34,22 +38,9 @@ class MenuSelection(pg.sprite.Sprite):
 
     def load_sprites_from_sheet(self):
         frames = []
-        frames.append(self.get_image(0, 0, 190, 49, self.sprite))
-        frames.append(self.get_image(0, 0, 190, 49, self.sprite_selected))
+        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite, mult=c.UI_MULT))
+        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite_selected, mult=c.UI_MULT))
         return frames
-
-
-    def get_image(self, x, y, width, height, sprite):
-        """Extracts from sprite sheet"""
-        image = pg.Surface([width, height]).convert()
-        rect = image.get_rect()
-
-        image.blit(sprite, (0, 0), (x, y, width, height))
-        image.set_colorkey(c.BLACK)
-
-        size_delta = (int(rect.width*c.UI_MULT), int(rect.height*c.UI_MULT))
-        image = pg.transform.scale(image, size_delta)
-        return image
 
 
     def update(self, selection):
@@ -66,12 +57,12 @@ class MenuSelection(pg.sprite.Sprite):
             frame_index = 0
             self.image = self.frames[frame_index]
 
+
     def render_name(self, surface):
-        font = setup.FONTS["kenvector_future_thin"]
         if self.selected:
-            text = font.render(labels[self.name], True, c.WHITE)
+            text = self.font.render(labels[self.name], True, c.WHITE)
         else:
-            text = font.render(labels[self.name], True, c.BLACK)
+            text = self.font.render(labels[self.name], True, c.BLACK)
 
         text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
