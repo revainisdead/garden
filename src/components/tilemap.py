@@ -1,10 +1,11 @@
-from typing import Set
+from typing import Optional, Set
 
 import random
 
 import pygame as pg
 
 from . import helpers
+from . import scenery
 
 from .. import constants as c
 from .. import setup
@@ -18,6 +19,7 @@ class Tile(pg.sprite.Sprite):
         sprite = setup.GFX[sprite_name]
 
         # Public
+        self.name = sprite_name
         self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -27,11 +29,17 @@ class Tile(pg.sprite.Sprite):
 class Map:
     def __init__(self) -> None:
         self.tile_names = [
-            "grass_tile",
-            "dirt_tile",
-            "black_brick_tile",
+            "grass",
+            "dirt",
+            "black_brick",
             "water_bottom_right_corner_grass",
         ]
+
+        self.bush_names = [
+            "small_green_bush",
+        ]
+
+        self.bush_group = pg.sprite.Group()
 
         width = int(c.MAP_WIDTH / c.TILE_SIZE)
         height = int(c.MAP_HEIGHT / c.TILE_SIZE)
@@ -47,9 +55,34 @@ class Map:
         for y in range(0, height):
             for x in range(0, width):
                 choice = random.randint(0, names_max)
-                tiles.add(Tile(x * c.TILE_SIZE, y * c.TILE_SIZE, self.tile_names[choice]))
+                tile_name = self.tile_names[choice]
+
+                x_pos = x * c.TILE_SIZE
+                y_pos = y * c.TILE_SIZE
+
+                if tile_name == "grass":
+                    bush = self.create_bush(x_pos, y_pos)
+                    if bush:
+                        self.bush_group.add(bush)
+
+                tiles.add(Tile(x_pos, y_pos, tile_name))
 
         return tiles
+
+
+    def create_bush(self, x, y) -> Optional[scenery.Bush]:
+        """
+        Chance to create a bush = 1 / density
+        """
+        density = 9
+        choice = random.randint(0, density)
+        bush_name = self.bush_names[random.randint(0, len(self.bush_names) - 1)]
+        bush = None
+
+        if choice == 0:
+            bush = scenery.Bush(x, y, bush_name)
+
+        return bush
 
 
     def update(self, surface: pg.Surface, camera: pg.Rect) -> None:
@@ -57,3 +90,6 @@ class Map:
         for tile in self.tiles:
             if camera.colliderect(tile):
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
+
+        # Draw scenery after tiles
+        self.bush_group.draw(surface)
