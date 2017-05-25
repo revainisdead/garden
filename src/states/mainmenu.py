@@ -43,7 +43,7 @@ class MainMenu(State):
         #self.entire_area = pg.Surface((self.background_rect.width, self.background_rect.height)).convert()
         #self.entire_area_rect = self.entire_area.get_rect()
 
-        self.viewport = setup.SCREEN.get_rect(bottom=setup.SCREEN_RECT.bottom)
+        self.camera = setup.SCREEN.get_rect(bottom=setup.SCREEN_RECT.bottom)
 
 
     def setup_menu(self):
@@ -122,7 +122,7 @@ class MainMenu(State):
 
 
     def blit_images(self, surface):
-        surface.blit(self.background, (0, 0), self.viewport)
+        surface.blit(self.background, (0, 0), self.camera)
 
         self.menu_group.draw(surface)
 

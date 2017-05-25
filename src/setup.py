@@ -8,7 +8,12 @@ from . import constants as c
 
 pg.init()
 pg.font.init()
-SCREEN = pg.display.set_mode(c.SCREEN_SIZE)
+
+if not c.DEBUG_MAP:
+    SCREEN = pg.display.set_mode(c.SCREEN_SIZE)
+else:
+    SCREEN = pg.display.set_mode(c.MAP_SIZE)
+
 SCREEN_RECT = SCREEN.get_rect()
 
 GFX = tools.load_gfx(os.path.join("data", "graphics"))

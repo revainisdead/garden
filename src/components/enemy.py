@@ -111,7 +111,7 @@ class Enemy(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        self.walking_speed = 4
+        self.walking_speed = c.speeds["enemy"]
         self.direction = c.Direction.UP
         self.set_velocity()
         self.walking_dir_change_interval = 0

@@ -3,6 +3,10 @@ import enum
 import pygame as pg
 
 
+# Debug flags.
+DEBUG_MAP = True
+
+
 class MainState(enum.Enum):
     MAINMENU = 0
     COMMONAREA = 1
@@ -45,6 +49,7 @@ SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 MAP_WIDTH = SCREEN_WIDTH*4
 MAP_HEIGHT = SCREEN_HEIGHT*4
+MAP_SIZE = (MAP_WIDTH, MAP_HEIGHT)
 TILE_SIZE = 64
 
 FONT_SIZE = 22
@@ -55,3 +60,10 @@ ENEMY_MULT = 1.5
 PROJECTILE_MULT = 1.25
 UI_MULT = 1.15
 TILE_MULT = 1
+
+# Speeds
+speeds = {
+    "player": 10,
+    "enemy": 2,
+    "camera": 100 if DEBUG_MAP else 10,
+}

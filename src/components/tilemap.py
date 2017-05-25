@@ -1,3 +1,5 @@
+from typing import Set
+
 import random
 
 import pygame as pg
@@ -31,28 +33,30 @@ class Tile(pg.sprite.Sprite):
 
 class Map:
     def __init__(self):
-        self.width = int(c.MAP_WIDTH / c.TILE_SIZE)
-        self.height = int(c.MAP_HEIGHT / c.TILE_SIZE)
-
         self.tile_names = [
             "grass_tile",
             "dirt_tile",
             "black_brick_tile",
         ]
 
-        self.generate()
+        width = int(c.MAP_WIDTH / c.TILE_SIZE)
+        height = int(c.MAP_HEIGHT / c.TILE_SIZE)
+
+        self.tiles = self.generate(width, height)
+        self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT))
 
 
-    def generate(self):
-        self.tiles = set()
+    def generate(self, width: int, height: int) -> Set[Tile]:
+        tiles = set()
 
         names_max = len(self.tile_names) - 1
-
-        for y in range(0, self.height):
-            for x in range(0, self.width):
+        for y in range(0, height):
+            for x in range(0, width):
                 choice = random.randint(0, names_max)
-                tile = Tile(x * c.TILE_SIZE, y * c.TILE_SIZE, self.tile_names[choice])
-                self.tiles.add(tile)
+                tiles.add(Tile(x * c.TILE_SIZE, y * c.TILE_SIZE, self.tile_names[choice]))
+
+        return tiles
+
 
     def update(self, surface):
         for tile in self.tiles:
