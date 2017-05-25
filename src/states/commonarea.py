@@ -7,12 +7,12 @@ import pygame as pg
 from .. import binds
 from .. import constants as c
 from .. import setup
+from .. import tools
 
 from .. components import enemy, player, tilemap
-from .. tools import State
 
 
-class CommonArea(State):
+class CommonArea(tools.State):
     def __init__(self) -> None:
         super().__init__()
         self.setup_map()
@@ -40,7 +40,10 @@ class CommonArea(State):
 
         #self.camera = setup.SCREEN.get_rect(bottom=self.entire_area_rect.bottom)
         if not c.DEBUG_MAP:
-            self.camera = pg.Rect((MAP_WIDTH/2, MAP_HEIGHT/2), (c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
+            # XXX Can adjust the starting area later.
+            # For now just start the camera at 0, 0
+            #self.camera = pg.Rect((c.MAP_WIDTH/2, c.MAP_HEIGHT/2), (c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
+            self.camera = pg.Rect((0, 0), (c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
         else:
             self.camera = pg.Rect((0, 0), (self.entire_area_rect.w, self.entire_area_rect.h))
 
@@ -48,28 +51,27 @@ class CommonArea(State):
     def setup_enemies(self) -> None:
         enemy1 = enemy.Enemy(300, 300)
         enemy2 = enemy.Enemy(350, 350)
+        enemy3 = enemy.Enemy(500, 500)
+        enemy4 = enemy.Enemy(600, 800)
+        enemy5 = enemy.Enemy(800, 400)
+        enemy6 = enemy.Enemy(400, 800)
 
-        self.enemy_group = pg.sprite.Group(enemy1, enemy2)
+        self.enemy_group = pg.sprite.Group(
+                enemy1, enemy2, enemy3,
+                enemy4, enemy5, enemy6
+                )
 
 
     def setup_player(self) -> None:
-        self.player = player.Player(500, 400)
-
-        self.player_group = pg.sprite.Group(self.player)
+        #self.player = player.Player(500, 400)
+        #self.player_group = pg.sprite.Group(self.player)
+        pass
 
 
     def update(self, surface, keys, current_time) -> None:
-        """Update the state every frame
-        print(self.camera.x)
-        print(self.camera.y)
-        print(self.entire_area.get_width())
-        print(self.entire_area.get_height())
-        print(self.entire_area_rect.w)
-        print(self.entire_area_rect.h)
-        print(self.entire_area_rect.x)
-        print(self.entire_area_rect.y)
-        """
+        """Update the state every frame"""
         self.game_info["current_time"] = current_time
+
         self.update_sprites(keys)
         self.handle_states(keys)
         self.blit_images(surface)
@@ -108,13 +110,32 @@ class CommonArea(State):
         self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
         self.glaive_group.update(self.game_info["current_time"])
 
-        self.player_group.update(keys)
+        #self.player_group.update(keys)
 
 
     def move_camera(self) -> None:
         self.set_camera_velocity()
-        self.camera.x += self.camera_x_vel
-        self.camera.y += self.camera_y_vel
+
+        self.camera = tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
+
+        """
+        new_camera_x = self.camera.x + self.camera_x_vel
+        new_camera_y = self.camera.y + self.camera_y_vel
+
+        if new_camera_x < 0:
+            new_camera_x = 0
+        elif new_camera_x + self.camera.w > self.tilemap_rect.right:
+            new_camera_x = self.camera.x
+        self.camera.x = new_camera_x
+
+        if new_camera_y < 0:
+            new_camera_y = 0
+        elif new_camera_y + self.camera.h > self.tilemap_rect.bottom:
+            # Remember: y is inverted...
+            # The highest point is the tilemap_rect's bottom.
+            new_camera_y = self.camera.y
+        self.camera.y = new_camera_y
+        """
 
 
     def set_camera_velocity(self) -> None:
@@ -147,7 +168,7 @@ class CommonArea(State):
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)
 
         self.tilemap.update(self.entire_area)
-        self.player_group.draw(self.entire_area)
+        #self.player_group.draw(self.entire_area)
         self.enemy_group.draw(self.entire_area)
         self.glaive_group.draw(self.entire_area)
 

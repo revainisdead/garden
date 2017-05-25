@@ -4,6 +4,7 @@ import pygame as pg
 
 from .. import constants as c
 from .. import setup
+from .. import tools
 
 
 class Glaive(pg.sprite.Sprite):
@@ -191,8 +192,10 @@ class Enemy(pg.sprite.Sprite):
                     self.direction = ea
                     self.set_velocity()
 
-        self.rect.x += self.x_vel
-        self.rect.y += self.y_vel
+        self.rect = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+
+        #self.rect.x += self.x_vel
+        #self.rect.y += self.y_vel
 
     def handle_state(self, glaive_group):
         # AI States

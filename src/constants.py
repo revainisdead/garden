@@ -4,7 +4,8 @@ import pygame as pg
 
 
 # Debug flags.
-DEBUG_MAP = True
+DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
+DEBUG_CAMERA = True
 
 
 class MainState(enum.Enum):
@@ -64,6 +65,6 @@ TILE_MULT = 1
 # Speeds
 speeds = {
     "player": 10,
-    "enemy": 2,
-    "camera": 100 if DEBUG_MAP else 10,
+    "enemy": 30,
+    "camera": 100 if DEBUG_CAMERA else 10,
 }

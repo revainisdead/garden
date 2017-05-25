@@ -37,6 +37,8 @@ class Map:
             "grass_tile",
             "dirt_tile",
             "black_brick_tile",
+            "some_water",
+            "small_green_bush",
         ]
 
         width = int(c.MAP_WIDTH / c.TILE_SIZE)

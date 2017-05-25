@@ -223,3 +223,38 @@ def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")):
 
 def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     pass
+
+
+
+def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> pg.Rect:
+    """Universal utility to fix x and y values based on bounds
+
+    Non-default args:
+    :param highest_x: Highest X allowed
+    :param highest_y: Highest Y allowed
+    :param x_vel: X movement speed
+    :param y_vel: Y movement speed
+    :param rect: Rectangle to check bounds for
+
+    Default args:
+    :param lowest_x=0: Lowest X allowed
+    :param lowest_y=0: Lowest Y allowed
+
+    :returns rect: Rectangle with corrected x, y values
+    """
+    new_x = rect.x + x_vel
+    new_y = rect.y + y_vel
+    if new_x < lowest_x:
+        new_x = lowest_x
+    elif new_x + rect.w > highest_x:
+        new_x = rect.x
+
+    if new_y < lowest_y:
+        new_y = lowest_y
+    elif new_y + rect.h > highest_y:
+        # Remember: y is inverted... The highest point is on the bottom.
+        new_y = rect.y
+
+    rect.x = new_x
+    rect.y = new_y
+    return rect
