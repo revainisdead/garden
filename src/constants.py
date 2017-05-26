@@ -75,3 +75,6 @@ speeds = {
     "npc": 2,
     "camera": 10 if not DEBUG_CAMERA else 100,
 }
+
+# Density.
+BUSH_DENSITY = 10
