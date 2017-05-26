@@ -1,4 +1,4 @@
-from typing import Optional, Set
+from typing import Set
 
 import random
 
@@ -65,7 +65,14 @@ class Map:
             "brown_bush",
         ]
 
+        self.tree_name_pairs = [
+            ["small_brown_treebottom", "small_brown_treetop"],
+            ["brown_treebottom", "brown_treetop"],
+        ]
+
+        self.collidables = []
         self.bush_group = pg.sprite.Group()
+        self.tree_group = pg.sprite.Group()
 
         self.width = int(c.MAP_WIDTH / c.TILE_SIZE)
         self.height = int(c.MAP_HEIGHT / c.TILE_SIZE)
@@ -94,13 +101,6 @@ class Map:
         # Virtual point: (1, 1)
         for y in range(self.height):
             for x in range(self.width):
-                # Stop choosing randomly for now
-                #choice = random.randint(0, names_max)
-                #if self.biome == "grass":
-                    #tile_name = self.grass_names[choice]
-                #else:
-                    #tile_name = self.tile_names[choice]
-
                 # Actual position on the map.
                 x_pos = x * c.TILE_SIZE
                 y_pos = y * c.TILE_SIZE
@@ -109,10 +109,18 @@ class Map:
                 tile_name = self.tile_names[grid_point]
 
                 if tile_name in self.grass_names:
-                    bush = self.create_bush(x_pos, y_pos)
-                    if bush:
-                        self.bush_group.add(bush)
+                    # Create a variety of grasses.
+                    tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
+                    created_tree = self.create_tree(x_pos, y_pos)
 
+                    if not created_tree:
+                        # Don't draw bushes under trees.
+                        created_bush = self.create_bush(x_pos, y_pos)
+
+                # If the rect is 1, it should be added to a list
+                # that is parsed to create collidable rects.
+
+                #self.collidables.append
                 tiles.add(Tile(x_pos, y_pos, tile_name))
 
 
@@ -174,26 +182,46 @@ class Map:
         return count
 
 
-    def create_bush(self, x, y) -> Optional[scenery.Bush]:
+    def create_bush(self, x, y) -> bool:
         """
         Chance to create a bush = 1 / density
         """
         density = c.BUSH_DENSITY
         choice = random.randint(1, density)
         bush_name = self.bush_names[random.randint(0, len(self.bush_names) - 1)]
-        bush = None
 
+        created = False
         if choice == 1:
             bush = scenery.Bush(x, y, bush_name)
+            self.bush_group.add(bush)
+            created = True
 
-        return bush
+        return created
 
 
-    def update(self, surface: pg.Surface, camera: pg.Rect) -> None:
-        #tiles = [tile for tile in self.tiles if camera.colliderect(tile))
+    def create_tree(self, x, y) -> bool:
+        """
+        Chance to create a tree = 1 / density
+        """
+        density = c.BUSH_DENSITY
+        choice = random.randint(1, density)
+        tree_names = self.tree_name_pairs[random.randint(0, len(self.tree_name_pairs) - 1)]
+
+        created = False
+        if choice == 1:
+            treebottom = scenery.TreeBottom(x, y, tree_names[0])
+            treetop = scenery.TreeTop(x, y - c.TILE_SIZE, tree_names[1])
+            self.tree_group.add(treebottom, treetop)
+            created = True
+
+        return created
+
+
+    def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
         for tile in self.tiles:
             if camera.colliderect(tile):
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
 
         # Draw scenery after tiles
         self.bush_group.draw(surface)
+        self.tree_group.draw(surface)
