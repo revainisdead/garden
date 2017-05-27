@@ -14,9 +14,17 @@ make
     Author: Lorc
     https://opengameart.org/content/700-rpg-icons
     License: CC-BY 3.0
-##### UI pack
+##### UI Pack
     Author: Kenney.nl
     https://opengameart.org/content/ui-pack
+    License: CC0
+##### RPG Pack
+    Author: Kenney.nl
+    https://opengameart.org/content/rpg-pack-base-set
+    License: CC0
+##### RPG Pack
+    Author: Unknown
+    https://opengameart.org/content/hero-0
     License: CC0
 ##### People
     Author: TokyoGeisha

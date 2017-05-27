@@ -9,7 +9,7 @@ from .. import constants as c
 from .. import setup
 from .. import tools
 
-from .. components import player, tilemap
+from .. components import npc, player, tilemap
 
 
 class CommonArea(tools.State):
@@ -51,9 +51,9 @@ class CommonArea(tools.State):
 
 
     def setup_npcs(self) -> None:
+        npc1 = npc.Npc(150, 150)
 
-
-        self.npc_group = pg.sprite.Group()
+        self.npc_group = pg.sprite.Group(npc1)
 
 
     def setup_enemies(self) -> None:
@@ -119,6 +119,7 @@ class CommonArea(tools.State):
         #self.glaive_group.update(self.game_info["current_time"])
 
         #self.player_group.update(keys)
+        self.npc_group.update(self.game_info["current_time"])
         pass
 
 
