@@ -18,6 +18,23 @@ class Bush(pg.sprite.Sprite):
         self.rect.y = y
 
 
+class TreeShadow(pg.sprite.Sprite):
+    def __init__(self, x, y) -> None:
+        super().__init__()
+        sprite = setup.GFX["tree_shadow"]
+
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        #self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, alpha=True)
+
+        if self.image.get_alpha():
+            # Now check if self.image has alpha values.
+            print("tree shadow alpha: {}".format(self.image.get_alpha()))
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
 class TreeBottom(pg.sprite.Sprite):
     def __init__(self, x, y, sprite_name) -> None:
         super().__init__()

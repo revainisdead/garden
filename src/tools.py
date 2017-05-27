@@ -7,6 +7,11 @@ from PIL import Image
 from . import constants as c
 
 
+per_pixel_alpha_names = [
+    "tree_shadow",
+]
+
+
 class Control:
     def __init__(self, caption):
         self.quit = False
@@ -128,6 +133,7 @@ def convert_png(name_path, convert_to_ext=".bmp"):
         os.unlink(original_name)
 
 
+# XXX Unused
 def colorize(image, color):
     image = image.copy()
     #image.fill((0, 0, 0, 255), None, pg.BLEND_RGBA_MULT)
@@ -153,8 +159,20 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
         if ext.lower() in accept:
             img = pg.image.load(pic_path)
 
+            #if name in per_pixel_alpha_names:
             if img.get_alpha():
-                img = img.convert_alpha()
+                if name == "tree_shadow":
+                    print("unconverted tree shadow alpha: {}".format(img.get_alpha()))
+                if name == "small_orange_treebottom":
+                    print("unconverted tree bottom alpha: {}".format(img.get_alpha()))
+                #img = img.convert_alpha()
+                img.convert_alpha()
+
+                # Debug.
+                if name == "tree_shadow":
+                    print("converted tree shadow alpha: {}".format(img.get_alpha()))
+                if name == "small_orange_treebottom":
+                    print("converted tree bottom alpha: {}".format(img.get_alpha()))
             else:
                 img = img.convert()
                 img.set_colorkey(colorkey)

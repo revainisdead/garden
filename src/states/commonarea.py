@@ -36,6 +36,7 @@ class CommonArea(tools.State):
         self.tilemap = tilemap.Map()
         self.tilemap_rect = self.tilemap.map_surface.get_rect()
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
+        #self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height))
         self.entire_area_rect = self.entire_area.get_rect()
 
         #self.camera = setup.SCREEN.get_rect(bottom=self.entire_area_rect.bottom)

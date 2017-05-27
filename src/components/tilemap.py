@@ -73,6 +73,7 @@ class Map:
         self.collidables = []
         self.bush_group = pg.sprite.Group()
         self.tree_group = pg.sprite.Group()
+        self.tree_shadow_group = pg.sprite.Group()
 
         self.width = int(c.MAP_WIDTH / c.TILE_SIZE)
         self.height = int(c.MAP_HEIGHT / c.TILE_SIZE)
@@ -83,7 +84,7 @@ class Map:
         self.birth_limit = 3
 
         self.tiles = self.generate()
-        self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT))
+        self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT)).convert()
 
 
     def generate(self) -> Set[Tile]:
@@ -170,7 +171,7 @@ class Map:
                 try:
                     test_point = self.grid[neighbor_x][neighbor_y]
                 except IndexError:
-                    test_point = 0
+                    test_point = 1
 
                 if i == 0 and j == 0:
                     pass
@@ -212,9 +213,16 @@ class Map:
             treebottom = scenery.TreeBottom(x, y, tree_names[0])
             treetop = scenery.TreeTop(x, y - c.TILE_SIZE, tree_names[1])
             self.tree_group.add(treebottom, treetop)
+
+            treeshadow = scenery.TreeShadow(x, y + 9)
+            self.tree_shadow_group.add(treeshadow)
+
             created = True
 
         return created
+
+
+    #def create_house(self, x, y):
 
 
     def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
@@ -225,3 +233,6 @@ class Map:
         # Draw scenery after tiles
         self.bush_group.draw(surface)
         self.tree_group.draw(surface)
+
+        # Draw tree shadows on top of the tree base.
+        self.tree_shadow_group.draw(surface)
