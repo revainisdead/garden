@@ -9,7 +9,7 @@ from .. import constants as c
 from .. import setup
 from .. import tools
 
-from .. components import enemy, player, tilemap
+from .. components import player, tilemap
 
 
 class CommonArea(tools.State):
@@ -21,9 +21,10 @@ class CommonArea(tools.State):
     def startup(self, game_info: Dict[str, Any]) -> None:
         self.game_info = game_info
 
-        self.setup_enemies()
+        #self.setup_enemies()
+        self.setup_npcs()
         self.setup_player()
-        self.glaive_group = pg.sprite.Group()
+        #self.glaive_group = pg.sprite.Group()
 
         self.state = c.MainState.COMMONAREA
 
@@ -49,18 +50,24 @@ class CommonArea(tools.State):
             self.camera = pg.Rect((0, 0), (self.entire_area_rect.w, self.entire_area_rect.h))
 
 
-    def setup_enemies(self) -> None:
-        enemy1 = enemy.Enemy(300, 300)
-        enemy2 = enemy.Enemy(350, 350)
-        enemy3 = enemy.Enemy(500, 500)
-        enemy4 = enemy.Enemy(600, 800)
-        enemy5 = enemy.Enemy(800, 400)
-        enemy6 = enemy.Enemy(400, 800)
+    def setup_npcs(self) -> None:
 
-        self.enemy_group = pg.sprite.Group(
-                enemy1, enemy2, enemy3,
-                enemy4, enemy5, enemy6
-                )
+
+        self.npc_group = pg.sprite.Group()
+
+
+    def setup_enemies(self) -> None:
+        #enemy1 = enemy.Enemy(300, 300)
+        #enemy2 = enemy.Enemy(350, 350)
+        #enemy3 = enemy.Enemy(500, 500)
+        #enemy4 = enemy.Enemy(600, 800)
+        #enemy5 = enemy.Enemy(800, 400)
+        #enemy6 = enemy.Enemy(400, 800)
+        #self.enemy_group = pg.sprite.Group(
+                #enemy1, enemy2, enemy3,
+                #enemy4, enemy5, enemy6
+                #)
+        pass
 
 
     def setup_player(self) -> None:
@@ -108,10 +115,11 @@ class CommonArea(tools.State):
 
 
     def update_sprites(self, keys: Tuple[int]) -> None:
-        self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
-        self.glaive_group.update(self.game_info["current_time"])
+        #self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
+        #self.glaive_group.update(self.game_info["current_time"])
 
         #self.player_group.update(keys)
+        pass
 
 
     def move_camera(self) -> None:
@@ -171,7 +179,8 @@ class CommonArea(tools.State):
 
         self.tilemap.update(self.entire_area, self.camera)
         #self.player_group.draw(self.entire_area)
-        self.enemy_group.draw(self.entire_area)
-        self.glaive_group.draw(self.entire_area)
+        #self.enemy_group.draw(self.entire_area)
+        self.npc_group.draw(self.entire_area)
+        #self.glaive_group.draw(self.entire_area)
 
         surface.blit(self.entire_area, (0, 0), self.camera)

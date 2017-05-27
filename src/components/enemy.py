@@ -37,11 +37,11 @@ class Glaive(pg.sprite.Sprite):
 
     def load_sprites_from_sheet(self) -> List[pg.Surface]:
         frames = []
-        frames.append(helpers.get_image(68, 65, 16, 20, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.SAPPHIRE))
-        frames.append(helpers.get_image(68, 65, 16, 20, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.SAPPHIRE))
-        frames.append(helpers.get_image(32, 67, 21, 17, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.SAPPHIRE))
-        frames.append(helpers.get_image(54, 63, 12, 24, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.SAPPHIRE))
-        frames.append(helpers.get_image(8, 69, 24, 12, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.SAPPHIRE))
+        frames.append(helpers.get_image(68, 65, 16, 20, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.PURPLE, transparent=False))
+        frames.append(helpers.get_image(68, 65, 16, 20, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.PURPLE, transparent=False))
+        frames.append(helpers.get_image(32, 67, 21, 17, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.PURPLE, transparent=False))
+        frames.append(helpers.get_image(54, 63, 12, 24, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.PURPLE, transparent=False))
+        frames.append(helpers.get_image(8, 69, 24, 12, self.sprite_sheet, c.PROJECTILE_MULT, colorkey=c.PURPLE, transparent=False))
         return frames
 
 

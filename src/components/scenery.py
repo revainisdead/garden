@@ -24,11 +24,6 @@ class TreeShadow(pg.sprite.Sprite):
         sprite = setup.GFX["tree_shadow"]
 
         self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
-        #self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, alpha=True)
-
-        if self.image.get_alpha():
-            # Now check if self.image has alpha values.
-            print("tree shadow alpha: {}".format(self.image.get_alpha()))
 
         self.rect = self.image.get_rect()
         self.rect.x = x

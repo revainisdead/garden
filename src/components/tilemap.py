@@ -68,20 +68,23 @@ class Map:
         self.tree_name_pairs = [
             ["small_brown_treebottom", "small_brown_treetop"],
             ["brown_treebottom", "brown_treetop"],
+            ["small_green_treebottom", "small_green_treetop"],
+            ["green_treebottom", "green_treetop"],
         ]
 
         self.collidables = []
         self.bush_group = pg.sprite.Group()
-        self.tree_group = pg.sprite.Group()
+        self.tree_bottom_group = pg.sprite.Group()
+        self.tree_top_group = pg.sprite.Group()
         self.tree_shadow_group = pg.sprite.Group()
 
         self.width = int(c.MAP_WIDTH / c.TILE_SIZE)
         self.height = int(c.MAP_HEIGHT / c.TILE_SIZE)
 
         # cellular automata values
-        self.num_sim_steps = 2
-        self.death_limit = 2
-        self.birth_limit = 3
+        self.num_sim_steps = 4
+        self.death_limit = 4
+        self.birth_limit = 6
 
         self.tiles = self.generate()
         self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT)).convert()
@@ -91,8 +94,8 @@ class Map:
         tiles = set()
 
         # Initialize grid with random values.
-        # 40% chance a 1 will occur.
-        self.grid = [[1 if random.randint(0, 4) == 0 else 0 for y in range(self.height)] for x in range(self.width)]
+        # 60% chance a 1 will occur.
+        self.grid = [[0 if random.randint(0, 4) == 0 else 1 for y in range(self.height)] for x in range(self.width)]
 
         for _ in range(self.num_sim_steps):
             self.simulation_step()
@@ -118,12 +121,12 @@ class Map:
                         # Don't draw bushes under trees.
                         created_bush = self.create_bush(x_pos, y_pos)
 
-                # If the rect is 1, it should be added to a list
-                # that is parsed to create collidable rects.
 
-                #self.collidables.append
-                tiles.add(Tile(x_pos, y_pos, tile_name))
+                tile = Tile(x_pos, y_pos, tile_name)
+                tiles.add(tile)
 
+                if grid_point == 1:
+                    self.collidables.append(tile.rect)
 
         return tiles
 
@@ -147,9 +150,9 @@ class Map:
                 if self.grid[x][y]: # Living cell
                     if neighbors < self.death_limit:
                         new_grid[x][y] = 0
-                    elif neighbors == 2 or neighbors == 3:
+                    elif neighbors == self.death_limit or neighbors == self.birth_limit:
                         new_grid[x][y] = 1
-                    elif neighbors > 3:
+                    elif neighbors > self.birth_limit:
                         new_grid[x][y] = 0
                 else: # Dead cell
                     if neighbors > self.birth_limit:
@@ -210,12 +213,13 @@ class Map:
 
         created = False
         if choice == 1:
-            treebottom = scenery.TreeBottom(x, y, tree_names[0])
-            treetop = scenery.TreeTop(x, y - c.TILE_SIZE, tree_names[1])
-            self.tree_group.add(treebottom, treetop)
+            tree_bottom = scenery.TreeBottom(x, y, tree_names[0])
+            tree_top = scenery.TreeTop(x, y - c.TILE_SIZE, tree_names[1])
+            self.tree_bottom_group.add(tree_bottom)
+            self.tree_top_group.add(tree_top)
 
-            treeshadow = scenery.TreeShadow(x, y + 9)
-            self.tree_shadow_group.add(treeshadow)
+            tree_shadow = scenery.TreeShadow(x, y + c.TREE_SHADOW_OFFSET)
+            self.tree_shadow_group.add(tree_shadow)
 
             created = True
 
@@ -225,6 +229,12 @@ class Map:
     #def create_house(self, x, y):
 
 
+    def create_collidables(self):
+        for rect in self.collidables:
+            # check rect bounds
+            pass
+
+
     def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
         for tile in self.tiles:
             if camera.colliderect(tile):
@@ -232,7 +242,10 @@ class Map:
 
         # Draw scenery after tiles
         self.bush_group.draw(surface)
-        self.tree_group.draw(surface)
 
-        # Draw tree shadows on top of the tree base.
+        # Draw tree shadows under the tree base.
         self.tree_shadow_group.draw(surface)
+
+        # Ensure tree tops are drawn last, they should cover tree bottoms.
+        self.tree_bottom_group.draw(surface)
+        self.tree_top_group.draw(surface)

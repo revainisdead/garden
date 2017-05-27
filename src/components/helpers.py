@@ -13,14 +13,14 @@ def get_image(
         sprite_sheet: pg.Surface,
         mult: float=1,
         colorkey: Tuple[int, int, int]=c.BLACK,
-        alpha: bool=False) -> pg.Surface:
+        transparent: bool=True) -> pg.Surface:
     """Extracts from the sprite sheet, or just the sprite."""
-    if alpha:
-        image = pg.Surface([width, height]).convert_alpha()
-    else:
-        #image = pg.Surface([width, height]).convert()
-        #image.set_colorkey(colorkey)
+    if transparent:
+        # For images without transparency in them
         image = pg.Surface([width, height], pg.SRCALPHA, 32)
+    else:
+        image = pg.Surface([width, height]).convert()
+        image.set_colorkey(colorkey)
 
     rect = image.get_rect()
 

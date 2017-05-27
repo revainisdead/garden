@@ -78,3 +78,6 @@ speeds = {
 
 # Density.
 BUSH_DENSITY = 10
+
+# Offsets.
+TREE_SHADOW_OFFSET = 9
