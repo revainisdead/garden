@@ -1,14 +1,16 @@
-from typing import Set
+from typing import List, Set
 
 import random
 
 import pygame as pg
 
-from . import helpers
-from . import scenery
+from . import helpers, scenery, util
 
 from .. import constants as c
 from .. import setup
+
+
+#all_tile_names
 
 
 class Tile(pg.sprite.Sprite):
@@ -74,12 +76,16 @@ class Map:
 
         self.collidables = []
         self.bush_group = pg.sprite.Group()
+
         self.tree_bottom_group = pg.sprite.Group()
         self.tree_top_group = pg.sprite.Group()
         self.tree_shadow_group = pg.sprite.Group()
 
-        self.width = int(c.MAP_WIDTH / c.TILE_SIZE)
-        self.height = int(c.MAP_HEIGHT / c.TILE_SIZE)
+        self.fence_link_group = pg.sprite.Group()
+        self.fence_end_group = pg.sprite.Group()
+
+        self.width = c.GRID_WIDTH
+        self.height = c.GRID_HEIGHT
 
         # cellular automata values
         self.num_sim_steps = 4
@@ -103,29 +109,33 @@ class Map:
         # x and y here represent the virtual values of the map.
         # Real point: (64, 64)
         # Virtual point: (1, 1)
-        for y in range(self.height):
-            for x in range(self.width):
-                # Actual position on the map.
-                x_pos = x * c.TILE_SIZE
-                y_pos = y * c.TILE_SIZE
+        for gridy in range(self.height):
+            for gridx in range(self.width):
+                x_pos = gridx * c.TILE_SIZE
+                y_pos = gridy * c.TILE_SIZE
 
-                grid_point = self.grid[x][y]
+                grid_point = self.grid[gridx][gridy]
+                solid_grid_point = grid_point == 1
                 tile_name = self.tile_names[grid_point]
 
                 if tile_name in self.grass_names:
                     # Create a variety of grasses.
                     tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
+                    created_bush = False
                     created_tree = self.create_tree(x_pos, y_pos)
+                    created_fence = False
 
                     if not created_tree:
                         # Don't draw bushes under trees.
                         created_bush = self.create_bush(x_pos, y_pos)
 
+                        if not created_bush:
+                            created_fence = self.create_fence(x_pos, y_pos, gridx, gridy)
 
                 tile = Tile(x_pos, y_pos, tile_name)
                 tiles.add(tile)
 
-                if grid_point == 1:
+                if solid_grid_point or created_fence or created_tree:
                     self.collidables.append(tile.rect)
 
         return tiles
@@ -137,16 +147,15 @@ class Map:
 
         for y in range(self.height):
             for x in range(self.width):
-        #for x, row in enumerate(self.grid):
-            #for y, _ in enumerate(row):
-
                 neighbors = self.count_alive_neighbors(x, y)
 
                 # Cell rules.
-                # Living cell has less than 2 living neighbors: dies.
-                # Living cell has 2 or 3 living neighbors: lives.
-                # Living cell has more than 3 living neighbors: dies.
-                # Dead cell has exactly 3 living neighbors: lives.
+                # DL - Death limit
+                # BL - Birth limit
+                # Living cell has less than DL living neighbors: dies.
+                # Living cell has DL or BL living neighbors: lives.
+                # Living cell has more than BL living neighbors: dies.
+                # Dead cell has exactly BL living neighbors: lives.
                 if self.grid[x][y]: # Living cell
                     if neighbors < self.death_limit:
                         new_grid[x][y] = 0
@@ -188,15 +197,15 @@ class Map:
 
     def create_bush(self, x, y) -> bool:
         """
-        Chance to create a bush = 1 / density
+        Chance to create the object = 1 / density
         """
         density = c.BUSH_DENSITY
         choice = random.randint(1, density)
-        bush_name = self.bush_names[random.randint(0, len(self.bush_names) - 1)]
+        name = self.bush_names[random.randint(0, len(self.bush_names) - 1)]
 
         created = False
         if choice == 1:
-            bush = scenery.Bush(x, y, bush_name)
+            bush = scenery.Bush(x, y, name)
             self.bush_group.add(bush)
             created = True
 
@@ -205,16 +214,16 @@ class Map:
 
     def create_tree(self, x, y) -> bool:
         """
-        Chance to create a tree = 1 / density
+        Chance to create the object = 1 / density
         """
-        density = c.BUSH_DENSITY
+        density = c.TREE_DENSITY
         choice = random.randint(1, density)
-        tree_names = self.tree_name_pairs[random.randint(0, len(self.tree_name_pairs) - 1)]
+        names = self.tree_name_pairs[random.randint(0, len(self.tree_name_pairs) - 1)]
 
         created = False
         if choice == 1:
-            tree_bottom = scenery.TreeBottom(x, y, tree_names[0])
-            tree_top = scenery.TreeTop(x, y - c.TILE_SIZE, tree_names[1])
+            tree_bottom = scenery.TreeBottom(x, y, names[0])
+            tree_top = scenery.TreeTop(x, y - c.TILE_SIZE, names[1])
             self.tree_bottom_group.add(tree_bottom)
             self.tree_top_group.add(tree_top)
 
@@ -226,13 +235,59 @@ class Map:
         return created
 
 
+    def create_fence(self, x: int, y: int, gridx: int, gridy: int) -> bool:
+        """
+        Chance to create the object = 1 / density
+
+        :param x: Real x location
+        :param y: Real y location
+        :param gridx: Grid x location
+        :param gridy: Grid y location
+        """
+        density = c.FENCE_DENSITY
+        choice = random.randint(1, density)
+
+        created = False
+        if choice == 1:
+            num_links = random.randint(0, c.MAX_FENCE_LENGTH)
+
+            for fence_index in range(num_links):
+                gridx += 1
+                x += c.TILE_SIZE
+                try:
+                    current_point = self.grid[gridx][gridy]
+                    next_point = self.grid[gridx + 1][gridy]
+                except IndexError:
+                    break
+
+                if (current_point == 0 and next_point == 1) or fence_index == num_links - 1:
+                    # Current point is good but the next one is solid,
+                    # assume the fence ends here.
+                    fence_end = scenery.FenceEnd(x, y)
+                    self.fence_end_group.add(fence_end)
+                    created = True
+                    break
+                elif current_point == 0 and next_point == 0:
+                    # Current point and the next right point is available.
+                    fence_link = scenery.FenceLink(x, y)
+                    self.fence_link_group.add(fence_link)
+                    created = True
+                elif current_point > 1:
+                    break
+
+        return created
+
+
     #def create_house(self, x, y):
 
 
-    def create_collidables(self):
+    def create_collidables(self) -> List[util.Collidable]:
+        collidables = []
+
         for rect in self.collidables:
-            # check rect bounds
-            pass
+            collidable = util.Collidable(rect.x, rect.y)
+            collidables.append(collidable)
+        return collidables
 
 
     def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
@@ -245,7 +300,10 @@ class Map:
 
         # Draw tree shadows under the tree base.
         self.tree_shadow_group.draw(surface)
+        self.tree_bottom_group.draw(surface)
+
+        self.fence_link_group.draw(surface)
+        self.fence_end_group.draw(surface)
 
         # Ensure tree tops are drawn last, they should cover tree bottoms.
-        self.tree_bottom_group.draw(surface)
-        self.tree_top_group.draw(surface)
+        # Let state draw tree tops, so that they can be drawn over npcs.

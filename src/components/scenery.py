@@ -35,6 +35,7 @@ class TreeBottom(pg.sprite.Sprite):
         super().__init__()
         sprite = setup.GFX[sprite_name]
 
+
         self.name = sprite_name
         self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
         self.rect = self.image.get_rect()
@@ -53,25 +54,38 @@ class TreeTop(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+        # If treetop is harvested, kill it's shadow
+        # If treetop is harvested, how to know whether to draw it? Need public method to see if it needs to be drawn
 
-class FenceLinkVertical(pg.sprite.Sprite):
-    def __init__(self, x, y, sprite_name) -> None:
+
+    def update(self) -> None:
+        self.handle_state()
+
+
+    def handle_state(self) -> None:
+        if self.state == c.CropState.HARVESTED:
+            # Track time and regrow
+            pass
+        else:
+            pass
+
+
+class FenceLink(pg.sprite.Sprite):
+    def __init__(self, x, y) -> None:
         super().__init__()
-        sprite = setup.GFX[sprite_name]
+        sprite = setup.GFX["fence_link"]
 
-        self.name = sprite_name
         self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
 
-class FenceLinkHorizontal(pg.sprite.Sprite):
-    def __init__(self, x, y, sprite_name) -> None:
+class FenceEnd(pg.sprite.Sprite):
+    def __init__(self, x, y) -> None:
         super().__init__()
-        sprite = setup.GFX[sprite_name]
+        sprite = setup.GFX["fence_end"]
 
-        self.name = sprite_name
         self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
         self.rect = self.image.get_rect()
         self.rect.x = x

@@ -1,6 +1,7 @@
 from typing import Any, Dict, Tuple
 
 import time
+import random
 
 import pygame as pg
 
@@ -9,7 +10,7 @@ from .. import constants as c
 from .. import setup
 from .. import tools
 
-from .. components import npc, player, tilemap
+from .. components import non_player_controlled, player, tilemap
 
 
 class CommonArea(tools.State):
@@ -22,19 +23,20 @@ class CommonArea(tools.State):
         self.game_info = game_info
 
         #self.setup_enemies()
-        self.setup_npcs()
+        self.npc_group = self.setup_npcs()
         self.setup_player()
         #self.glaive_group = pg.sprite.Group()
 
         self.state = c.MainState.COMMONAREA
 
-        self.direction = c.Direction.UP
+        self.direction = c.Direction.DOWN
         self.camera_speed = c.speeds["camera"]
         self.set_camera_velocity()
 
 
     def setup_map(self) -> None:
         self.tilemap = tilemap.Map()
+        self.collidables = self.tilemap.create_collidables()
         self.tilemap_rect = self.tilemap.map_surface.get_rect()
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
         #self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height))
@@ -50,10 +52,28 @@ class CommonArea(tools.State):
             self.camera = pg.Rect((0, 0), (self.entire_area_rect.w, self.entire_area_rect.h))
 
 
-    def setup_npcs(self) -> None:
-        npc1 = npc.Npc(150, 150)
+    def setup_npcs(self) -> pg.sprite.Group:
+        npcs = [] # type: List[non_player_controlled.Npc]
+        npc_group = pg.sprite.Group()
 
-        self.npc_group = pg.sprite.Group(npc1)
+        random_npcs_limit = 5
+        random_npcs_count = 0
+
+        grid = self.tilemap.grid
+        while True:
+            x = random.randint(0, c.GRID_WIDTH - 1)
+            y = random.randint(0, c.GRID_HEIGHT - 1)
+
+            if grid[x][y] == 0:
+                # Found an empty spot to place an npc
+                npcs.append(non_player_controlled.Npc(x * c.TILE_SIZE, y * c.TILE_SIZE))
+                random_npcs_count += 1
+                if random_npcs_count > random_npcs_limit:
+                    break
+
+        for npc in npcs:
+            npc_group.add(npc)
+        return npc_group
 
 
     def setup_enemies(self) -> None:
@@ -119,14 +139,13 @@ class CommonArea(tools.State):
         #self.glaive_group.update(self.game_info["current_time"])
 
         #self.player_group.update(keys)
-        self.npc_group.update(self.game_info["current_time"])
-        pass
+        self.npc_group.update(self.game_info["current_time"], self.collidables)
 
 
     def move_camera(self) -> None:
         self.set_camera_velocity()
 
-        self.camera = tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
+        _ = tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
 
         """
         new_camera_x = self.camera.x + self.camera_x_vel
@@ -182,6 +201,10 @@ class CommonArea(tools.State):
         #self.player_group.draw(self.entire_area)
         #self.enemy_group.draw(self.entire_area)
         self.npc_group.draw(self.entire_area)
+
+        # Put things here that should be drawn over npcs
+        self.tilemap.tree_top_group.draw(self.entire_area)
+
         #self.glaive_group.draw(self.entire_area)
 
         surface.blit(self.entire_area, (0, 0), self.camera)

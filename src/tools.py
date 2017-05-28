@@ -8,6 +8,8 @@ from PIL import Image
 
 from . import constants as c
 
+from . components import util
+
 
 per_pixel_alpha_names = [
     "tree_shadow",
@@ -245,29 +247,29 @@ def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     pass
 
 
-
-def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> Tuple[pg.Rect, bool]:
+def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0, collidables: util.Collidable=[]) -> bool:
     """Universal utility to fix x and y values based on bounds
 
     Non-default args:
+    :param rect: Rectangle to check bounds for
     :param highest_x: Highest X allowed
     :param highest_y: Highest Y allowed
     :param x_vel: X movement speed
     :param y_vel: Y movement speed
-    :param rect: Rectangle to check bounds for
 
     Default args:
     :param lowest_x=0: Lowest X allowed
     :param lowest_y=0: Lowest Y allowed
+    :param collidables: Rectangles that can't be moved through
 
     Returns Tuple of:
     :returns rect: Rectangle with corrected x, y values
     :returns hit_wall: Whether the end of the map was hit
     """
-    hit_wall = False
-
+    # Capture rect's values as early as possible
     new_x = rect.x + x_vel
     new_y = rect.y + y_vel
+    hit_wall = False
     if new_x < lowest_x:
         hit_wall = True
         new_x = lowest_x
@@ -283,6 +285,22 @@ def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel:
         hit_wall = True
         new_y = rect.y
 
+    for collider in collidables:
+        if collider.rect.colliderect(rect):
+            hit_wall = True
+            # Reset x and y to old values
+            #new_x = new_x - x_vel
+            #new_y = new_y - y_vel
+            if x_vel > 0:
+                rect.right = collider.rect.left
+            elif x_vel < 0:
+                rect.left = collider.rect.right
+
+            if y_vel > 0:
+                rect.bottom = collider.rect.top
+            elif y_vel < 0:
+                rect.top = collider.rect.bottom
+
     rect.x = new_x
     rect.y = new_y
-    return rect, hit_wall
+    return hit_wall

@@ -11,6 +11,7 @@ FPS = 20
 DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
 DEBUG_CAMERA = True
 DEBUG_ENEMY = False
+DEBUG_NPC = True
 
 
 class MainState(enum.Enum):
@@ -28,6 +29,11 @@ class Direction(enum.Enum):
     RIGHTUP = 6
     RIGHTDOWN = 7
     NONE = 8
+
+
+class CropState(enum.Enum):
+    HARVESTED = 0
+    GROWN = 1
 
 
 # XXX Unused
@@ -53,6 +59,8 @@ SAPPHIRE =  (5, 35, 94)
 
 
 # Sizes.
+TILE_SIZE = 64
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -60,7 +68,8 @@ SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 MAP_WIDTH = SCREEN_WIDTH*4
 MAP_HEIGHT = SCREEN_HEIGHT*4
 MAP_SIZE = (MAP_WIDTH, MAP_HEIGHT)
-TILE_SIZE = 64
+GRID_WIDTH = int(MAP_WIDTH / TILE_SIZE)
+GRID_HEIGHT = int(MAP_HEIGHT / TILE_SIZE)
 
 FONT_SIZE = 22
 
@@ -78,13 +87,19 @@ speeds = {
     "player": 10,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
-    "npc_roaming": 1.5,
+    "npc_roaming": 1.5 if not DEBUG_NPC else 10,
     "npc_running": 5,
     "camera": 10 if not DEBUG_CAMERA else 100,
 }
 
+
 # Density.
 BUSH_DENSITY = 10
+FENCE_DENSITY = 40
+TREE_DENSITY = 8
+
+MAX_FENCE_LENGTH = 5
+
 
 # Offsets.
 TREE_SHADOW_OFFSET = 9

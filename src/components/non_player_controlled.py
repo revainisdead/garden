@@ -4,7 +4,7 @@ import random
 
 import pygame as pg
 
-from . import helpers
+from . import helpers, util
 
 from .. import constants as c
 from .. import setup
@@ -144,13 +144,13 @@ class Npc(pg.sprite.Sprite):
         direction_choice = directions[direction_index]
         if ran_into_wall and direction_choice == self.previous_direction:
             # When we run into a wall, go left.
-            # Based on ability to always complete a maze if always going left,
+            # Based on ability to always complete a maze if always going left
             direction_choice = c.Direction.LEFT
 
         return direction_choice
 
 
-    def auto_walk(self) -> None:
+    def auto_walk(self, collidables: List[util.Collidable]) -> None:
         if self.walking_dir_change_interval is None:
             if self.direction == c.Direction.NONE:
                 self.walking_dir_change_interval = self.standing_still_interval
@@ -162,28 +162,24 @@ class Npc(pg.sprite.Sprite):
         if self.walking_dir_change_counter == self.walking_dir_change_interval:
             self.direction = self.pick_new_direction()
 
-        old_rect = self.rect
-        self.rect, hit_wall = tools.fix_bounds(rect=old_rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        #old_rect = self.rect
+        hit_wall = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
 
-        # If the rect's x and y are the same as they were before
-        # but the direction is not NONE, then the bounds were fixed.
-        # We can use this to not let the npc not continually run into things.
-        #if old_rect.x == self.rect.x and old_rect.y == self.rect.y and self.direction != c.Direction.NONE:
         if hit_wall:
             self.direction = self.pick_new_direction(ran_into_wall=True)
 
         self.set_velocity()
 
 
-    def handle_state(self) -> None:
+    def handle_state(self, collidables: List[util.Collidable]) -> None:
         self.animate_walk()
-        self.auto_walk()
+        self.auto_walk(collidables)
 
 
-    def update(self, current_time: float) -> None:
+    def update(self, current_time: float, collidables: List[util.Collidable]) -> None:
         self.current_time = current_time
 
-        self.handle_state()
+        self.handle_state(collidables)
 
 
     def animate_walk(self) -> None:
