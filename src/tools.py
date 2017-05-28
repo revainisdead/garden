@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import os
 import time
 
@@ -19,7 +21,7 @@ class Control:
         self.screen = pg.display.get_surface()
 
         self.current_time = 0
-        self.fps = 20
+        self.fps = c.FPS
         pg.display.set_caption(caption)
         self.clock = pg.time.Clock()
 
@@ -244,7 +246,7 @@ def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
 
 
 
-def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> pg.Rect:
+def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> Tuple[pg.Rect, bool]:
     """Universal utility to fix x and y values based on bounds
 
     Non-default args:
@@ -258,21 +260,29 @@ def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel:
     :param lowest_x=0: Lowest X allowed
     :param lowest_y=0: Lowest Y allowed
 
+    Returns Tuple of:
     :returns rect: Rectangle with corrected x, y values
+    :returns hit_wall: Whether the end of the map was hit
     """
+    hit_wall = False
+
     new_x = rect.x + x_vel
     new_y = rect.y + y_vel
     if new_x < lowest_x:
+        hit_wall = True
         new_x = lowest_x
     elif new_x + rect.w > highest_x:
+        hit_wall = True
         new_x = rect.x
 
     if new_y < lowest_y:
+        hit_wall = True
         new_y = lowest_y
     elif new_y + rect.h > highest_y:
         # Remember: y is inverted... The highest point is on the bottom.
+        hit_wall = True
         new_y = rect.y
 
     rect.x = new_x
     rect.y = new_y
-    return rect
+    return rect, hit_wall

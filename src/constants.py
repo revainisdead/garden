@@ -3,6 +3,10 @@ import enum
 import pygame as pg
 
 
+# Frames per second.
+FPS = 20
+
+
 # Debug flags.
 DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
 DEBUG_CAMERA = True
@@ -23,6 +27,7 @@ class Direction(enum.Enum):
     LEFTDOWN = 5
     RIGHTUP = 6
     RIGHTDOWN = 7
+    NONE = 8
 
 
 # XXX Unused
@@ -73,7 +78,8 @@ speeds = {
     "player": 10,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
-    "npc": 2,
+    "npc_roaming": 1.5,
+    "npc_running": 5,
     "camera": 10 if not DEBUG_CAMERA else 100,
 }
 
