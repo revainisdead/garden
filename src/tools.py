@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 import os
 import time
@@ -247,7 +247,7 @@ def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     pass
 
 
-def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0, collidables: util.Collidable=[]) -> bool:
+def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> bool:
     """Universal utility to fix x and y values based on bounds
 
     Non-default args:
@@ -266,7 +266,6 @@ def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel:
     :returns rect: Rectangle with corrected x, y values
     :returns hit_wall: Whether the end of the map was hit
     """
-    # Capture rect's values as early as possible
     new_x = rect.x + x_vel
     new_y = rect.y + y_vel
     hit_wall = False
@@ -285,22 +284,30 @@ def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel:
         hit_wall = True
         new_y = rect.y
 
-    for collider in collidables:
-        if collider.rect.colliderect(rect):
-            hit_wall = True
-            # Reset x and y to old values
-            #new_x = new_x - x_vel
-            #new_y = new_y - y_vel
-            if x_vel > 0:
-                rect.right = collider.rect.left
-            elif x_vel < 0:
-                rect.left = collider.rect.right
-
-            if y_vel > 0:
-                rect.bottom = collider.rect.top
-            elif y_vel < 0:
-                rect.top = collider.rect.bottom
-
     rect.x = new_x
     rect.y = new_y
+    return hit_wall
+
+
+def test_collide(rect: pg.Rect, x_vel: int, y_vel: int, collidables: List[util.Collidable]) -> bool:
+    """Test for the rect's collision into collidables and fix bounds."""
+    # Rewrite collidables to only contain rects that are collided with.
+    collidables = [collider for collider in collidables if collider.rect.colliderect(rect)]
+
+    hit_wall = False
+    for collider in collidables:
+        if collider.rect.colliderect(rect):
+            if x_vel > 0:
+                rect.right = collider.rect.left
+                hit_wall = True
+            elif x_vel < 0:
+                rect.left = collider.rect.right
+                hit_wall = True
+            if y_vel > 0:
+                rect.bottom = collider.rect.top
+                hit_wall = True
+            elif y_vel < 0:
+                rect.top = collider.rect.bottom
+                hit_wall = True
+
     return hit_wall

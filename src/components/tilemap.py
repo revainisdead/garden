@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Set, Tuple
 
 import random
 
@@ -33,12 +33,31 @@ class Map:
         self.tile_names = [
             "grass", # 0, Starting value for grid
             "black_brick", # 1, Fill in cell value
-            "water_bottom_right_corner_grass",
-            "dirt",
+            "dirt", # XXX How to use dirt?
         ]
 
         # Test a grass biome
         biome = "island"
+
+        self.water_choices = {
+            c.Direction.UP: "water_top_grass",
+            c.Direction.DOWN: "water_bottom_grass",
+            c.Direction.LEFT: "water_left_grass",
+            c.Direction.RIGHT: "water_right_grass",
+            c.Direction.LEFTUP: "water_top_left_grass",
+            c.Direction.LEFTDOWN: "water_bottom_left_grass",
+            c.Direction.RIGHTUP: "water_top_right_grass",
+            c.Direction.RIGHTDOWN: "water_bottom_right_grass",
+            c.Direction.NONE: "water",
+        }
+
+        # Ex. Left Up means top left corner is grass.
+        self.water_corners = {
+            c.Direction.LEFTUP: "water_top_left_corner_grass",
+            c.Direction.LEFTDOWN: "water_bottom_left_corner_grass",
+            c.Direction.RIGHTUP: "water_top_right_corner_grass",
+            c.Direction.RIGHTDOWN: "water_bottom_right_corner_grass",
+        }
 
         # Position 0 = default
         # Position 1 = fill
@@ -92,13 +111,13 @@ class Map:
         self.death_limit = 4
         self.birth_limit = 6
 
-        self.tiles = self.generate()
+        self.generate_grid()
+        self.tiles = self.create_tiles()
+
         self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT)).convert()
 
 
-    def generate(self) -> Set[Tile]:
-        tiles = set()
-
+    def generate_grid(self) -> Set[Tile]:
         # Initialize grid with random values.
         # 60% chance a 1 will occur.
         self.grid = [[0 if random.randint(0, 4) == 0 else 1 for y in range(self.height)] for x in range(self.width)]
@@ -106,6 +125,18 @@ class Map:
         for _ in range(self.num_sim_steps):
             self.simulation_step()
 
+
+    def create_tiles(self) -> Set[Tile]:
+        """Grid must be created before running this method.
+
+        Calculate tile sprite's based surroundings:
+            If a tile is surrounded by solid points:
+                Is full water image.
+            If a tile has only water to it's left:
+                Water and left grass image.
+            Etc.
+        """
+        tiles = set()
         # x and y here represent the virtual values of the map.
         # Real point: (64, 64)
         # Virtual point: (1, 1)
@@ -118,12 +149,28 @@ class Map:
                 solid_grid_point = grid_point == 1
                 tile_name = self.tile_names[grid_point]
 
-                if tile_name in self.grass_names:
+                created_bush = False
+                created_tree = False
+                created_fence = False
+
+
+                # Select names based on biome.
+
+                if solid_grid_point:
+                    # XXX Unfinished smoother water tiles...
+                    #tile_name, finished = self.retry_swapped(gridx, gridy)
+                    #if finished:
+                        #solid_grid_point = False
+                    #tile_name, swapped = self.solid_tilename_calculation(gridx, gridy)
+                    #if swapped:
+                        #solid_grid_point = False
+                    tile_name = self.tile_names[1]
+
+                else:
                     # Create a variety of grasses.
                     tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
-                    created_bush = False
+
                     created_tree = self.create_tree(x_pos, y_pos)
-                    created_fence = False
 
                     if not created_tree:
                         # Don't draw bushes under trees.
@@ -139,6 +186,89 @@ class Map:
                     self.collidables.append(tile.rect)
 
         return tiles
+
+
+    def retry_swapped(self, x: int, y:int) -> Tuple[str, bool]:
+        while True:
+            tile_name, swapped = self.solid_tilename_calculation(x, y)
+            if not swapped:
+                return tile_name, swapped
+
+
+    def solid_tilename_calculation(self, x: int, y: int) -> Tuple[str, bool]:
+        """Choose a solid tilename based on surroundings.
+
+        :returns Tuple: tilename, swapped
+        :returns tilename: Tilename
+        :returns swapped: If the tile was swapped from solid (1) to empty (0)
+        """
+        swapped = False
+
+        num_directions = 8
+        zeros = [0 for _ in range(0, num_directions)]
+        up, down, left, right, upleft, upright, downleft, downright = zeros
+        try:
+            up = self.grid[x][y-1]      # Tile above.
+            down = self.grid[x][y+1]    # Tile below.
+            right = self.grid[x+1][y]   # Tile to the right.
+            left = self.grid[x-1][y]    # Tile to the left.
+            leftup = self.grid[x-1][y-1]
+            rightup = self.grid[x][y+1]
+            leftdown = self.grid[x+1][y]
+            rightdown = self.grid[x-1][y]
+        except IndexError:
+            pass
+
+
+        if up and down and left and left:
+            # Four sides are covered
+            # Check corner cases first, literally.
+            if leftup and rightup and leftdown and not rightdown:
+                tilename = self.water_corners[c.Direction.RIGHTDOWN]
+            if leftup and rightup and not leftdown and rightdown:
+                tilename = self.water_corners[c.Direction.LEFTDOWN]
+            if leftup and not rightup and leftdown and rightdown:
+                tilename = self.water_corners[c.Direction.RIGHTUP]
+            if not leftup and rightup and leftdown and rightdown:
+                tilename = self.water_corners[c.Direction.LEFTUP]
+            else:
+                tilename = self.water_choices[c.Direction.NONE]
+
+        elif down and left and right and not up:
+            tilename = self.water_choices[c.Direction.UP]
+        elif up and left and right and not down:
+            tilename = self.water_choices[c.Direction.DOWN]
+        elif up and down and right and not left:
+            tilename = self.water_choices[c.Direction.LEFT]
+        elif up and down and left and not right:
+            # XXX Case broken???
+            tilename = self.water_choices[c.Direction.RIGHT]
+        # 2 water side tiles
+        elif not right and not up and left and down:
+            tilename = self.water_choices[c.Direction.RIGHTUP]
+        elif not left and not up and right and down:
+            tilename = self.water_choices[c.Direction.LEFTUP]
+        elif not right and not down and left and up:
+            tilename = self.water_choices[c.Direction.RIGHTDOWN]
+        elif not left and not down and right and up:
+            tilename = self.water_choices[c.Direction.LEFTDOWN]
+        else:
+            # GENIUS! If a water is by itself, change it to grass!
+            self.grid[x][y] = 0 # Set grid position to empty.
+            tilename = self.grass_names[0]
+            swapped = True
+
+            #tilename = self.water_choices[c.Direction.NONE]
+
+        return tilename, swapped
+
+
+    def create_farm_biome(self):
+        pass
+
+
+    def create_cave_biome(self):
+        pass
 
 
     def simulation_step(self):
@@ -183,13 +313,13 @@ class Map:
                 try:
                     test_point = self.grid[neighbor_x][neighbor_y]
                 except IndexError:
-                    test_point = 1
+                    test_point = 0
 
                 if i == 0 and j == 0:
                     pass
                 elif neighbor_x < 0 or neighbor_y < 0 or neighbor_x >= self.width or neighbor_y >= self.height:
                     count += 1
-                elif test_point:
+                elif test_point > 0:
                     count += 1
 
         return count
@@ -249,7 +379,7 @@ class Map:
 
         created = False
         if choice == 1:
-            num_links = random.randint(0, c.MAX_FENCE_LENGTH)
+            num_links = random.randint(c.MIN_FENCE_LENGTH, c.MAX_FENCE_LENGTH)
 
             for fence_index in range(num_links):
                 gridx += 1

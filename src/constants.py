@@ -4,14 +4,14 @@ import pygame as pg
 
 
 # Frames per second.
-FPS = 20
+FPS = 40
 
 
 # Debug flags.
 DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
 DEBUG_CAMERA = True
 DEBUG_ENEMY = False
-DEBUG_NPC = True
+DEBUG_NPC = False
 
 
 class MainState(enum.Enum):
@@ -81,16 +81,22 @@ PROJECTILE_MULT = 1.25
 UI_MULT = 1.15
 NPC_MULT = 0.25
 
+# Full size(1) for tile_size = 64
+# Half size(0.5)  for tile_size = 32
+TILE_MULT = TILE_SIZE / 64
+
 
 # Speeds.
 speeds = {
     "player": 10,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
-    "npc_roaming": 1.5 if not DEBUG_NPC else 10,
+    "npc_roaming": 2 if not DEBUG_NPC else 10,
     "npc_running": 5,
-    "camera": 10 if not DEBUG_CAMERA else 100,
+    "camera": 5 if not DEBUG_CAMERA else 100,
 }
+# Running: also change animation speed.
+# And change sprite state.
 
 
 # Density.
@@ -98,6 +104,7 @@ BUSH_DENSITY = 10
 FENCE_DENSITY = 40
 TREE_DENSITY = 8
 
+MIN_FENCE_LENGTH = 2
 MAX_FENCE_LENGTH = 5
 
 

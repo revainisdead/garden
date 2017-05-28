@@ -12,7 +12,7 @@ class Bush(pg.sprite.Sprite):
         sprite = setup.GFX[sprite_name]
 
         self.name = sprite_name
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -23,7 +23,7 @@ class TreeShadow(pg.sprite.Sprite):
         super().__init__()
         sprite = setup.GFX["tree_shadow"]
 
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -37,7 +37,7 @@ class TreeBottom(pg.sprite.Sprite):
 
 
         self.name = sprite_name
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -49,7 +49,7 @@ class TreeTop(pg.sprite.Sprite):
         sprite = setup.GFX[sprite_name]
 
         self.name = sprite_name
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, c.TILE_MULT)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -75,7 +75,7 @@ class FenceLink(pg.sprite.Sprite):
         super().__init__()
         sprite = setup.GFX["fence_link"]
 
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -86,7 +86,7 @@ class FenceEnd(pg.sprite.Sprite):
         super().__init__()
         sprite = setup.GFX["fence_end"]
 
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite)
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

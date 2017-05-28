@@ -19,6 +19,13 @@ directions = [
     c.Direction.NONE,
 ]
 
+opposite_directions = {
+    c.Direction.UP: c.Direction.DOWN,
+    c.Direction.DOWN: c.Direction.UP,
+    c.Direction.LEFT: c.Direction.RIGHT,
+    c.Direction.RIGHT: c.Direction.LEFT,
+}
+
 
 class Npc(pg.sprite.Sprite):
     def __init__(self, x, y) -> None:
@@ -50,8 +57,12 @@ class Npc(pg.sprite.Sprite):
 
         self.walking_dir_change_counter = 0
         self.walking_dir_change_interval = None
-        self.standing_still_interval = 40
         self.standing_still_direction_index = 4 # Index for c.Direction.NONE in direction
+
+        # Affect standing still frequency.
+        self.standing_still_interval = 20
+        # For every one added, double the standing still chance.
+        self.increase_standing_still_chance = len(directions) + 1
 
         self.current_time = 0
         self.walking_timer = 0
@@ -127,8 +138,7 @@ class Npc(pg.sprite.Sprite):
 
     def pick_new_direction(self, ran_into_wall: bool=False) -> c.Direction:
         # Make c.Direction.NONE Much more likely to happen.
-        increase_standing_still_chance = 7
-        direction_chance = random.randint(0, increase_standing_still_chance)
+        direction_chance = random.randint(0, self.increase_standing_still_chance)
 
         if direction_chance > len(directions) - 1:
             direction_index = self.standing_still_direction_index
@@ -145,7 +155,8 @@ class Npc(pg.sprite.Sprite):
         if ran_into_wall and direction_choice == self.previous_direction:
             # When we run into a wall, go left.
             # Based on ability to always complete a maze if always going left
-            direction_choice = c.Direction.LEFT
+            if direction_choice is not c.Direction.NONE:
+                direction_choice = opposite_directions[direction_choice]
 
         return direction_choice
 
@@ -162,8 +173,9 @@ class Npc(pg.sprite.Sprite):
         if self.walking_dir_change_counter == self.walking_dir_change_interval:
             self.direction = self.pick_new_direction()
 
-        #old_rect = self.rect
-        hit_wall = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
+        _ = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+
+        hit_wall = tools.test_collide(rect=self.rect, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
 
         if hit_wall:
             self.direction = self.pick_new_direction(ran_into_wall=True)
@@ -191,7 +203,7 @@ class Npc(pg.sprite.Sprite):
         if self.frame_index == 0:
             self.frame_index += 1
 
-            # Setting shooting timer for the first time
+            # Setting timer for the first time
             self.walking_timer = self.current_time
         elif self.direction == c.Direction.NONE:
             # Select standing still images.
@@ -203,17 +215,8 @@ class Npc(pg.sprite.Sprite):
             if self.current_time - self.walking_timer > self.animation_speed:
                 self.frame_index += 1
 
-                # If the image is the shooting image, shoot glaive.
-                #if self.frame_index == 4:
-                    #self.shoot_glaive(glaive_group)
-
                 if self.frame_index >= len(self.current_frames):
                     self.frame_index = 1
                 self.walking_timer = self.current_time
 
         self.image = self.current_frames[self.frame_index]
-
-
-    #def shoot_glaive(self, glaive_group: pg.sprite.Group) -> None:
-        #glaive = Glaive(self.rect.x, self.rect.y + self.rect.height/2)
-        #glaive_group.add(glaive)
