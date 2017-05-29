@@ -4,7 +4,7 @@ from .. import constants as c
 from .. import binds
 from .. import setup
 
-from .. components import menu
+from .. components import user_interface
 from .. tools import State
 
 
@@ -49,11 +49,11 @@ class MainMenu(State):
     def setup_menu(self):
         menu_height = 200
         menu_separation = 80
-        selection1 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "play")
+        selection1 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "play")
         menu_height += menu_separation
-        selection2 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "load_game")
+        selection2 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "load_game")
         menu_height += menu_separation
-        selection3 = menu.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "quit")
+        selection3 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "quit")
 
         # Create a list of the menu sprites, so ensure text gets
         # drawn after the sprite group gets drawn.

@@ -208,3 +208,11 @@ class CommonArea(tools.State):
         #self.glaive_group.draw(self.entire_area)
 
         surface.blit(self.entire_area, (0, 0), self.camera)
+
+        # Draw UI over everything else.
+        self.draw_ui(self.entire_area)
+
+
+    def draw_ui(self, surface):
+        # Draw icon
+        pass

@@ -174,8 +174,6 @@ class Map:
                         if swapped:
                             solid_grid_point = False
 
-                        #tile_name = self.tile_names[1]
-
                     else:
                         # Create a variety of grasses.
                         tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
