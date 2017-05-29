@@ -90,3 +90,14 @@ class FenceEnd(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+class WaterCornerCut(pg.sprite.Sprite):
+    def __init__(self, x, y) -> None:
+        super().__init__()
+        sprite = setup.GFX["water_top_left_corner_grass"]
+
+        self.image = helpers.get_image(0, 0, c.CORNER_SIZE, c.CORNER_SIZE, sprite, mult=c.TILE_MULT)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y

@@ -37,7 +37,7 @@ class Map:
         ]
 
         # Test a grass biome
-        biome = "island"
+        self.biome = "island"
 
         self.water_choices = {
             c.Direction.UP: "water_top_grass",
@@ -61,12 +61,12 @@ class Map:
 
         # Position 0 = default
         # Position 1 = fill
-        if biome == "island":
+        if self.biome == "island":
             self.tile_names = [
                 "grass",
                 "water",
             ]
-        elif biome == "cave":
+        elif self.biome == "cave":
             self.tile_names = [
                 "black_brick",
                 "gray_brick",
@@ -99,6 +99,7 @@ class Map:
         self.tree_bottom_group = pg.sprite.Group()
         self.tree_top_group = pg.sprite.Group()
         self.tree_shadow_group = pg.sprite.Group()
+        self.water_corner_cut_group = pg.sprite.Group()
 
         self.fence_link_group = pg.sprite.Group()
         self.fence_end_group = pg.sprite.Group()
@@ -125,6 +126,16 @@ class Map:
         for _ in range(self.num_sim_steps):
             self.simulation_step()
 
+        if self.biome == "island":
+            num_check_swaps = 3
+            for _ in range(num_check_swaps):
+                # Do a check for swaps before actually creating tiles.
+                for gridy in range(self.height):
+                    for gridx in range(self.width):
+                        _, swapped = self.solid_tilename_calculation(gridx, gridy, False)
+        else:
+            pass
+
 
     def create_tiles(self) -> Set[Tile]:
         """Grid must be created before running this method.
@@ -137,6 +148,7 @@ class Map:
             Etc.
         """
         tiles = set()
+        #tiles = {}
         # x and y here represent the virtual values of the map.
         # Real point: (64, 64)
         # Virtual point: (1, 1)
@@ -156,34 +168,43 @@ class Map:
 
                 # Select names based on biome.
 
-                if solid_grid_point:
-                    # XXX Unfinished smoother water tiles...
-                    #tile_name, finished = self.retry_swapped(gridx, gridy)
-                    #if finished:
-                        #solid_grid_point = False
-                    #tile_name, swapped = self.solid_tilename_calculation(gridx, gridy)
-                    #if swapped:
-                        #solid_grid_point = False
-                    tile_name = self.tile_names[1]
+                if self.biome == "island":
+                    if solid_grid_point:
+                        tile_name, swapped = self.solid_tilename_calculation(gridx, gridy, True)
+                        if swapped:
+                            solid_grid_point = False
 
-                else:
-                    # Create a variety of grasses.
-                    tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
+                        #tile_name = self.tile_names[1]
 
-                    created_tree = self.create_tree(x_pos, y_pos)
+                    else:
+                        # Create a variety of grasses.
+                        tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
 
-                    if not created_tree:
-                        # Don't draw bushes under trees.
-                        created_bush = self.create_bush(x_pos, y_pos)
+                        created_tree = self.create_tree(x_pos, y_pos)
 
-                        if not created_bush:
-                            created_fence = self.create_fence(x_pos, y_pos, gridx, gridy)
+                        if not created_tree:
+                            # Don't draw bushes under trees.
+                            created_bush = self.create_bush(x_pos, y_pos)
 
-                tile = Tile(x_pos, y_pos, tile_name)
-                tiles.add(tile)
+                            if not created_bush:
+                                created_fence = self.create_fence(x_pos, y_pos, gridx, gridy)
 
-                if solid_grid_point or created_fence or created_tree:
-                    self.collidables.append(tile.rect)
+                    tile = Tile(x_pos, y_pos, tile_name)
+                    tiles.add(tile) # Tile as set.
+
+                    #point = (gridx, gridy)
+                    #tiles[point] = tile
+
+                    if solid_grid_point or created_fence or created_tree:
+                        self.collidables.append(tile.rect)
+                elif self.biome == "cave":
+                    tile_names = self.tile_names[grid_point]
+
+                    tile = Tile(x_pos, y_pos, tile_name)
+                    tiles.add(tile) # Tile as set.
+
+                    if solid_grid_point or created_fence or created_tree:
+                        self.collidables.append(tile.rect)
 
         return tiles
 
@@ -195,70 +216,96 @@ class Map:
                 return tile_name, swapped
 
 
-    def solid_tilename_calculation(self, x: int, y: int) -> Tuple[str, bool]:
+    def solid_tilename_calculation(self, x: int, y: int, create_corner_cuts: bool) -> Tuple[str, bool]:
         """Choose a solid tilename based on surroundings.
 
         :returns Tuple: tilename, swapped
         :returns tilename: Tilename
         :returns swapped: If the tile was swapped from solid (1) to empty (0)
         """
-        swapped = False
-
         num_directions = 8
-        zeros = [0 for _ in range(0, num_directions)]
-        up, down, left, right, upleft, upright, downleft, downright = zeros
+        init_ones = [0 for _ in range(0, num_directions)]
+        up, down, left, right, leftup, rightup, leftdown, rightdown = init_ones
         try:
             up = self.grid[x][y-1]      # Tile above.
             down = self.grid[x][y+1]    # Tile below.
             right = self.grid[x+1][y]   # Tile to the right.
             left = self.grid[x-1][y]    # Tile to the left.
             leftup = self.grid[x-1][y-1]
-            rightup = self.grid[x][y+1]
-            leftdown = self.grid[x+1][y]
-            rightdown = self.grid[x-1][y]
+            rightup = self.grid[x+1][y-1]
+            leftdown = self.grid[x-1][y+1]
+            rightdown = self.grid[x+1][y+1]
         except IndexError:
             pass
 
-
-        if up and down and left and left:
+        swapped = False
+        tilename = self.water_choices[c.Direction.NONE]
+        #tilename = self.grass_names[0]
+        if up and down and left and right:
             # Four sides are covered
             # Check corner cases first, literally.
-            if leftup and rightup and leftdown and not rightdown:
-                tilename = self.water_corners[c.Direction.RIGHTDOWN]
-            if leftup and rightup and not leftdown and rightdown:
-                tilename = self.water_corners[c.Direction.LEFTDOWN]
-            if leftup and not rightup and leftdown and rightdown:
-                tilename = self.water_corners[c.Direction.RIGHTUP]
-            if not leftup and rightup and leftdown and rightdown:
-                tilename = self.water_corners[c.Direction.LEFTUP]
-            else:
-                tilename = self.water_choices[c.Direction.NONE]
+            if leftup and rightup and leftdown and rightdown:
+                return self.water_choices[c.Direction.NONE], swapped
+            elif leftup and rightup and leftdown and not rightdown:
+                return self.water_corners[c.Direction.RIGHTDOWN], swapped
+            elif leftup and rightup and not leftdown and rightdown:
+                return self.water_corners[c.Direction.LEFTDOWN], swapped
+            elif leftup and not rightup and leftdown and rightdown:
+                return self.water_corners[c.Direction.RIGHTUP], swapped
+            elif not leftup and rightup and leftdown and rightdown:
+                return self.water_corners[c.Direction.LEFTUP], swapped
 
+        # 3 water side tiles
         elif down and left and right and not up:
-            tilename = self.water_choices[c.Direction.UP]
+            return self.water_choices[c.Direction.UP], swapped
         elif up and left and right and not down:
-            tilename = self.water_choices[c.Direction.DOWN]
+            return self.water_choices[c.Direction.DOWN], swapped
         elif up and down and right and not left:
-            tilename = self.water_choices[c.Direction.LEFT]
+            return self.water_choices[c.Direction.LEFT], swapped
         elif up and down and left and not right:
-            # XXX Case broken???
-            tilename = self.water_choices[c.Direction.RIGHT]
+            return self.water_choices[c.Direction.RIGHT], swapped
+
         # 2 water side tiles
         elif not right and not up and left and down:
-            tilename = self.water_choices[c.Direction.RIGHTUP]
+            if create_corner_cuts:
+                if not leftdown:
+                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y * c.TILE_SIZE)
+                    corner.rect.y += (c.TILE_SIZE - c.CORNER_SIZE)
+                    corner.image = pg.transform.flip(corner.image, False, True)
+                    self.water_corner_cut_group.add(corner)
+            return self.water_choices[c.Direction.RIGHTUP], swapped
         elif not left and not up and right and down:
-            tilename = self.water_choices[c.Direction.LEFTUP]
+            if create_corner_cuts:
+                if not rightdown:
+                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y * c.TILE_SIZE)
+                    corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
+                    corner.rect.y += (c.TILE_SIZE - c.CORNER_SIZE)
+                    corner.image = pg.transform.flip(corner.image, True, True)
+                    self.water_corner_cut_group.add(corner)
+            return self.water_choices[c.Direction.LEFTUP], swapped
         elif not right and not down and left and up:
-            tilename = self.water_choices[c.Direction.RIGHTDOWN]
+            if create_corner_cuts:
+                if not leftup:
+                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y * c.TILE_SIZE)
+                    #corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
+                    corner.image = pg.transform.flip(corner.image, False, False)
+                    self.water_corner_cut_group.add(corner)
+            return self.water_choices[c.Direction.RIGHTDOWN], swapped
         elif not left and not down and right and up:
-            tilename = self.water_choices[c.Direction.LEFTDOWN]
+            if create_corner_cuts:
+                if not rightup:
+                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y* c.TILE_SIZE)
+                    corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
+                    corner.image = pg.transform.flip(corner.image, True, False)
+                    self.water_corner_cut_group.add(corner)
+            return self.water_choices[c.Direction.LEFTDOWN], swapped
         else:
             # GENIUS! If a water is by itself, change it to grass!
             self.grid[x][y] = 0 # Set grid position to empty.
-            tilename = self.grass_names[0]
             swapped = True
-
-            #tilename = self.water_choices[c.Direction.NONE]
+            tilename = self.grass_names[0]
+            return tilename, swapped
+            #return self.water_choices[c.Direction.NONE], swapped
 
         return tilename, swapped
 
@@ -421,9 +468,14 @@ class Map:
 
 
     def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
+        # Test tiles as dict
+        #for tile in list(self.tiles.values()):
         for tile in self.tiles:
             if camera.colliderect(tile):
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
+
+        self.water_corner_cut_group.draw(surface)
+        #print(self.water_corner_cut_group.sprites)
 
         # Draw scenery after tiles
         self.bush_group.draw(surface)
