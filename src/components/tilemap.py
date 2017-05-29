@@ -245,7 +245,24 @@ class Map:
             # Four sides are covered
             # Check corner cases first, literally.
             if leftup and rightup and leftdown and rightdown:
+                # All sides are covered.
                 return self.water_choices[c.Direction.NONE], swapped
+
+            # 2 Opposite corners are not solid.
+            elif not leftup and not rightdown:
+                if create_corner_cuts:
+                    # Cover left up corner
+                    self.create_corner(x, y, movex=False, movey=False, flipx=False, flipy=False)
+                    # Cover right down corner
+                    self.create_corner(x, y, movex=True, movey=True, flipx=True, flipy=True)
+            elif not leftdown and not rightup:
+                if create_corner_cuts:
+                    # Cover left down corner
+                    self.create_corner(x, y, movex=False, movey=True, flipx=False, flipy=True)
+                    # Cover right up corner
+                    self.create_corner(x, y, movex=True, movey=False, flipx=True, flipy=False)
+
+            # All four sides are covered, and 1 corner is not.
             elif leftup and rightup and leftdown and not rightdown:
                 return self.water_corners[c.Direction.RIGHTDOWN], swapped
             elif leftup and rightup and not leftdown and rightdown:
@@ -257,31 +274,48 @@ class Map:
 
         # 3 water side tiles
         elif down and left and right and not up:
+            # UP GRASS
+            if create_corner_cuts:
+                if not leftdown:
+                    self.create_corner(x, y, movex=False, movey=True, flipx=False, flipy=True)
+                if not rightdown:
+                    self.create_corner(x, y, movex=True, movey=True, flipx=True, flipy=True)
             return self.water_choices[c.Direction.UP], swapped
         elif up and left and right and not down:
+            # DOWN GRASS
+            if create_corner_cuts:
+                if not leftup:
+                    self.create_corner(x, y, movex=False, movey=False, flipx=False, flipy=False)
+                if not rightup:
+                    self.create_corner(x, y, movex=True, movey=False, flipx=True, flipy=False)
             return self.water_choices[c.Direction.DOWN], swapped
         elif up and down and right and not left:
+            # LEFT GRASS
+            if create_corner_cuts:
+                if not rightdown:
+                    self.create_corner(x, y, movex=True, movey=True, flipx=True, flipy=True)
+                if not rightup:
+                    self.create_corner(x, y, movex=True, movey=False, flipx=True, flipy=False)
             return self.water_choices[c.Direction.LEFT], swapped
         elif up and down and left and not right:
+            # RIGHT GRASS
+            if create_corner_cuts:
+                if not leftdown:
+                    self.create_corner(x, y, movex=False, movey=True, flipx=False, flipy=True)
+                if not leftup:
+                    self.create_corner(x, y, movex=False, movey=False, flipx=False, flipy=False)
             return self.water_choices[c.Direction.RIGHT], swapped
 
         # 2 water side tiles
         elif not right and not up and left and down:
             if create_corner_cuts:
                 if not leftdown:
-                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y * c.TILE_SIZE)
-                    corner.rect.y += (c.TILE_SIZE - c.CORNER_SIZE)
-                    corner.image = pg.transform.flip(corner.image, False, True)
-                    self.water_corner_cut_group.add(corner)
+                    self.create_corner(x, y, movex=False, movey=True, flipx=False, flipy=True)
             return self.water_choices[c.Direction.RIGHTUP], swapped
         elif not left and not up and right and down:
             if create_corner_cuts:
                 if not rightdown:
-                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y * c.TILE_SIZE)
-                    corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
-                    corner.rect.y += (c.TILE_SIZE - c.CORNER_SIZE)
-                    corner.image = pg.transform.flip(corner.image, True, True)
-                    self.water_corner_cut_group.add(corner)
+                    self.create_corner(x, y, movex=True, movey=True, flipx=True, flipy=True)
             return self.water_choices[c.Direction.LEFTUP], swapped
         elif not right and not down and left and up:
             if create_corner_cuts:
@@ -294,10 +328,7 @@ class Map:
         elif not left and not down and right and up:
             if create_corner_cuts:
                 if not rightup:
-                    corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y* c.TILE_SIZE)
-                    corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
-                    corner.image = pg.transform.flip(corner.image, True, False)
-                    self.water_corner_cut_group.add(corner)
+                    self.create_corner(x, y, movex=True, movey=False, flipx=True, flipy=False)
             return self.water_choices[c.Direction.LEFTDOWN], swapped
         else:
             # GENIUS! If a water is by itself, change it to grass!
@@ -305,9 +336,18 @@ class Map:
             swapped = True
             tilename = self.grass_names[0]
             return tilename, swapped
-            #return self.water_choices[c.Direction.NONE], swapped
 
         return tilename, swapped
+
+
+    def create_corner(self, x, y, movex: bool, movey: bool, flipx: bool, flipy: bool):
+        corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y* c.TILE_SIZE)
+        if movex:
+            corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
+        if movey:
+            corner.rect.y += (c.TILE_SIZE - c.CORNER_SIZE)
+        corner.image = pg.transform.flip(corner.image, flipx, flipy)
+        self.water_corner_cut_group.add(corner)
 
 
     def create_farm_biome(self):
