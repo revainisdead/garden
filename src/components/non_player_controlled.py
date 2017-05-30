@@ -173,7 +173,7 @@ class Npc(pg.sprite.Sprite):
         if self.walking_dir_change_counter == self.walking_dir_change_interval:
             self.direction = self.pick_new_direction()
 
-        _ = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
 
         hit_wall = tools.test_collide(rect=self.rect, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
 

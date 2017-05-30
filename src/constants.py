@@ -3,6 +3,8 @@ import enum
 import pygame as pg
 
 
+CAPTION = "Garden"
+
 # Frames per second.
 FPS = 40
 
@@ -80,8 +82,10 @@ FONT_SIZE = 22
 BACKGROUND_MULT = 2.5
 ENEMY_MULT = 1.5
 PROJECTILE_MULT = 1.25
-UI_MULT = 1.15
 NPC_MULT = 0.25
+
+MENU_MULT = 1.15
+BUTTON_UI_MULT = 0.16
 
 # Full size(1) for tile_size = 64
 # Half size(0.5)  for tile_size = 32

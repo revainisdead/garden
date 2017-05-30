@@ -7,13 +7,14 @@ import pygame as pg
 
 from .. import binds
 from .. import constants as c
+from .. import control
 from .. import setup
 from .. import tools
 
-from .. components import non_player_controlled, player, tilemap
+from .. components import non_player_controlled, player, tilemap, user_interface
 
 
-class CommonArea(tools.State):
+class CommonArea(control.State):
     def __init__(self) -> None:
         super().__init__()
         self.setup_map()
@@ -145,26 +146,7 @@ class CommonArea(tools.State):
     def move_camera(self) -> None:
         self.set_camera_velocity()
 
-        _ = tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
-
-        """
-        new_camera_x = self.camera.x + self.camera_x_vel
-        new_camera_y = self.camera.y + self.camera_y_vel
-
-        if new_camera_x < 0:
-            new_camera_x = 0
-        elif new_camera_x + self.camera.w > self.tilemap_rect.right:
-            new_camera_x = self.camera.x
-        self.camera.x = new_camera_x
-
-        if new_camera_y < 0:
-            new_camera_y = 0
-        elif new_camera_y + self.camera.h > self.tilemap_rect.bottom:
-            # Remember: y is inverted...
-            # The highest point is the tilemap_rect's bottom.
-            new_camera_y = self.camera.y
-        self.camera.y = new_camera_y
-        """
+        tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
 
 
     def set_camera_velocity(self) -> None:
@@ -209,10 +191,10 @@ class CommonArea(tools.State):
 
         surface.blit(self.entire_area, (0, 0), self.camera)
 
+
         # Draw UI over everything else.
-        self.draw_ui(self.entire_area)
+        # UI Has to be relative to camera at all times
+        #user_interface.draw_ui(self.entire_area)
 
-
-    def draw_ui(self, surface):
-        # Draw icon
-        pass
+        # Can I just UI on to the screen resolutio?
+        # With a completely new surface?

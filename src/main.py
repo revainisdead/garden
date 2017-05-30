@@ -1,6 +1,6 @@
 from . import constants as c
+from . import control
 from . import setup
-from . import tools
 
 from . states import commonarea
 from . states import mainmenu
@@ -12,11 +12,11 @@ def main():
         c.MainState.COMMONAREA: commonarea.CommonArea(),
     }
 
-    control = tools.Control("Garden")
-    control.setup_states(state_dict, c.MainState.MAINMENU)
-    control.game_loop()
+    game = control.Control(c.CAPTION)
+    game.setup_states(state_dict, c.MainState.MAINMENU)
+    game.setup_game_ui()
 
-
+    game.game_loop()
 
 
 if __name__ == "__main__":

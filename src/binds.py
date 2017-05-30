@@ -16,3 +16,14 @@ keybinds = {
     "arrow_up": pg.K_UP,
     "arrow_down": pg.K_DOWN,
 }
+
+
+# Consider renaming this file to something with input as opposed
+# to keybinds focused, but this file should also handle keybinds.
+class Input:
+    # A class that handles all input and keybinds.
+    #   - Other objects like states and the player, camera, etc.
+    #     should interface with this one, so that that input is streamline
+    #     and not affecting everything in muliple places.
+    def __init__(self):
+        pass

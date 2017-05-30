@@ -1,14 +1,13 @@
 import pygame as pg
 
 from .. import constants as c
+from .. import control
 from .. import binds
 from .. import setup
-
 from .. components import user_interface
-from .. tools import State
 
 
-class MainMenu(State):
+class MainMenu(control.State):
     def __init__(self):
         super().__init__()
         self.game_info = {

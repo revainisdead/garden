@@ -6,7 +6,7 @@ from .. import constants as c
 from .. import setup
 
 
-labels = {
+menu_labels = {
     "play": "play",
     "load_game": "load game",
     "quit": "quit",
@@ -17,8 +17,8 @@ class Button(pg.sprite.Sprite):
     def __init__(self, x, y, name):
         super().__init__()
 
-        self.sprite = setup.GFX["green_button01"]
-        self.sprite_selected = setup.GFX["green_button00"]
+        self.sprite = setup.GFX["wood_axe_icon"]
+        self.sprite_pressed = setup.GFX["wood_axe_icon"]
 
         self.font = setup.FONTS["kenvector_future_thin"]
 
@@ -32,13 +32,13 @@ class Button(pg.sprite.Sprite):
         self.rect.y = y
 
         self.name = name
-        self.selected = False
+        self.pressed = False
 
 
     def load_sprites_from_sheet(self):
         frames = []
-        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite, mult=c.UI_MULT))
-        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite_selected, mult=c.UI_MULT))
+        frames.append(helpers.get_image(0, 0, 400, 400, self.sprite, mult=c.BUTTON_UI_MULT))
+        frames.append(helpers.get_image(0, 0, 400, 400, self.sprite_pressed, mult=c.BUTTON_UI_MULT))
         return frames
 
 
@@ -48,20 +48,20 @@ class Button(pg.sprite.Sprite):
 
     def handle_state(self, selection):
         if selection == self.name:
-            self.selected = True
+            self.pressed = True
             frame_index = 1
             self.image = self.frames[frame_index]
         else:
-            self.selected = False
+            self.pressed = False
             frame_index = 0
             self.image = self.frames[frame_index]
 
 
     def render_name(self, surface):
-        if self.selected:
-            text = self.font.render(labels[self.name], True, c.WHITE)
+        if self.pressed:
+            text = self.font.render(menu_labels[self.name], True, c.WHITE)
         else:
-            text = self.font.render(labels[self.name], True, c.BLACK)
+            text = self.font.render(menu_labels[self.name], True, c.BLACK)
 
         text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
@@ -92,8 +92,8 @@ class MenuSelection(pg.sprite.Sprite):
 
     def load_sprites_from_sheet(self):
         frames = []
-        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite, mult=c.UI_MULT))
-        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite_selected, mult=c.UI_MULT))
+        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite, mult=c.MENU_MULT))
+        frames.append(helpers.get_image(0, 0, 190, 49, self.sprite_selected, mult=c.MENU_MULT))
         return frames
 
 
@@ -114,9 +114,16 @@ class MenuSelection(pg.sprite.Sprite):
 
     def render_name(self, surface):
         if self.selected:
-            text = self.font.render(labels[self.name], True, c.WHITE)
+            text = self.font.render(menu_labels[self.name], True, c.WHITE)
         else:
-            text = self.font.render(labels[self.name], True, c.BLACK)
+            text = self.font.render(menu_labels[self.name], True, c.BLACK)
 
         text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
+
+
+class GameUI:
+    def __init__(self):
+        pass
+
+

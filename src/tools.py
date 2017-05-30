@@ -1,116 +1,12 @@
-from typing import List, Tuple
+from typing import List
 
 import os
-import time
 
-import pygame as pg
 from PIL import Image
+import pygame as pg
 
 from . import constants as c
-
 from . components import util
-
-
-per_pixel_alpha_names = [
-    "tree_shadow",
-]
-
-
-class Control:
-    def __init__(self, caption):
-        self.quit = False
-
-        self.screen = pg.display.get_surface()
-
-        self.current_time = 0
-        self.fps = c.FPS
-        pg.display.set_caption(caption)
-        self.clock = pg.time.Clock()
-
-        self.keys = pg.key.get_pressed()
-
-        self.state = None
-        self.state_name = None
-        self.state_dict = {}
-
-
-    def game_loop(self):
-        while not self.quit:
-            self.event_loop()
-
-            self.update()
-            pg.display.update()
-
-            self.clock.tick(self.fps)
-
-
-    def event_loop(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.quit = True
-            elif event.type == pg.KEYDOWN:
-                self.keys = pg.key.get_pressed()
-            elif event.type == pg.KEYUP:
-                self.keys = pg.key.get_pressed()
-
-
-    def update(self):
-        """Connects to the main game loop.
-        Do any updates needed
-        """
-        self.current_time = pg.time.get_ticks()
-        if self.state.quit:
-            self.quit = True
-        elif self.state.state_done:
-            self.flip_state()
-
-        self.state.update(self.screen, self.keys, self.current_time)
-
-
-    def setup_states(self, state_dict, start_state):
-        self.state_dict = state_dict
-        self.state_name = start_state
-        self.state = self.state_dict[self.state_name]
-
-        print("Initial state in control object: {}".format(self.state_name))
-
-
-    def flip_state(self):
-        previous, self.state_name = self.state_name, self.state.next
-        # Get game_info before setting new state
-        game_info = self.state.dump_game_info()
-        self.state = self.state_dict[self.state_name]
-
-        # Startup state when switching to it
-        self.state.startup(game_info)
-        print("Main state switched to: {}".format(self.state_name))
-
-        self.state.previous = previous
-
-
-class State:
-    def __init__(self):
-        # Quit everything
-        self.quit = False
-
-        # Quit this state
-        self.state_done = False
-
-        self.next = None
-        self.previous = None
-        self.game_info = {}
-
-
-    def dump_game_info(self):
-        return self.game_info
-
-
-    def startup(self):
-        raise NotImplementedError
-
-
-    def update(self):
-        raise NotImplementedError
 
 
 # XXX Unused
@@ -163,20 +59,15 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
         if ext.lower() in accept:
             img = pg.image.load(pic_path)
 
-            #if name in per_pixel_alpha_names:
             if img.get_alpha():
                 if name == "tree_shadow":
                     print("unconverted tree shadow alpha: {}".format(img.get_alpha()))
-                if name == "small_orange_treebottom":
-                    print("unconverted tree bottom alpha: {}".format(img.get_alpha()))
                 #img = img.convert_alpha()
                 img.convert_alpha()
 
                 # Debug.
                 if name == "tree_shadow":
                     print("converted tree shadow alpha: {}".format(img.get_alpha()))
-                if name == "small_orange_treebottom":
-                    print("converted tree bottom alpha: {}".format(img.get_alpha()))
             else:
                 img = img.convert()
                 img.set_colorkey(colorkey)
@@ -247,11 +138,11 @@ def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     pass
 
 
-def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> bool:
+def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> None:
     """Universal utility to fix x and y values based on bounds
 
     Non-default args:
-    :param rect: Rectangle to check bounds for
+    :param rect: Rectangle that gets its x and y modified.
     :param highest_x: Highest X allowed
     :param highest_y: Highest Y allowed
     :param x_vel: X movement speed
@@ -260,11 +151,6 @@ def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel:
     Default args:
     :param lowest_x=0: Lowest X allowed
     :param lowest_y=0: Lowest Y allowed
-    :param collidables: Rectangles that can't be moved through
-
-    Returns Tuple of:
-    :returns rect: Rectangle with corrected x, y values
-    :returns hit_wall: Whether the end of the map was hit
     """
     new_x = rect.x + x_vel
     new_y = rect.y + y_vel
