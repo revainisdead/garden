@@ -93,14 +93,11 @@ class Map:
             ["green_treebottom", "green_treetop"],
         ]
 
-        self.collidables = []
         self.bush_group = pg.sprite.Group()
-
         self.tree_bottom_group = pg.sprite.Group()
         self.tree_top_group = pg.sprite.Group()
         self.tree_shadow_group = pg.sprite.Group()
         self.water_corner_cut_group = pg.sprite.Group()
-
         self.fence_link_group = pg.sprite.Group()
         self.fence_end_group = pg.sprite.Group()
 
@@ -111,6 +108,10 @@ class Map:
         self.num_sim_steps = 4
         self.death_limit = 4
         self.birth_limit = 6
+
+        # Use this list the same as the grid.
+        # But instead of 1 being water, make 1 represent a collidable.
+        self.collidable_grid = [[0 if random.randint(0, 4) == 0 else 1 for y in range(self.height)] for x in range(self.width)]
 
         self.__generate_grid()
         self.tiles = self.create_tiles()
@@ -185,7 +186,9 @@ class Map:
                             created_bush = self.__create_bush(x_pos, y_pos)
 
                             if not created_bush:
-                                created_fence = self.__create_fence(x_pos, y_pos, gridx, gridy)
+                                pass
+
+                    created_fence = self.__create_fence(x_pos, y_pos, gridx, gridy)
 
                     tile = Tile(x_pos, y_pos, tile_name)
                     tiles.add(tile) # Tile as set.
@@ -193,16 +196,16 @@ class Map:
                     #point = (gridx, gridy)
                     #tiles[point] = tile
 
-                    if solid_grid_point or created_fence or created_tree:
-                        self.collidables.append(tile.rect)
+                    if solid_grid_point or created_tree:
+                        self.collidable_grid[gridx][gridy] = 1
                 elif self.biome == "cave":
                     tile_names = self.tile_names[grid_point]
 
                     tile = Tile(x_pos, y_pos, tile_name)
                     tiles.add(tile) # Tile as set.
 
-                    if solid_grid_point or created_fence or created_tree:
-                        self.collidables.append(tile.rect)
+                    if solid_grid_point:
+                        self.collidable_grid[gridx][gridy] = 1
 
         return tiles
 
@@ -467,41 +470,60 @@ class Map:
             num_links = random.randint(c.MIN_FENCE_LENGTH, c.MAX_FENCE_LENGTH)
 
             for fence_index in range(num_links):
-                gridx += 1
-                x += c.TILE_SIZE
+                current_point = 1   # Assume point is taken, at first.
+                next_point = 1      # Assume point is taken, at first.
                 try:
                     current_point = self.grid[gridx][gridy]
                     next_point = self.grid[gridx + 1][gridy]
                 except IndexError:
-                    break
+                    pass
 
-                if (current_point == 0 and next_point == 1) or fence_index == num_links - 1:
+                if (current_point == 0 and next_point == 1) or (current_point == 0 and fence_index == num_links - 1):
                     # Current point is good but the next one is solid,
                     # assume the fence ends here.
                     fence_end = scenery.FenceEnd(x, y)
+                    self.collidable_grid[gridx][gridy] = 1
+
                     self.fence_end_group.add(fence_end)
                     created = True
                     break
                 elif current_point == 0 and next_point == 0:
-                    # Current point and the next right point is available.
+                    # Current point and the next right point are available.
                     fence_link = scenery.FenceLink(x, y)
+                    self.collidable_grid[gridx][gridy] = 1
+
                     self.fence_link_group.add(fence_link)
                     created = True
-                elif current_point > 1:
+                elif current_point == 1:
+                    # Current point solid. Don't create anything.
                     break
+
+                gridx += 1
+                x += c.TILE_SIZE
 
         return created
 
 
-    #def create_house(self, x, y):
+    #def __create_house(self, x, y):
+    #for farmland: def __farm_area
+    #for farmland: def __create_stash
+    #for farmland: def __create_stairs
+    #for cave: __create_minerals? gems?
+    #for island: __do a completely different map
 
 
     def create_collidables(self) -> List[util.Collidable]:
         collidables = []
 
-        for rect in self.collidables:
-            collidable = util.Collidable(rect.x, rect.y)
-            collidables.append(collidable)
+        #for rect in self.collidables:
+            #collidable = util.Collidable(rect.x, rect.y)
+            #collidables.append(collidable)
+
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.collidable_grid[x][y] > 0:
+                    collidables.append(util.Collidable(x * c.TILE_SIZE, y * c.TILE_SIZE))
+
         return collidables
 
 
@@ -510,7 +532,7 @@ class Map:
             x = random.randint(0, self.width - 1)
             y = random.randint(0, self.height - 1)
 
-            if self.grid[x][y] == 0:
+            if self.collidable_grid[x][y] == 0:
                 return x, y
 
 

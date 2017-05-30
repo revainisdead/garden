@@ -10,8 +10,8 @@ FPS = 40
 
 
 # Debug flags.
-DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
-DEBUG_CAMERA = False # XXX IF NOT CAMERA_ON_HERO, use debug_camera speed.
+DEBUG_MAP = False   # XXX Doesn't work properly with new camera changes.
+DEBUG_CAMERA = True # XXX IF NOT CAMERA_ON_HERO, use debug_camera speed.
 DEBUG_ENEMY = False
 DEBUG_NPC = False
 
@@ -76,12 +76,13 @@ NPC_MULT = 0.25
 
 MENU_MULT = 1.15
 BUTTON_MULT = 0.10 # 0.16 makes the button the size of a tile
-PRESSED_BUTTON_MULT = 0.095
+PRESSED_BUTTON_MULT = 0.097
 
 
 # Sizes.
 TILE_SIZE = 64
-BUTTON_SIZE = 400 * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
+ORIGINAL_ICON_SIZE = 400
+BUTTON_SIZE = ORIGINAL_ICON_SIZE * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -116,9 +117,13 @@ speeds = {
 
 
 # Density.
-BUSH_DENSITY = 10
-FENCE_DENSITY = 40
-TREE_DENSITY = 8
+#BUSH_DENSITY = 10
+#FENCE_DENSITY = 40
+#TREE_DENSITY = 8
+BUSH_DENSITY = 9
+FENCE_DENSITY = 60
+TREE_DENSITY = 6
+
 
 MIN_FENCE_LENGTH = 2
 MAX_FENCE_LENGTH = 5
@@ -131,3 +136,4 @@ MAX_NPC_AMOUNT = 8
 TREE_SHADOW_OFFSET = 9
 BUTTON_OFFSET = 60
 MENU_SELECTION_OFFSET = 80
+#PRESSED_BUTTON_OFFSET = ORIGINAL_ICON_SIZE * 0.02

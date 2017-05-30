@@ -38,7 +38,7 @@ def colorize(images: List[pg.Surface], color: Tuple[int, int, int]) -> List[pg.S
     for image in images:
         image = image.copy()
         #image.fill((0, 0, 0, 255), None, pg.BLEND_RGBA_MULT)
-        image.fill(color[0:3] + (0,), None, pg.BLEND_RGBA_ADD)
+        image.fill(color + (0,), None, pg.BLEND_RGBA_ADD)
         colored.append(image)
 
     return colored

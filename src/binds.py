@@ -27,3 +27,8 @@ class Input:
     #     and not affecting everything in muliple places.
     def __init__(self):
         pass
+
+
+    #last_key_pressed
+    #mouse_pos
+    #pressed_keys # interface to get_pressed...

@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+from collections import OrderedDict
 import time
 
 import pygame as pg
@@ -19,10 +20,16 @@ menu_labels = {
 }
 
 
-button_icon_color = {
-    "wood_axe_icon": c.LIGHT_YELLOW,
-    "tree_icon": c.SOFT_GREEN,
+button_binds = {
+    "wood_axe_icon": pg.K_1,
+    "tree_icon": pg.K_2,
 }
+
+
+button_icon_color = OrderedDict([
+    ("wood_axe_icon", c.LIGHT_YELLOW),
+    ("tree_icon", c.SOFT_GREEN),
+])
 
 
 class MenuSelection(pg.sprite.Sprite):
@@ -94,10 +101,13 @@ class Button(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        self.name = name
-        #self.keybind = button_binds[self.name]
-        self.keybind = pg.K_1
+        # XXX
+        #self.pressed_rect = self.frames[1].get_rect()
+        # "Inflate" duplicate image to smaller by using negatives.
+        #self.pressed_rect = self.pressed_rect.inflate((-c.PRESSED_BUTTON_OFFSET, -c.PRESSED_BUTTON_OFFSET))
 
+        self.name = name
+        self.keybind = button_binds[self.name]
         # key: wood_axe_icon value: current keybind for action in binds file
 
         self.current_time = 0
@@ -108,8 +118,8 @@ class Button(pg.sprite.Sprite):
 
     def load_sprites_from_sheet(self) -> List[pg.Surface]:
         frames = []
-        frames.append(helpers.get_image(0, 0, 400, 400, self.sprite, mult=c.BUTTON_MULT))
-        frames.append(helpers.get_image(0, 0, 400, 400, self.sprite, mult=c.PRESSED_BUTTON_MULT))
+        frames.append(helpers.get_image(0, 0, c.ORIGINAL_ICON_SIZE, c.ORIGINAL_ICON_SIZE, self.sprite, mult=c.BUTTON_MULT))
+        frames.append(helpers.get_image(0, 0, c.ORIGINAL_ICON_SIZE, c.ORIGINAL_ICON_SIZE, self.sprite, mult=c.PRESSED_BUTTON_MULT))
         return frames
 
 
@@ -175,9 +185,9 @@ class GameUI:
         self.button_group = pg.sprite.Group()
         button_starting_x = 120
         button_y = 500
-
         button_separation = 0
-        for name in button_icon_color.keys():
+
+        for name in list(button_icon_color.keys()):
             self.button_group.add(Button(button_starting_x + button_separation, button_y, name))
             button_separation += c.BUTTON_OFFSET
 
