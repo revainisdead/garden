@@ -21,12 +21,11 @@ import time
 import pygame as pg
 
 from . import constants as c
-
 from . components import user_interface, util
 
 
 class Control:
-    def __init__(self, caption):
+    def __init__(self, caption) -> None:
         self.quit = False
 
         self.screen = pg.display.get_surface()
@@ -38,12 +37,12 @@ class Control:
 
         self.keys = pg.key.get_pressed()
 
-        self.state = None
-        self.state_name = None
+        self.state = None # type: State
+        self.state_name = None # type: Dict[c.MainState, State]
         self.state_dict = {}
 
 
-    def game_loop(self):
+    def game_loop(self) -> None:
         while not self.quit:
             self.event_loop()
 
@@ -53,7 +52,7 @@ class Control:
             self.clock.tick(self.fps)
 
 
-    def event_loop(self):
+    def event_loop(self) -> None:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit = True
@@ -77,7 +76,7 @@ class Control:
 
         # In Game User Interface.
         if self.state_name != c.MainState.MAINMENU:
-            self.game_ui.update(self.screen)
+            self.game_ui.update(self.screen, self.keys)
 
 
     def setup_states(self, state_dict, start_state):

@@ -47,7 +47,7 @@ class MainMenu(control.State):
 
     def setup_menu(self):
         menu_height = 200
-        menu_separation = 80
+        menu_separation = c.MENU_SELECTION_OFFSET
         selection1 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "play")
         menu_height += menu_separation
         selection2 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "load_game")

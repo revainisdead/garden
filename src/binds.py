@@ -6,6 +6,8 @@ import pygame as pg
 # To allow changing of keybinds
 # Note: Don't implement until decided what the keys actually do by
 # default because the strings will name them: move_left, move_right, etc.
+#
+# Need to have a list of all available keybinds: shift, letters, numbers, etc.
 keybinds = {
     "up": pg.K_w,
     "down": pg.K_s,
@@ -18,8 +20,6 @@ keybinds = {
 }
 
 
-# Consider renaming this file to something with input as opposed
-# to keybinds focused, but this file should also handle keybinds.
 class Input:
     # A class that handles all input and keybinds.
     #   - Other objects like states and the player, camera, etc.

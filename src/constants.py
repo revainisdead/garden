@@ -11,7 +11,7 @@ FPS = 40
 
 # Debug flags.
 DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
-DEBUG_CAMERA = True
+DEBUG_CAMERA = False # XXX IF NOT CAMERA_ON_HERO, use debug_camera speed.
 DEBUG_ENEMY = False
 DEBUG_NPC = False
 
@@ -49,19 +49,39 @@ class TimeState(enum.Enum):
 # Convert hex color to r,g,b using: www.rapidtables.com/convert/color/
 # Sprites: getspritexy.com, spritecow.com
 #            R, G, B
-RED =       (255, 0, 0)
-GREEN =     (0, 255, 0)
-BLUE =      (0, 0, 255)
-YELLOW =    (0, 255, 255)
-PURPLE =    (255, 0, 255)
-GRAY =      (100, 100, 100)
-BLACK =     (0, 0, 0)
-WHITE =     (255, 255, 255)
-SAPPHIRE =  (5, 35, 94)
+RED =           (255, 0, 0)
+GREEN =         (0, 255, 0)
+BLUE =          (0, 0, 255)
+YELLOW =        (0, 255, 255)
+PURPLE =        (255, 0, 255)
+GRAY =          (100, 100, 100)
+BLACK =         (0, 0, 0)
+WHITE =         (255, 255, 255)
+
+# Colorkey for pressed icons.
+ICON_GRAY =     (136, 136, 136)
+
+# Soothing colors for UI buttons.
+PALE =          (251, 255, 193) # Too close to white for an icon.
+SOFT_GREEN =    (176, 255, 112)
+#LIGHT_YELLOW =  (242, 244, 117)
+LIGHT_YELLOW =  (232, 234, 119)
+
+
+# Multipliers.
+BACKGROUND_MULT = 2.5
+ENEMY_MULT = 1.5
+PROJECTILE_MULT = 1.25
+NPC_MULT = 0.25
+
+MENU_MULT = 1.15
+BUTTON_MULT = 0.10 # 0.16 makes the button the size of a tile
+PRESSED_BUTTON_MULT = 0.095
 
 
 # Sizes.
 TILE_SIZE = 64
+BUTTON_SIZE = 400 * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -76,16 +96,6 @@ GRID_HEIGHT = int(MAP_HEIGHT / TILE_SIZE)
 CORNER_SIZE = 15
 
 FONT_SIZE = 22
-
-
-# Multipliers.
-BACKGROUND_MULT = 2.5
-ENEMY_MULT = 1.5
-PROJECTILE_MULT = 1.25
-NPC_MULT = 0.25
-
-MENU_MULT = 1.15
-BUTTON_UI_MULT = 0.16
 
 # Full size(1) for tile_size = 64
 # Half size(0.5)  for tile_size = 32
@@ -119,3 +129,5 @@ MAX_NPC_AMOUNT = 8
 
 # Offsets.
 TREE_SHADOW_OFFSET = 9
+BUTTON_OFFSET = 60
+MENU_SELECTION_OFFSET = 80

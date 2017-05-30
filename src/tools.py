@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import os
 
@@ -33,12 +33,15 @@ def convert_png(name_path, convert_to_ext=".bmp"):
         os.unlink(original_name)
 
 
-# XXX Unused
-def colorize(image, color):
-    image = image.copy()
-    #image.fill((0, 0, 0, 255), None, pg.BLEND_RGBA_MULT)
-    image.fill(color[0:3] + (0,), None, pg.BLEND_RGBA_ADD)
-    return image
+def colorize(images: List[pg.Surface], color: Tuple[int, int, int]) -> List[pg.Surface]:
+    colored = []
+    for image in images:
+        image = image.copy()
+        #image.fill((0, 0, 0, 255), None, pg.BLEND_RGBA_MULT)
+        image.fill(color[0:3] + (0,), None, pg.BLEND_RGBA_ADD)
+        colored.append(image)
+
+    return colored
 
 
 def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
