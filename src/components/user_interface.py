@@ -13,14 +13,20 @@ menu_labels = {
 }
 
 
+button_names = [
+    "wood_axe_icon",
+]
+
+
 class Button(pg.sprite.Sprite):
     def __init__(self, x, y, name):
         super().__init__()
 
-        self.sprite = setup.GFX["wood_axe_icon"]
-        self.sprite_pressed = setup.GFX["wood_axe_icon"]
+        self.sprite = setup.GFX[name]
+        #self.sprite_pressed = setup.GFX["wood_axe_icon"]
+        #self.pressed = False
 
-        self.font = setup.FONTS["kenvector_future_thin"]
+        #self.font = setup.FONTS["kenvector_future_thin"]
 
         self.frames = self.load_sprites_from_sheet()
         self.frame_index = 0
@@ -32,29 +38,21 @@ class Button(pg.sprite.Sprite):
         self.rect.y = y
 
         self.name = name
-        self.pressed = False
 
 
     def load_sprites_from_sheet(self):
         frames = []
         frames.append(helpers.get_image(0, 0, 400, 400, self.sprite, mult=c.BUTTON_UI_MULT))
-        frames.append(helpers.get_image(0, 0, 400, 400, self.sprite_pressed, mult=c.BUTTON_UI_MULT))
+        #frames.append(helpers.get_image(0, 0, 400, 400, self.sprite_pressed, mult=c.BUTTON_UI_MULT))
         return frames
 
 
     def update(self, selection):
-        self.handle_state(selection)
+        self.handle_state()
 
 
-    def handle_state(self, selection):
-        if selection == self.name:
-            self.pressed = True
-            frame_index = 1
-            self.image = self.frames[frame_index]
-        else:
-            self.pressed = False
-            frame_index = 0
-            self.image = self.frames[frame_index]
+    def handle_state(self):
+        pass
 
 
     def render_name(self, surface):
@@ -124,6 +122,29 @@ class MenuSelection(pg.sprite.Sprite):
 
 class GameUI:
     def __init__(self):
+        self.setup_buttons()
+
+
+    def setup_buttons(self) -> None:
+        # XXX UI button area?
+        # Don't set area and don't name it button1, loop over to create buttons?
+        # And loop over a list of button sprite names
+        button1 = Button(200, 500, button_names[0])
+
+        self.button_group = pg.sprite.Group(button1)
+
+
+    def update(self, screen: pg.Surface) -> None:
+        # XXX Access Input
+        self.handle_state()
+
+        self.blit_images(screen)
+
+
+    def handle_state(self) -> None:
         pass
 
 
+    def blit_images(self, screen: pg.Surface) -> None:
+        # Draw sprites onto the screen
+        self.button_group.draw(screen)

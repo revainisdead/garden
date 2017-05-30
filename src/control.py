@@ -77,8 +77,7 @@ class Control:
 
         # In Game User Interface.
         if self.state_name != c.MainState.MAINMENU:
-            #self.game_ui.update(self.screen)
-            pass
+            self.game_ui.update(self.screen)
 
 
     def setup_states(self, state_dict, start_state):

@@ -40,7 +40,6 @@ class CommonArea(control.State):
         self.collidables = self.tilemap.create_collidables()
         self.tilemap_rect = self.tilemap.map_surface.get_rect()
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
-        #self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height))
         self.entire_area_rect = self.entire_area.get_rect()
 
         #self.camera = setup.SCREEN.get_rect(bottom=self.entire_area_rect.bottom)
@@ -57,23 +56,14 @@ class CommonArea(control.State):
         npcs = [] # type: List[non_player_controlled.Npc]
         npc_group = pg.sprite.Group()
 
-        random_npcs_limit = 5
-        random_npcs_count = 0
+        # min_npc_amount
+        # max_npc_amount
+        random_npcs_limit = random.randint(c.MIN_NPC_AMOUNT, c.MAX_NPC_AMOUNT)
 
-        grid = self.tilemap.grid
-        while True:
-            x = random.randint(0, c.GRID_WIDTH - 1)
-            y = random.randint(0, c.GRID_HEIGHT - 1)
+        for _ in range(random_npcs_limit):
+            x, y = self.tilemap.find_random_open_location()
+            npc_group.add(non_player_controlled.Npc(x * c.TILE_SIZE, y * c.TILE_SIZE))
 
-            if grid[x][y] == 0:
-                # Found an empty spot to place an npc
-                npcs.append(non_player_controlled.Npc(x * c.TILE_SIZE, y * c.TILE_SIZE))
-                random_npcs_count += 1
-                if random_npcs_count > random_npcs_limit:
-                    break
-
-        for npc in npcs:
-            npc_group.add(npc)
         return npc_group
 
 
@@ -92,6 +82,8 @@ class CommonArea(control.State):
 
 
     def setup_player(self) -> None:
+        # Is also going to need to find_open_location method
+        # But should the player's location be random? Maybe, go find your farm!
         #self.player = player.Player(500, 400)
         #self.player_group = pg.sprite.Group(self.player)
         pass
@@ -177,6 +169,8 @@ class CommonArea(control.State):
 
 
     def blit_images(self, surface: pg.Surface) -> None:
+        # This is responsible for showing only a certain area
+        # of the tilemap surface, the area shown is the area of the camera.
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)
 
         self.tilemap.update(self.entire_area, self.camera)
@@ -189,12 +183,5 @@ class CommonArea(control.State):
 
         #self.glaive_group.draw(self.entire_area)
 
+        # Finally, draw everything to the screen surface.
         surface.blit(self.entire_area, (0, 0), self.camera)
-
-
-        # Draw UI over everything else.
-        # UI Has to be relative to camera at all times
-        #user_interface.draw_ui(self.entire_area)
-
-        # Can I just UI on to the screen resolutio?
-        # With a completely new surface?

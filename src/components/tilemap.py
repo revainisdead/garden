@@ -112,13 +112,13 @@ class Map:
         self.death_limit = 4
         self.birth_limit = 6
 
-        self.generate_grid()
+        self.__generate_grid()
         self.tiles = self.create_tiles()
 
         self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT)).convert()
 
 
-    def generate_grid(self) -> Set[Tile]:
+    def __generate_grid(self) -> Set[Tile]:
         # Initialize grid with random values.
         # 60% chance a 1 will occur.
         self.grid = [[0 if random.randint(0, 4) == 0 else 1 for y in range(self.height)] for x in range(self.width)]
@@ -178,14 +178,14 @@ class Map:
                         # Create a variety of grasses.
                         tile_name = self.grass_names[random.randint(0, len(self.grass_names) - 1)]
 
-                        created_tree = self.create_tree(x_pos, y_pos)
+                        created_tree = self.__create_tree(x_pos, y_pos)
 
                         if not created_tree:
                             # Don't draw bushes under trees.
-                            created_bush = self.create_bush(x_pos, y_pos)
+                            created_bush = self.__create_bush(x_pos, y_pos)
 
                             if not created_bush:
-                                created_fence = self.create_fence(x_pos, y_pos, gridx, gridy)
+                                created_fence = self.__create_fence(x_pos, y_pos, gridx, gridy)
 
                     tile = Tile(x_pos, y_pos, tile_name)
                     tiles.add(tile) # Tile as set.
@@ -410,7 +410,7 @@ class Map:
         return count
 
 
-    def create_bush(self, x, y) -> bool:
+    def __create_bush(self, x, y) -> bool:
         """
         Chance to create the object = 1 / density
         """
@@ -427,7 +427,7 @@ class Map:
         return created
 
 
-    def create_tree(self, x, y) -> bool:
+    def __create_tree(self, x, y) -> bool:
         """
         Chance to create the object = 1 / density
         """
@@ -450,7 +450,7 @@ class Map:
         return created
 
 
-    def create_fence(self, x: int, y: int, gridx: int, gridy: int) -> bool:
+    def __create_fence(self, x: int, y: int, gridx: int, gridy: int) -> bool:
         """
         Chance to create the object = 1 / density
 
@@ -505,6 +505,15 @@ class Map:
         return collidables
 
 
+    def find_random_open_location(self) -> Tuple[int, int]:
+        while True:
+            x = random.randint(0, self.width - 1)
+            y = random.randint(0, self.height - 1)
+
+            if self.grid[x][y] == 0:
+                return x, y
+
+
     def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
         # Test tiles as dict
         #for tile in list(self.tiles.values()):
@@ -513,7 +522,6 @@ class Map:
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
 
         self.water_corner_cut_group.draw(surface)
-        #print(self.water_corner_cut_group.sprites)
 
         # Draw scenery after tiles
         self.bush_group.draw(surface)
