@@ -27,8 +27,8 @@ button_binds = {
 
 
 button_icon_color = OrderedDict([
-    ("wood_axe_icon", c.LIGHT_YELLOW),
-    ("tree_icon", c.SOFT_GREEN),
+    ("wood_axe_icon", c.DARK_PALE),
+    ("tree_icon", c.FOREST_GREEN),
 ])
 
 
@@ -167,9 +167,6 @@ class Button(pg.sprite.Sprite):
 
         text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
-
-
-    #def set_keybind?
 
 
 class GameUI:

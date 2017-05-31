@@ -62,10 +62,12 @@ WHITE =         (255, 255, 255)
 ICON_GRAY =     (136, 136, 136)
 
 # Soothing colors for UI buttons.
-PALE =          (251, 255, 193) # Too close to white for an icon.
-SOFT_GREEN =    (176, 255, 112)
+#SOFT_GREEN =    (176, 255, 112)
+FOREST_GREEN =  (83, 150, 78)
+#PALE =          (251, 255, 193) # Too close to white for an icon.
 #LIGHT_YELLOW =  (242, 244, 117)
-LIGHT_YELLOW =  (232, 234, 119)
+#LIGHT_YELLOW =  (232, 234, 119)
+DARK_PALE =     (170, 155, 82)
 
 
 # Multipliers.
