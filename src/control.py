@@ -12,14 +12,13 @@
 # Rule: unqualified imports before qualified
 #   Ex. from module import class
 #       import module
-
-
 from typing import Any, Dict
 
 import time
 
 import pygame as pg
 
+from . import binds
 from . import constants as c
 from . components import user_interface, util
 
@@ -45,26 +44,31 @@ class Control:
     def game_loop(self) -> None:
         while not self.quit:
             self.event_loop()
-
             self.update()
             pg.display.update()
-
             self.clock.tick(self.fps)
+            
+            # XXX Force binds.INPUT to only process one frame of KEYDOWN.
 
 
     def event_loop(self) -> None:
         for event in pg.event.get():
+            print("in event loop")
             if event.type == pg.QUIT:
                 self.quit = True
-            elif event.type == pg.KEYDOWN:
-                self.keys = pg.key.get_pressed()
-            elif event.type == pg.KEYUP:
-                self.keys = pg.key.get_pressed()
+            else:
+                binds.INPUT.update(event)
+            #elif event.type == pg.KEYDOWN:
+                #self.keys = pg.key.get_pressed()
+            #elif event.type == pg.KEYUP:
+                #self.keys = pg.key.get_pressed()
 
+            #if event.type != pg.QUIT:
+                #binds.INPUT.update(event)
 
-    def update(self):
+    def update(self) -> None:
         """Connects to the main game loop.
-        Do any updates needed
+        Do any updates needed.
         """
         self.current_time = pg.time.get_ticks()
         if self.state.quit:

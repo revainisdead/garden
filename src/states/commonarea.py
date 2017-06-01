@@ -99,31 +99,31 @@ class CommonArea(control.State):
 
 
     def handle_states(self, keys: Tuple[int, ...]) -> None:
-        if keys[binds.keybinds["left"]]:
-            if keys[binds.keybinds["up"]]:
+        if binds.INPUT.held("left"):
+            if binds.INPUT.held("up"):
                 self.direction = c.Direction.LEFTUP
-            elif keys[binds.keybinds["down"]]:
+            elif binds.INPUT.held("down"):
                 self.direction = c.Direction.LEFTDOWN
             else:
                 self.direction = c.Direction.LEFT
             self.move_camera()
 
-        elif keys[binds.keybinds["right"]]:
-            if keys[binds.keybinds["up"]]:
+        elif binds.INPUT.held("right"):
+            if binds.INPUT.held("up"):
                 self.direction = c.Direction.RIGHTUP
-            elif keys[binds.keybinds["down"]]:
+            elif binds.INPUT.held("down"):
                 self.direction = c.Direction.RIGHTDOWN
             else:
                 self.direction = c.Direction.RIGHT
             self.move_camera()
 
-        elif keys[binds.keybinds["up"]]:
+        elif binds.INPUT.held("up"):
             self.direction = c.Direction.UP
             self.move_camera()
-        elif keys[binds.keybinds["down"]]:
+        elif binds.INPUT.held("down"):
             self.direction = c.Direction.DOWN
             self.move_camera()
-        elif keys[binds.keybinds["escape"]]:
+        elif binds.INPUT.held("escape"):
             self.quit = True
 
 

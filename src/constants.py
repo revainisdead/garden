@@ -7,6 +7,7 @@ CAPTION = "Garden"
 
 # Frames per second.
 FPS = 40
+PG_GET_PRESSED_LENGTH = 323
 
 
 # Debug flags.

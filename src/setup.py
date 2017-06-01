@@ -2,8 +2,9 @@ import os
 
 import pygame as pg
 
-from . import tools
+from . import binds
 from . import constants as c
+from . import tools
 
 
 pg.init()
