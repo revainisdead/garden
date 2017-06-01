@@ -68,18 +68,18 @@ class MainMenu(control.State):
                 selection3)
 
 
-    def set_next_state(self):
+    def set_next_state(self) -> c.MainState:
         return c.MainState.COMMONAREA
 
 
-    def update(self, surface, keys, current_time):
+    def update(self, surface: pg.Surface, current_time: float) -> None:
         """Update the state every frame"""
         self.update_sprites(self.selection)
-        self.handle_states(keys)
+        self.handle_states()
         self.blit_images(surface)
 
 
-    def handle_states(self, keys):
+    def handle_states(self):
         if binds.INPUT.pressed("enter"):
             if self.selection == "play":
                 self.state_done = True

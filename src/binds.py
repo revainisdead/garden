@@ -24,6 +24,8 @@ keybinds = {
     "enter": pg.K_RETURN,
     "arrow_up": pg.K_UP,
     "arrow_down": pg.K_DOWN,
+    "one": pg.K_1,
+    "two": pg.K_2,
 }
 
 
@@ -59,16 +61,22 @@ class Input:
         - Key sends a keydown for every frame it is held down for.
     """
     def __init__(self):
-        self.__last_key_pressed = None # type: int
+        self.__last_keys_pressed = []
         self.__held_keys = tuple(0 for _ in range(c.PG_GET_PRESSED_LENGTH))
         self.__mouse_pos = (0, 0)
         self.__last_mouse_click = None # type: Tuple[int, int]
         self.__last_mouse_drop = None # type: Tuple[int, int]
 
 
-    def __set_last_key_pressed(self, key: Optional[int]) -> None:
-        """Add key that generates a KEYDOWN event in one frame."""
-        self.__last_key_pressed = key
+    def __set_last_keys_pressed(self, key: Optional[int]) -> None:
+        """Add key that generates a KEYDOWN event in one frame.
+        Because many different keys can be pressed in a short amount
+        of time. Make this a list of the last keys pressed
+        """
+        if key is None:
+            self.__last_keys_pressed = []
+        else:
+            self.__last_keys_pressed.append(key)
 
 
     def __set_held_keys(self, keys: Tuple[int, ...]) -> None:
@@ -90,11 +98,7 @@ class Input:
 
     def update(self, event: Optional[pg.event.Event]) -> None:
         if event.type == pg.KEYDOWN:
-            print(self.__last_key_pressed)
-            # Only one keydown is sent when a button is pressed.
-            # If the button is held, still only one keydown is sent.
-            #self.button_lock = False
-            self.__set_last_key_pressed(event.key)
+            self.__set_last_keys_pressed(event.key)
             self.__set_held_keys(pg.key.get_pressed())
         elif event.type == pg.KEYUP:
             self.__set_held_keys(pg.key.get_pressed())
@@ -104,7 +108,6 @@ class Input:
         elif event.type == pg.MOUSEBUTTONDOWN:
             point = pg.mouse.get_pos()
             self.__set_last_mouse_click(point)
-            print("Mouse clicked.")
         elif event.type == pg.MOUSEBUTTONUP:
             point = pg.mouse.get_pos()
             self.__set_last_mouse_drop(point)
@@ -118,12 +121,9 @@ class Input:
         if event.type != pg.MOUSEBUTTONUP:
             self.__set_last_mouse_drop(None)
 
-        print(event.type == pg.KEYDOWN)
-        print(self.__last_key_pressed)
 
-
-    def last_key_pressed(self) -> Optional[int]:
-        return self.__last_key_pressed
+    def last_keys_pressed(self) -> Optional[int]:
+        return self.__last_keys_pressed
 
 
     def held_keys(self) -> Optional[Tuple[int, ...]]:
@@ -144,8 +144,7 @@ class Input:
 
     def pressed(self, value: str) -> bool:
         """Convenience function for testing last pressed keybind"""
-        return self.__last_key_pressed == keybinds[value]
-        #return keybinds[value] in self.__last_key_pressed
+        return keybinds[value] in self.__last_keys_pressed
 
 
     def held(self, value: str) -> bool:
@@ -157,7 +156,7 @@ class Input:
         """This should be called once per frame to reset
         keys that need to be read Once Per Frame.
         """
-        self.__set_last_key_pressed(None)
+        self.__set_last_keys_pressed(None)
         self.__set_last_mouse_click(None)
         self.__set_last_mouse_drop(None)
 

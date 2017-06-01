@@ -34,8 +34,6 @@ class Control:
         pg.display.set_caption(caption)
         self.clock = pg.time.Clock()
 
-        self.keys = pg.key.get_pressed()
-
         self.state = None # type: State
         self.state_name = None # type: Dict[c.MainState, State]
         self.state_dict = {}
@@ -47,24 +45,17 @@ class Control:
             self.update()
             pg.display.update()
             self.clock.tick(self.fps)
-            
-            # XXX Force binds.INPUT to only process one frame of KEYDOWN.
+
+            binds.INPUT.reset()
 
 
     def event_loop(self) -> None:
         for event in pg.event.get():
-            print("in event loop")
             if event.type == pg.QUIT:
                 self.quit = True
             else:
                 binds.INPUT.update(event)
-            #elif event.type == pg.KEYDOWN:
-                #self.keys = pg.key.get_pressed()
-            #elif event.type == pg.KEYUP:
-                #self.keys = pg.key.get_pressed()
 
-            #if event.type != pg.QUIT:
-                #binds.INPUT.update(event)
 
     def update(self) -> None:
         """Connects to the main game loop.
@@ -76,11 +67,11 @@ class Control:
         elif self.state.state_done:
             self.flip_state()
 
-        self.state.update(self.screen, self.keys, self.current_time)
+        self.state.update(self.screen, self.current_time)
 
         # In Game User Interface.
         if self.state_name != c.MainState.MAINMENU:
-            self.game_ui.update(self.screen, self.keys)
+            self.game_ui.update(self.screen)
 
 
     def setup_states(self, state_dict, start_state):

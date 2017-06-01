@@ -89,16 +89,16 @@ class CommonArea(control.State):
         pass
 
 
-    def update(self, surface: pg.Surface, keys: Tuple[int, ...], current_time: float) -> None:
+    def update(self, surface: pg.Surface, current_time: float) -> None:
         """Update the state every frame"""
         self.game_info["current_time"] = current_time
 
-        self.update_sprites(keys)
-        self.handle_states(keys)
+        self.update_sprites()
+        self.handle_states()
         self.blit_images(surface)
 
 
-    def handle_states(self, keys: Tuple[int, ...]) -> None:
+    def handle_states(self) -> None:
         if binds.INPUT.held("left"):
             if binds.INPUT.held("up"):
                 self.direction = c.Direction.LEFTUP
@@ -127,11 +127,11 @@ class CommonArea(control.State):
             self.quit = True
 
 
-    def update_sprites(self, keys: Tuple[int]) -> None:
+    def update_sprites(self) -> None:
         #self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
         #self.glaive_group.update(self.game_info["current_time"])
 
-        #self.player_group.update(keys)
+        #self.player_group.update()
         self.npc_group.update(self.game_info["current_time"], self.collidables)
 
 

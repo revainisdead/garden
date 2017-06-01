@@ -21,8 +21,8 @@ menu_labels = {
 
 
 button_binds = {
-    "wood_axe_icon": pg.K_1,
-    "tree_icon": pg.K_2,
+    "wood_axe_icon": "one",
+    "tree_icon": "two",
 }
 
 
@@ -123,21 +123,15 @@ class Button(pg.sprite.Sprite):
         return frames
 
 
-    #def update(self, key_pressed: int) -> None:
-        #self.handle_state(key_pressed)
-    def update(self, keys: Tuple[int, ...]) -> None:
+    def update(self) -> None:
         self.current_time = time.time()
 
-        self.handle_state(keys)
+        self.handle_state()
 
 
-    #def handle_state(self, key_pressed) -> None:
+    def handle_state(self) -> None:
         # Ex. if near_tree: cut.
-        #if self.keybind == key_pressed:
-            #self.action()
-    def handle_state(self, keys: Tuple[int, ...]) -> None:
-        # Ex. if near_tree: cut.
-        if keys[self.keybind]:
+        if binds.INPUT.pressed(self.keybind):
             self.pressed_animation()
             self.action()
         else:
@@ -189,14 +183,9 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pg.Surface, keys: Tuple[int, ...]) -> None:
-        # XXX Access Input to get key pressed
-        key_pressed = None
-
+    def update(self, screen: pg.Surface) -> None:
         #self.handle_state()
-
-        #self.button_group.update(key_pressed)
-        self.button_group.update(keys)
+        self.button_group.update()
 
         # if state is off: don't blit
         self.blit_images(screen)
