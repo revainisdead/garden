@@ -131,7 +131,7 @@ class Button(pg.sprite.Sprite):
 
     def handle_state(self) -> None:
         # Ex. if near_tree: cut.
-        if binds.INPUT.pressed(self.keybind):
+        if binds.INPUT.pressed(self.keybind) or self.rect.collidepoint(*binds.INPUT.last_mouse_click()):
             self.pressed_animation()
             self.action()
         else:

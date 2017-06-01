@@ -115,6 +115,14 @@ speeds = {
     "npc_running": 5,
     "camera": 5 if not DEBUG_CAMERA else 100,
 }
+
+# XXX mirror movement speeds dict with proportional animation speeds.
+#animation_speeds {
+#    "player": ?,
+#    "npc_roaming": ?,
+#}
+
+
 # Running: also change animation speed.
 # And change sprite state.
 

@@ -64,8 +64,8 @@ class Input:
         self.__last_keys_pressed = []
         self.__held_keys = tuple(0 for _ in range(c.PG_GET_PRESSED_LENGTH))
         self.__mouse_pos = (0, 0)
-        self.__last_mouse_click = None # type: Tuple[int, int]
-        self.__last_mouse_drop = None # type: Tuple[int, int]
+        self.__last_mouse_click = (0, 0)
+        self.__last_mouse_drop = (0, 0)
 
 
     def __set_last_keys_pressed(self, key: Optional[int]) -> None:
@@ -89,11 +89,17 @@ class Input:
 
 
     def __set_last_mouse_click(self, point: Optional[Tuple[int, int]]) -> None:
-        self.__last_mouse_click = point
+        if point is None:
+            self.__last_mouse_click = (0, 0)
+        else:
+            self.__last_mouse_click = point
 
 
     def __set_last_mouse_drop(self, point: Optional[Tuple[int, int]]) -> None:
-        self.__last_mouse_drop = point
+        if point is None:
+            self.last_mouse_drop = (0, 0)
+        else:
+            self.__last_mouse_drop = point
 
 
     def update(self, event: Optional[pg.event.Event]) -> None:
