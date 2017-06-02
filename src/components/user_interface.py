@@ -78,9 +78,9 @@ class MenuSelection(pg.sprite.Sprite):
 
     def render_name(self, surface) -> None:
         if self.selected:
-            text = self.font.render(menu_labels[self.name], True, c.WHITE)
+            text = self.font.render(menu_labels[self.name], True, c.SELECTED_GRAY)
         else:
-            text = self.font.render(menu_labels[self.name], True, c.BLACK)
+            text = self.font.render(menu_labels[self.name], True, c.RESTING_GRAY)
 
         text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
@@ -175,7 +175,7 @@ class GameUI:
         # Well I need to map each button to an action, so I need to know them by variable.
         self.button_group = pg.sprite.Group()
         button_starting_x = 120
-        button_y = 500
+        button_y = c.UI_BUTTON_Y
         button_separation = 0
 
         for name in list(button_icon_color.keys()):

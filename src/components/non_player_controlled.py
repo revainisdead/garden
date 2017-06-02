@@ -162,22 +162,25 @@ class Npc(pg.sprite.Sprite):
 
 
     def auto_walk(self, collidables: List[util.Collidable]) -> None:
+        interval_change_sec_min = c.FPS * 5
+        interval_change_sec_max = c.FPS * 6
+
         if self.walking_dir_change_interval is None:
             if self.direction == c.Direction.NONE:
                 self.walking_dir_change_interval = self.standing_still_interval
             else:
-                self.walking_dir_change_interval = random.randint(c.FPS * 0.7, c.FPS)
+                self.walking_dir_change_interval = random.randint(interval_change_sec_min, interval_change_sec_max)
         else:
             self.walking_dir_change_counter += 1
 
         if self.walking_dir_change_counter == self.walking_dir_change_interval:
             self.direction = self.pick_new_direction()
 
-        tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        hit_edge = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
 
         hit_wall = tools.test_collide(rect=self.rect, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
 
-        if hit_wall:
+        if hit_wall or hit_edge:
             self.direction = self.pick_new_direction(ran_into_wall=True)
 
         self.set_velocity()

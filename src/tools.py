@@ -52,7 +52,7 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
     Note: An empty string doesn't count as invalid,
     since that represents a folder name.
     """
-    colorkey = c.PURPLE
+    colorkey = c.UGLY_PURPLE
     graphics = {}
 
     for pic in os.listdir(path):
@@ -141,7 +141,7 @@ def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     pass
 
 
-def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> None:
+def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int, lowest_x: int=0, lowest_y: int=0) -> bool:
     """Universal utility to fix x and y values based on bounds
 
     Non-default args:
@@ -171,10 +171,32 @@ def fix_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel:
     elif new_y + rect.h > highest_y:
         # Remember: y is inverted... The highest point is on the bottom.
         hit_wall = True
-        new_y = rect.y
+        # Interesting bug was here. When the camera is about the move off
+        # the map, the camera speed will be added to new_y and if the camera
+        # displacement would have moved the camera off the screen, it will
+        # prevent it from moving to the end. So add whatever is left between
+        # the camera and the end of the map, even if it was less than the 
+        # speed, to see the entire area. Somehow though this bug didn't
+        # apply to the horizontal movement.
+        new_y = rect.y + (highest_y - rect.bottom)
 
     rect.x = new_x
     rect.y = new_y
+    """
+    hit_wall = False
+    if x_vel > 0:
+        rect.right = highest_x
+        hit_wall = True
+    elif x_vel < 0:
+        rect.left = lowest_x
+        hit_wall = True
+    if y_vel > 0:
+        rect.bottom = highest_y
+        hit_wall = True
+    elif y_vel < 0:
+        rect.top = lowest_y
+        hit_wall = True
+    """
     return hit_wall
 
 

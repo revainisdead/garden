@@ -33,20 +33,15 @@ class MainMenu(control.State):
 
 
     def setup_background(self):
-        self.background = setup.GFX["cloud_background"]
+        self.background = setup.GFX["nature_mountain_background"]
         self.background_rect = self.background.get_rect()
 
         size_delta = (int(self.background_rect.width*c.BACKGROUND_MULT), int(self.background_rect.height*c.BACKGROUND_MULT))
         self.background = pg.transform.scale(self.background, size_delta)
 
-        #self.entire_area = pg.Surface((self.background_rect.width, self.background_rect.height)).convert()
-        #self.entire_area_rect = self.entire_area.get_rect()
-
-        self.camera = setup.SCREEN.get_rect(bottom=setup.SCREEN_RECT.bottom)
-
 
     def setup_menu(self):
-        menu_height = 200
+        menu_height = c.MENU_Y
         menu_separation = c.MENU_SELECTION_OFFSET
         selection1 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "play")
         menu_height += menu_separation
@@ -111,7 +106,7 @@ class MainMenu(control.State):
 
 
     def blit_images(self, surface):
-        surface.blit(self.background, (0, 0), self.camera)
+        surface.blit(self.background, (0, 0))
 
         self.menu_group.draw(surface)
 
