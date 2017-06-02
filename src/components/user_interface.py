@@ -164,17 +164,18 @@ class Button(pg.sprite.Sprite):
 
 class GameUI:
     def __init__(self) -> None:
-        self.setup_buttons()
+        self.button_x = c.IMMUTABLE_BUTTON_X
+        self.button_y = setup.screen_size.get_height() - c.IMMUTABLE_BUTTON_Y_OFFSET
+        self.re_setup_buttons()
 
 
     def re_setup_buttons(self) -> None:
         self.button_group = pg.sprite.Group()
-        button_starting_x = 120
-        button_y = c.STARTING_BUTTON_Y
+        button_y = self.button_y
         button_separation = 0
 
         for name in list(button_icon_color.keys()):
-            self.button_group.add(Button(button_starting_x + button_separation, button_y, name))
+            self.button_group.add(Button(self.button_x + button_separation, button_y, name))
             button_separation += c.BUTTON_OFFSET
 
 
@@ -188,10 +189,12 @@ class GameUI:
         self.blit_images(screen)
 
 
+
     def update_sizes(self) -> None:
         if setup.screen_size.changed():
-            self.re_setup_buttons()
-            self.button_y = setup.screen_size.get_height() * 5/6
+            self.button_y = setup.screen_size.get_height() - c.IMMUTABLE_BUTTON_Y_OFFSET
+            self.re_setup_buttons() # Re-setup buttons after y changes.
+
 
     def handle_state(self) -> None:
         pass

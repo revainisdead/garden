@@ -165,7 +165,8 @@ MENU_SELECTION_OFFSET = 73
 
 
 # Starting heights based off the default screen size.
-STARTING_BUTTON_Y = DEFAULT_SCREEN_HEIGHT * 5/6
+IMMUTABLE_BUTTON_X = 120
+IMMUTABLE_BUTTON_Y_OFFSET = 100
 STARTING_MENU_Y = int(DEFAULT_SCREEN_HEIGHT / 3.5)
 
 MENU_WIDTH = 218 # Size of the menu item sprites after transformation.
