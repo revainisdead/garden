@@ -46,8 +46,7 @@ class MenuSelection(pg.sprite.Sprite):
 
         self.rect = self.image.get_rect()
 
-        # To center the menu item, take half of the width away from x.
-        self.rect.x = x - self.rect.width/2
+        self.rect.x = x
         self.rect.y = y
 
         self.name = name
@@ -82,7 +81,7 @@ class MenuSelection(pg.sprite.Sprite):
         else:
             text = self.font.render(menu_labels[self.name], True, c.RESTING_GRAY)
 
-        text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
+        text_rect = text.get_rect(center=(setup.screen_size.get_width()/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
 
 
@@ -159,7 +158,7 @@ class Button(pg.sprite.Sprite):
         else:
             text = self.font.render(menu_labels[self.name], True, c.BLACK)
 
-        text_rect = text.get_rect(center=(c.SCREEN_WIDTH/2, self.rect.y + self.rect.height/2))
+        text_rect = text.get_rect(center=(setup.screen_size.get_width()/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
 
 
@@ -168,14 +167,10 @@ class GameUI:
         self.setup_buttons()
 
 
-    def setup_buttons(self) -> None:
-        # XXX UI button area?
-        # Don't set area and don't name it button1, loop over to create buttons?
-        # And loop over a list of button sprite names
-        # Well I need to map each button to an action, so I need to know them by variable.
+    def re_setup_buttons(self) -> None:
         self.button_group = pg.sprite.Group()
         button_starting_x = 120
-        button_y = c.UI_BUTTON_Y
+        button_y = c.STARTING_BUTTON_Y
         button_separation = 0
 
         for name in list(button_icon_color.keys()):
@@ -184,12 +179,19 @@ class GameUI:
 
 
     def update(self, screen: pg.Surface) -> None:
+        self.update_sizes()
+
         #self.handle_state()
         self.button_group.update()
 
         # if state is off: don't blit
         self.blit_images(screen)
 
+
+    def update_sizes(self) -> None:
+        if setup.screen_size.changed():
+            self.re_setup_buttons()
+            self.button_y = setup.screen_size.get_height() * 5/6
 
     def handle_state(self) -> None:
         pass

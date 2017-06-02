@@ -20,19 +20,19 @@ import pygame as pg
 
 from . import binds
 from . import constants as c
+from . import setup
 from . components import user_interface, util
 
 
 class Control:
     def __init__(self, caption) -> None:
         self.quit = False
-
-        self.screen = pg.display.get_surface()
-
         self.current_time = 0
         self.fps = c.FPS
         pg.display.set_caption(caption)
         self.clock = pg.time.Clock()
+
+        self.screen_surface = pg.display.get_surface()
 
         self.state = None # type: State
         self.state_name = None # type: Dict[c.MainState, State]
@@ -67,11 +67,11 @@ class Control:
         elif self.state.state_done:
             self.flip_state()
 
-        self.state.update(self.screen, self.current_time)
+        self.state.update(self.screen_surface, self.current_time)
 
         # In Game User Interface.
         if self.state_name != c.MainState.MAINMENU:
-            self.game_ui.update(self.screen)
+            self.game_ui.update(self.screen_surface)
 
 
     def setup_states(self, state_dict, start_state):

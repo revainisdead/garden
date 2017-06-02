@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 import pygame as pg
 
 from . import constants as c
+from . import setup
 
 
 # XXX Load keys from json file
@@ -117,15 +118,9 @@ class Input:
         elif event.type == pg.MOUSEBUTTONUP:
             point = pg.mouse.get_pos()
             self.__set_last_mouse_drop(point)
-
-        #self.button_lock = True
-        #if event.type != pg.KEYDOWN:
-            # If no keydown was sent, reset last key pressed value.
-            #self.__set_last_key_pressed(None)
-        if event.type != pg.MOUSEBUTTONDOWN:
-            self.__set_last_mouse_click(None)
-        if event.type != pg.MOUSEBUTTONUP:
-            self.__set_last_mouse_drop(None)
+        elif event.type == pg.VIDEORESIZE:
+            w, h = event.size
+            setup.screen_size.update(w, h)
 
 
     def last_keys_pressed(self) -> Optional[int]:

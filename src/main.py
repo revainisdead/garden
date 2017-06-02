@@ -7,6 +7,8 @@ from . states import mainmenu
 
 
 def main():
+    setup.start()
+
     state_dict = {
         c.MainState.MAINMENU: mainmenu.MainMenu(),
         c.MainState.COMMONAREA: commonarea.CommonArea(),

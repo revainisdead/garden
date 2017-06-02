@@ -14,6 +14,10 @@ class MainMenu(control.State):
             "current_time": 0,
         }
 
+        self.background_x_mult = c.DEFAULT_BACKGROUND_X_MULT
+        self.background_y_mult = c.DEFAULT_BACKGROUND_Y_MULT
+        self.menu_y = c.STARTING_MENU_Y
+
         self.startup(self.game_info)
 
         self.options = ["play", "load_game", "quit"]
@@ -29,25 +33,27 @@ class MainMenu(control.State):
         self.game_info = game_info
         self.next = self.set_next_state()
         self.setup_background()
-        self.setup_menu()
+        self.re_setup_menu()
 
 
     def setup_background(self):
         self.background = setup.GFX["nature_mountain_background"]
         self.background_rect = self.background.get_rect()
+        self.view = pg.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
 
-        size_delta = (int(self.background_rect.width*c.BACKGROUND_MULT), int(self.background_rect.height*c.BACKGROUND_MULT))
+        size_delta = (int(self.background_rect.width*self.background_x_mult), int(self.background_rect.height*self.background_y_mult))
         self.background = pg.transform.scale(self.background, size_delta)
 
 
-    def setup_menu(self):
-        menu_height = c.MENU_Y
+    def re_setup_menu(self):
+        x = setup.screen_size.get_width()/2 - c.MENU_WIDTH/2
+        y = self.menu_y
         menu_separation = c.MENU_SELECTION_OFFSET
-        selection1 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "play")
-        menu_height += menu_separation
-        selection2 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "load_game")
-        menu_height += menu_separation
-        selection3 = user_interface.MenuSelection(c.SCREEN_WIDTH/2, menu_height, "quit")
+        selection1 = user_interface.MenuSelection(x, y, "play")
+        y += menu_separation
+        selection2 = user_interface.MenuSelection(x, y, "load_game")
+        y += menu_separation
+        selection3 = user_interface.MenuSelection(x, y, "quit")
 
         # Create a list of the menu sprites, so ensure text gets
         # drawn after the sprite group gets drawn.
@@ -69,6 +75,8 @@ class MainMenu(control.State):
 
     def update(self, surface: pg.Surface, current_time: float) -> None:
         """Update the state every frame"""
+        self.update_sizes()
+
         self.update_sprites(self.selection)
         self.handle_states()
         self.blit_images(surface)
@@ -101,12 +109,26 @@ class MainMenu(control.State):
             self.allow_input = False
 
 
-    def update_sprites(self, selection):
+    def update_sizes(self) -> None:
+        """Update sizes if screen size has changed."""
+        if setup.screen_size.changed():
+            self.re_setup_menu()
+            self.background_x_mult = setup.screen_size.get_width() * c.BACKGROUND_X_SCALER
+            self.background_y_mult = setup.screen_size.get_height() * c.BACKGROUND_Y_SCALER
+            self.menu_y = int(setup.screen_size.get_height() / 3.5)
+
+            self.view = pg.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+
+            size_delta = (int(self.background_rect.width*self.background_x_mult), int(self.background_rect.height*self.background_y_mult))
+            self.background = pg.transform.scale(self.background, size_delta)
+
+
+    def update_sprites(self, selection: user_interface.MenuSelection) -> None:
         self.menu_group.update(selection)
 
 
-    def blit_images(self, surface):
-        surface.blit(self.background, (0, 0))
+    def blit_images(self, surface: pg.Surface) -> None:
+        surface.blit(self.background, (0, 0), self.view)
 
         self.menu_group.draw(surface)
 

@@ -12,6 +12,7 @@ def get_image(
         height: int,
         sprite_sheet: pg.Surface,
         mult: float=1,
+        y_mult: float=None,
         colorkey: Tuple[int, int, int]=c.BLACK,
         transparent: bool=True) -> pg.Surface:
     """Extracts from the sprite sheet, or just the sprite."""
@@ -28,6 +29,8 @@ def get_image(
 
     #image.set_colorkey(colorkey)
 
-    size_delta = (int(rect.width * mult), int(rect.height * mult))
+    if y_mult is None:
+        y_mult = mult
+    size_delta = (int(rect.width * mult), int(rect.height * y_mult))
     image = pg.transform.scale(image, size_delta)
     return image

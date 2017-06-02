@@ -75,7 +75,8 @@ DARK_PALE =     (170, 155, 82)
 
 
 # Multipliers.
-BACKGROUND_MULT = 0.397
+DEFAULT_BACKGROUND_X_MULT = 0.26042 # Resolution w / background w
+DEFAULT_BACKGROUND_Y_MULT = 0.39063 # Resolution h / background h
 ENEMY_MULT = 1.5
 PROJECTILE_MULT = 1.25
 NPC_MULT = 0.25
@@ -85,7 +86,7 @@ BUTTON_MULT = 0.10 # 0.16 makes the button the size of a tile
 PRESSED_BUTTON_MULT = 0.097
 
 map_mult = {
-    Biome.FARMLAND: 4,
+    Biome.FARMLAND: 5,
     Biome.ISLAND: 2,
     Biome.CAVE: 2,
     Biome.HOUSE: 0.5,
@@ -97,17 +98,15 @@ TILE_SIZE = 64
 ORIGINAL_ICON_SIZE = 400
 BUTTON_SIZE = ORIGINAL_ICON_SIZE * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
+DEFAULT_SCREEN_WIDTH = 800
+DEFAULT_SCREEN_HEIGHT = 600
+DEFAULT_SCREEN_SIZE = (DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT)
 
 #***
 # Base map size off of resolution, fix it to the nearest TILE_SIZE.
 #***
-#MAP_WIDTH = SCREEN_WIDTH*4
-#MAP_HEIGHT = SCREEN_HEIGHT*4
-MAP_WIDTH = round(SCREEN_WIDTH * map_mult[Biome.FARMLAND] / TILE_SIZE) * TILE_SIZE
-MAP_HEIGHT = round(SCREEN_HEIGHT * map_mult[Biome.FARMLAND] / TILE_SIZE) * TILE_SIZE
+MAP_WIDTH = round(DEFAULT_SCREEN_WIDTH * map_mult[Biome.FARMLAND] / TILE_SIZE) * TILE_SIZE
+MAP_HEIGHT = round(DEFAULT_SCREEN_HEIGHT * map_mult[Biome.FARMLAND] / TILE_SIZE) * TILE_SIZE
 MAP_SIZE = (MAP_WIDTH, MAP_HEIGHT)
 GRID_WIDTH = int(round(MAP_WIDTH / TILE_SIZE))
 GRID_HEIGHT = int(round(MAP_HEIGHT / TILE_SIZE))
@@ -165,6 +164,17 @@ MENU_SELECTION_OFFSET = 73
 #PRESSED_BUTTON_OFFSET = ORIGINAL_ICON_SIZE * 0.02
 
 
-# Height on screen
-UI_BUTTON_Y = SCREEN_HEIGHT * 5/6
-MENU_Y = int(SCREEN_HEIGHT / 3.5)
+# Starting heights based off the default screen size.
+STARTING_BUTTON_Y = DEFAULT_SCREEN_HEIGHT * 5/6
+STARTING_MENU_Y = int(DEFAULT_SCREEN_HEIGHT / 3.5)
+
+MENU_WIDTH = 218 # Size of the menu item sprites after transformation.
+
+
+# Scalers.
+# I know that for the 800 by 600 resolution the background
+# multiplier of 0.397 fits well so that mimick that scale
+# determine a value to multiply the sum of the width and height
+# to get a reasonable background multiplier.
+BACKGROUND_X_SCALER = DEFAULT_BACKGROUND_X_MULT / DEFAULT_SCREEN_WIDTH
+BACKGROUND_Y_SCALER = DEFAULT_BACKGROUND_Y_MULT / DEFAULT_SCREEN_HEIGHT

@@ -30,9 +30,7 @@ class CommonArea(control.State):
 
         self.state = c.MainState.COMMONAREA
 
-        self.direction = c.Direction.DOWN
-        self.camera_speed = c.speeds["camera"]
-        self.set_camera_velocity()
+        self.setup_camera()
 
 
     def setup_map(self) -> None:
@@ -42,14 +40,14 @@ class CommonArea(control.State):
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
 
-        #self.camera = setup.SCREEN.get_rect(bottom=self.entire_area_rect.bottom)
-        if not c.DEBUG_MAP:
-            # XXX Can adjust the starting area later.
-            # For now just start the camera at 0, 0
-            #self.camera = pg.Rect((c.MAP_WIDTH/2, c.MAP_HEIGHT/2), (c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
-            self.camera = pg.Rect((0, 0), (c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
-        else:
-            self.camera = pg.Rect((0, 0), (self.entire_area_rect.w, self.entire_area_rect.h))
+
+    def setup_camera(self) -> None:
+        # XXX Can adjust the starting area later.
+        # For now just start the camera at 0, 0
+        self.camera = pg.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+        self.direction = c.Direction.DOWN
+        self.camera_speed = c.speeds["camera"]
+        self.set_camera_velocity()
 
 
     def setup_npcs(self) -> pg.sprite.Group:
@@ -93,6 +91,7 @@ class CommonArea(control.State):
         """Update the state every frame"""
         self.game_info["current_time"] = current_time
 
+        self.update_sizes()
         self.update_sprites()
         self.handle_states()
         self.blit_images(surface)
@@ -125,6 +124,12 @@ class CommonArea(control.State):
             self.move_camera()
         elif binds.INPUT.held("escape"):
             self.quit = True
+
+
+    def update_sizes(self) -> None:
+        if setup.screen_size.changed():
+            # Before overwriting camera, set it at the same position it was before.
+            self.camera = pg.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
 
 
     def update_sprites(self) -> None:
