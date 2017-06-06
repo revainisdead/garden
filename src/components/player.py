@@ -157,7 +157,7 @@ class Player(pg.sprite.Sprite):
         self.set_velocity()
 
 
-        new_x, new_y = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        new_x, new_y = tools.fix_edge_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
 
         self.rect.x = new_x
         collided = self.get_closest_collisions()

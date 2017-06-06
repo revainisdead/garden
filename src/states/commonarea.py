@@ -142,7 +142,7 @@ class CommonArea(control.State):
     def move_camera(self) -> None:
         self.set_camera_velocity()
 
-        new_x, new_y = tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
+        new_x, new_y = tools.fix_edge_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
         self.camera.x = new_x
         self.camera.y = new_y
 
