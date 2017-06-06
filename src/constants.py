@@ -11,8 +11,8 @@ PG_GET_PRESSED_LENGTH = 323
 
 
 # Debug flags.
-DEBUG_MAP = False   # XXX Doesn't work properly with new camera changes.
-DEBUG_CAMERA = True # XXX IF NOT CAMERA_ON_HERO, use debug_camera speed.
+DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
+DEBUG_CAMERA = False # XXX IF NOT CAMERA_ON_HERO, use debug_camera speed.
 DEBUG_ENEMY = False
 DEBUG_PLAYER = False
 DEBUG_NPC = False
@@ -122,7 +122,7 @@ TILE_MULT = TILE_SIZE / 64
 
 # Speeds.
 speeds = {
-    "player": 5 if not DEBUG_PLAYER else 15,
+    "player": 6 if not DEBUG_PLAYER else 15,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
     "npc_roaming": 3 if not DEBUG_NPC else 10,

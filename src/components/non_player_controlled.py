@@ -69,7 +69,6 @@ class Npc(pg.sprite.Sprite):
         self.animation_speed_static = 120
 
 
-
     def load_up_sprites_from_sheet(self) -> List[pg.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
@@ -161,9 +160,10 @@ class Npc(pg.sprite.Sprite):
         return direction_choice
 
 
-    def auto_walk(self, collidables: List[util.Collidable]) -> None:
-        interval_change_sec_min = c.FPS * 5
-        interval_change_sec_max = c.FPS * 6
+    def auto_walk(self) -> None:
+        interval_change_sec_min = c.FPS * 2
+        interval_change_sec_max = c.FPS * 3
+        self.set_velocity()
 
         if self.walking_dir_change_interval is None:
             if self.direction == c.Direction.NONE:
@@ -176,25 +176,36 @@ class Npc(pg.sprite.Sprite):
         if self.walking_dir_change_counter == self.walking_dir_change_interval:
             self.direction = self.pick_new_direction()
 
-        hit_edge = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        new_x, new_y = tools.fix_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
 
-        hit_wall = tools.test_collide(rect=self.rect, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
+        hit_edge = False
+        if new_x == self.rect.x and new_y == self.rect.y:
+            # If the rect hasn't moved when checking for end of map
+            # bounds, then it hit the end of the map. Save for later.
+            hit_edge = True
 
-        if hit_wall or hit_edge:
+        # Move the Rect.
+        self.rect.x = new_x
+        self.rect.y = new_y
+
+        hit_wall = tools.test_collide(sprite=self, x_vel=self.x_vel, y_vel=self.y_vel, collidable_group=self.collidable_group)
+
+        if hit_edge or hit_wall:
+            # If the end of the map prevented the npc from moving,
+            # pick a new direction. Don't let npcs run into walls...
             self.direction = self.pick_new_direction(ran_into_wall=True)
 
-        self.set_velocity()
 
-
-    def handle_state(self, collidables: List[util.Collidable]) -> None:
+    def handle_state(self) -> None:
         self.animate_walk()
-        self.auto_walk(collidables)
+        self.auto_walk()
 
 
-    def update(self, current_time: float, collidables: List[util.Collidable]) -> None:
+    def update(self, current_time: float, collidable_group: pg.sprite.Group) -> None:
         self.current_time = current_time
+        self.collidable_group = collidable_group
 
-        self.handle_state(collidables)
+        self.handle_state()
 
 
     def animate_walk(self) -> None:

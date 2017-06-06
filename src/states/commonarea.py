@@ -22,30 +22,27 @@ class CommonArea(control.State):
 
     def startup(self, game_info: Dict[str, Any]) -> None:
         self.game_info = game_info
-
-        #self.setup_enemies()
-        self.npc_group = self.setup_npcs()
-        self.setup_player()
-        #self.glaive_group = pg.sprite.Group()
-
         self.state = c.MainState.COMMONAREA
 
+        #self.setup_enemies()
+        self.setup_player()
+        self.npc_group = self.setup_npcs()
+        #self.glaive_group = pg.sprite.Group()
         self.setup_camera()
 
 
     def setup_map(self) -> None:
         self.tilemap = tilemap.Map()
-        self.collidables = self.tilemap.create_collidables()
+        self.collidable_group = self.tilemap.create_collidables()
         self.tilemap_rect = self.tilemap.map_surface.get_rect()
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
 
 
     def setup_camera(self) -> None:
-        # XXX Can adjust the starting area later.
-        # For now just start the camera at 0, 0
-        self.camera = pg.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
-        self.direction = c.Direction.DOWN
+        # Start the camera on top of the player.
+        self.camera = pg.Rect((self.player.rect.x, self.player.rect.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+        self.direction = c.Direction.NONE
         self.camera_speed = c.speeds["camera"]
         self.set_camera_velocity()
 
@@ -60,7 +57,7 @@ class CommonArea(control.State):
 
         for _ in range(random_npcs_limit):
             x, y = self.tilemap.find_random_open_location()
-            npc_group.add(non_player_controlled.Npc(x * c.TILE_SIZE, y * c.TILE_SIZE))
+            npc_group.add(non_player_controlled.Npc(x, y))
 
         return npc_group
 
@@ -80,11 +77,10 @@ class CommonArea(control.State):
 
 
     def setup_player(self) -> None:
-        # Is also going to need to find_open_location method
         # But should the player's location be random? Maybe, go find your farm!
-        #self.player = player.Player(500, 400)
-        #self.player_group = pg.sprite.Group(self.player)
-        pass
+        x, y = self.tilemap.find_random_open_location()
+        self.player = player.Player(x, y)
+        self.player_group = pg.sprite.Group(self.player)
 
 
     def update(self, surface: pg.Surface, current_time: float) -> None:
@@ -99,6 +95,10 @@ class CommonArea(control.State):
 
     def handle_states(self) -> None:
         if binds.INPUT.held("left"):
+            # XXX Hacking different directions into each of these directions
+            # doesn't help. The if statement priority still takes
+            # precedence. How to make it so that the new button pressed
+            # is the one that takes priority? Maybe change Input class.
             if binds.INPUT.held("up"):
                 self.direction = c.Direction.LEFTUP
             elif binds.INPUT.held("down"):
@@ -115,7 +115,6 @@ class CommonArea(control.State):
             else:
                 self.direction = c.Direction.RIGHT
             self.move_camera()
-
         elif binds.INPUT.held("up"):
             self.direction = c.Direction.UP
             self.move_camera()
@@ -136,14 +135,16 @@ class CommonArea(control.State):
         #self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
         #self.glaive_group.update(self.game_info["current_time"])
 
-        #self.player_group.update()
-        self.npc_group.update(self.game_info["current_time"], self.collidables)
+        self.player_group.update(self.game_info["current_time"], self.collidable_group)
+        self.npc_group.update(self.game_info["current_time"], self.collidable_group)
 
 
     def move_camera(self) -> None:
         self.set_camera_velocity()
 
-        tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
+        new_x, new_y = tools.fix_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
+        self.camera.x = new_x
+        self.camera.y = new_y
 
 
     def set_camera_velocity(self) -> None:
@@ -179,7 +180,7 @@ class CommonArea(control.State):
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)
 
         self.tilemap.update(self.entire_area, self.camera)
-        #self.player_group.draw(self.entire_area)
+        self.player_group.draw(self.entire_area)
         #self.enemy_group.draw(self.entire_area)
         self.npc_group.draw(self.entire_area)
 

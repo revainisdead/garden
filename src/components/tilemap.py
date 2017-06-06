@@ -111,7 +111,7 @@ class Map:
 
         # Use this list the same as the grid.
         # But instead of 1 being water, make 1 represent a collidable.
-        self.collidable_grid = [[0 if random.randint(0, 4) == 0 else 1 for y in range(self.height)] for x in range(self.width)]
+        self.collidable_grid = [[0 for y in range(self.height)] for x in range(self.width)]
 
         self.__generate_grid()
         self.tiles = self.create_tiles()
@@ -512,28 +512,26 @@ class Map:
     #for island: __do a completely different map
 
 
-    def create_collidables(self) -> List[util.Collidable]:
-        collidables = []
-
-        #for rect in self.collidables:
-            #collidable = util.Collidable(rect.x, rect.y)
-            #collidables.append(collidable)
+    def create_collidables(self) -> pg.sprite.Group:
+        collidable_group = pg.sprite.Group()
 
         for y in range(self.height):
             for x in range(self.width):
                 if self.collidable_grid[x][y] > 0:
-                    collidables.append(util.Collidable(x * c.TILE_SIZE, y * c.TILE_SIZE))
+                    collidable_group.add(util.Collidable(x * c.TILE_SIZE, y * c.TILE_SIZE))
 
-        return collidables
+        return collidable_group
 
 
     def find_random_open_location(self) -> Tuple[int, int]:
+        """ Based on collidable spots, return a random, open location.
+        Return an actual location on the map, not the grid location."""
         while True:
             x = random.randint(0, self.width - 1)
             y = random.randint(0, self.height - 1)
 
             if self.collidable_grid[x][y] == 0:
-                return x, y
+                return x * c.TILE_SIZE, y * c.TILE_SIZE
 
 
     def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
