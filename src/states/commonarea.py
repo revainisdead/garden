@@ -47,6 +47,10 @@ class CommonArea(control.State):
         self.camera_speed = c.speeds["camera"]
         self.set_camera_velocity()
 
+        # Call move_camera once in setup to force the camera to center
+        # on the player.
+        self.move_camera()
+
 
     def setup_npcs(self) -> pg.sprite.Group:
         npcs = [] # type: List[non_player_controlled.Npc]
@@ -81,6 +85,26 @@ class CommonArea(control.State):
 
 
     def handle_states(self) -> None:
+        if binds.INPUT.pressed("escape"):
+            self.quit = True
+        else:
+            self.move_camera()
+
+
+    def update_sizes(self) -> None:
+        """Used when changing the screen resolution"""
+        if setup.screen_size.changed():
+            # Start new camera at the same position as before.
+            self.camera = pg.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+
+
+    def update_sprites(self) -> None:
+        self.player_group.update(self.game_info["current_time"], self.collidable_group)
+        self.npc_group.update(self.game_info["current_time"], self.collidable_group)
+
+
+    def move_camera(self) -> None:
+        """
         if binds.INPUT.held("left"):
             # XXX Hacking different directions into each of these directions
             # doesn't help. The if statement priority still takes
@@ -108,22 +132,10 @@ class CommonArea(control.State):
         elif binds.INPUT.held("down"):
             self.direction = c.Direction.DOWN
             self.move_camera()
-        elif binds.INPUT.held("escape"):
-            self.quit = True
+        else:
+            self.direction = c.Direction.NONE
+        """
 
-
-    def update_sizes(self) -> None:
-        if setup.screen_size.changed():
-            # Before overwriting camera, set it at the same position it was before.
-            self.camera = pg.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
-
-
-    def update_sprites(self) -> None:
-        self.player_group.update(self.game_info["current_time"], self.collidable_group)
-        self.npc_group.update(self.game_info["current_time"], self.collidable_group)
-
-
-    def move_camera(self) -> None:
         self.direction = self.player.direction
         self.set_camera_velocity()
 
@@ -133,10 +145,6 @@ class CommonArea(control.State):
         check_lt_x = lambda x: x if x < self.camera.centerx else self.camera.centerx
         check_gt_y = lambda y: y if y > self.camera.centery else self.camera.centery
         check_lt_y = lambda y: y if y < self.camera.centery else self.camera.centery
-        # check_lt_y(self.player.rect.centery)
-        # check_gt_x(self.player.rect.centerx)
-        # check_lt_x(self.player.rect.centerx)
-        # check_gt_y(self.player.rect.centery)
 
         if self.camera.x != new_x:
             if self.direction == c.Direction.LEFT:
@@ -145,21 +153,22 @@ class CommonArea(control.State):
                 self.camera.centerx = check_gt_x(self.player.rect.centerx)
             elif self.direction == c.Direction.LEFTUP:
                 self.camera.centerx = check_lt_x(self.player.rect.centerx)
-                self.camera.centery = check_lt_y(self.player.rect.centery)
             elif self.direction == c.Direction.RIGHTUP:
                 self.camera.centerx = check_gt_x(self.player.rect.centerx)
-                self.camera.centery = check_lt_y(self.player.rect.centery)
             elif self.direction == c.Direction.LEFTDOWN:
                 self.camera.centerx = check_lt_x(self.player.rect.centerx)
-                self.camera.centery = check_gt_y(self.player.rect.centery)
             elif self.direction == c.Direction.RIGHTDOWN:
                 self.camera.centerx = check_gt_x(self.player.rect.centerx)
-                self.camera.centery = check_gt_y(self.player.rect.centery)
 
-            if self.camera.x < 0:
-                self.camera.x = new_x
-            elif self.camera.x > self.tilemap_rect.right:
-                self.camera.x = new_x
+        if self.camera.x < 0:
+            self.camera.x = 0
+        elif self.camera.x + self.camera.w > self.tilemap_rect.right:
+            self.camera.x = new_x
+
+        if self.camera.y < 0:
+            self.camera.y = 0
+        elif self.camera.y + self.camera.h > self.tilemap_rect.bottom:
+            self.camera.y = new_y
 
         new_x, new_y = tools.fix_edge_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
 
@@ -168,19 +177,34 @@ class CommonArea(control.State):
                 self.camera.centery = check_lt_y(self.player.rect.centery)
             elif self.direction == c.Direction.DOWN:
                 self.camera.centery = check_gt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.LEFTUP:
+                self.camera.centery = check_lt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.RIGHTUP:
+                self.camera.centery = check_lt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.LEFTDOWN:
+                self.camera.centery = check_gt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.RIGHTDOWN:
+                self.camera.centery = check_gt_y(self.player.rect.centery)
 
-            if self.camera.y < 0:
-                self.camera.y = new_y
-            elif self.camera.y > self.tilemap_rect.bottom:
-                self.camera.y = new_y
 
+        if self.camera.x < 0:
+            self.camera.x = 0
+        elif self.camera.x + self.camera.w > self.tilemap_rect.right:
+            self.camera.x = new_x
+
+        if self.camera.y < 0:
+            self.camera.y = 0
+        elif self.camera.y + self.camera.h > self.tilemap_rect.bottom:
+            self.camera.y = new_y
+
+        # Debug.
+        #print("camera.y: {}".format(self.camera.y))
+        #print("new_y:    {}".format(new_y))
         #self.camera.centerx = self.player.rect.centerx
         #self.camera.centery = self.player.rect.centery
 
 
-
     def set_camera_velocity(self) -> None:
-        # Before setting new velocity, reset to 0
         self.camera_x_vel = 0
         self.camera_y_vel = 0
 
@@ -204,6 +228,9 @@ class CommonArea(control.State):
         elif self.direction == c.Direction.RIGHTDOWN:
             self.camera_x_vel = self.camera_speed
             self.camera_y_vel = self.camera_speed
+        elif self.direction == c.Direction.NONE:
+            self.camera_x_vel = 0
+            self.camera_y_vel = 0
 
 
     def blit_images(self, surface: pg.Surface) -> None:

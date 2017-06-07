@@ -11,16 +11,25 @@ PG_GET_PRESSED_LENGTH = 323
 
 
 # Debug flags.
-DEBUG_MAP = False # XXX Doesn't work properly with new camera changes.
-DEBUG_CAMERA = True # XXX IF NOT CAMERA_ON_HERO, use debug_camera speed.
+DEBUG_MAP = False
+DEBUG_CAMERA = False
 DEBUG_ENEMY = False
-DEBUG_PLAYER = True
+DEBUG_PLAYER = False
 DEBUG_NPC = False
+
+
+def flip_player_camera_combo() -> None:
+    global DEBUG_CAMERA
+    DEBUG_CAMERA = True
+    global DEBUG_PLAYER
+    DEBUG_PLAYER = True
+flip_player_camera_combo()
 
 
 class MainState(enum.Enum):
     MAINMENU = 0
-    COMMONAREA = 1
+    INGAMEMENU = 1
+    COMMONAREA = 2
 
 
 class Direction(enum.Enum):
@@ -51,6 +60,11 @@ class Biome(enum.Enum):
     ISLAND = 1
     CAVE = 2
     HOUSE = 3
+
+
+class Switch(enum.Enum):
+    ON = 0
+    OFF = 1
 
 
 # Extract colors using: labs.tineye.com/color/

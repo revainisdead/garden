@@ -38,17 +38,15 @@ class MenuSelection(pg.sprite.Sprite):
 
         self.sprite = setup.GFX["green_button01"]
         self.sprite_selected = setup.GFX["green_button00"]
-
         self.font = setup.FONTS["kenvector_future_thin"]
 
         self.frames = self.load_sprites_from_sheet()
         self.image = self.frames[0]
-
         self.rect = self.image.get_rect()
-
         self.rect.x = x
         self.rect.y = y
 
+        self.state = c.Switch.OFF
         self.name = name
         self.selected = False
 
@@ -179,15 +177,13 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pg.Surface) -> None:
-        self.update_sizes()
+    def update(self, screen: pg.Surface, mainstate: c.MainState) -> None:
+        self.handle_state(mainstate)
 
-        #self.handle_state()
-        self.button_group.update()
-
-        # if state is off: don't blit
-        self.blit_images(screen)
-
+        if self.state == c.Switch.ON:
+            self.update_sizes()
+            self.button_group.update()
+            self.blit_images(screen)
 
 
     def update_sizes(self) -> None:
@@ -196,8 +192,11 @@ class GameUI:
             self.re_setup_buttons() # Re-setup buttons after y changes.
 
 
-    def handle_state(self) -> None:
-        pass
+    def handle_state(self, mainstate) -> None:
+        if mainstate == c.MainState.MAINMENU or mainstate == c.MainState.INGAMEMENU:
+            self.state = c.Switch.OFF
+        else:
+            self.state = c.Switch.ON
 
 
     def blit_images(self, screen: pg.Surface) -> None:

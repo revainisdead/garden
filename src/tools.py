@@ -184,6 +184,8 @@ def fix_edge_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y
         # apply to the horizontal movement.
         new_y = rect.y + (highest_y - rect.bottom)
 
+    #rect.x = new_x
+    #rect.y = new_y
     return new_x, new_y
 
 
