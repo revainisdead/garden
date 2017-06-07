@@ -54,6 +54,7 @@ class ScreenSize:
 
 
 def start():
+    os.environ["SDL_VIDEO_CENTERED"] = "1"
     pg.init()
     pg.font.init()
 

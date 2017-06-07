@@ -24,10 +24,8 @@ class CommonArea(control.State):
         self.game_info = game_info
         self.state = c.MainState.COMMONAREA
 
-        #self.setup_enemies()
         self.setup_player()
         self.npc_group = self.setup_npcs()
-        #self.glaive_group = pg.sprite.Group()
         self.setup_camera()
 
 
@@ -42,6 +40,9 @@ class CommonArea(control.State):
     def setup_camera(self) -> None:
         # Start the camera on top of the player.
         self.camera = pg.Rect((self.player.rect.x, self.player.rect.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+        self.camera.centerx = self.player.rect.centerx
+        self.camera.centery = self.player.rect.centery
+
         self.direction = c.Direction.NONE
         self.camera_speed = c.speeds["camera"]
         self.set_camera_velocity()
@@ -60,20 +61,6 @@ class CommonArea(control.State):
             npc_group.add(non_player_controlled.Npc(x, y))
 
         return npc_group
-
-
-    def setup_enemies(self) -> None:
-        #enemy1 = enemy.Enemy(300, 300)
-        #enemy2 = enemy.Enemy(350, 350)
-        #enemy3 = enemy.Enemy(500, 500)
-        #enemy4 = enemy.Enemy(600, 800)
-        #enemy5 = enemy.Enemy(800, 400)
-        #enemy6 = enemy.Enemy(400, 800)
-        #self.enemy_group = pg.sprite.Group(
-                #enemy1, enemy2, enemy3,
-                #enemy4, enemy5, enemy6
-                #)
-        pass
 
 
     def setup_player(self) -> None:
@@ -132,19 +119,64 @@ class CommonArea(control.State):
 
 
     def update_sprites(self) -> None:
-        #self.enemy_group.update(self.game_info["current_time"], self.glaive_group)
-        #self.glaive_group.update(self.game_info["current_time"])
-
         self.player_group.update(self.game_info["current_time"], self.collidable_group)
         self.npc_group.update(self.game_info["current_time"], self.collidable_group)
 
 
     def move_camera(self) -> None:
+        self.direction = self.player.direction
         self.set_camera_velocity()
 
         new_x, new_y = tools.fix_edge_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
-        self.camera.x = new_x
-        self.camera.y = new_y
+
+        check_gt_x = lambda x: x if x > self.camera.centerx else self.camera.centerx
+        check_lt_x = lambda x: x if x < self.camera.centerx else self.camera.centerx
+        check_gt_y = lambda y: y if y > self.camera.centery else self.camera.centery
+        check_lt_y = lambda y: y if y < self.camera.centery else self.camera.centery
+        # check_lt_y(self.player.rect.centery)
+        # check_gt_x(self.player.rect.centerx)
+        # check_lt_x(self.player.rect.centerx)
+        # check_gt_y(self.player.rect.centery)
+
+        if self.camera.x != new_x:
+            if self.direction == c.Direction.LEFT:
+                self.camera.centerx = check_lt_x(self.player.rect.centerx)
+            elif self.direction == c.Direction.RIGHT:
+                self.camera.centerx = check_gt_x(self.player.rect.centerx)
+            elif self.direction == c.Direction.LEFTUP:
+                self.camera.centerx = check_lt_x(self.player.rect.centerx)
+                self.camera.centery = check_lt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.RIGHTUP:
+                self.camera.centerx = check_gt_x(self.player.rect.centerx)
+                self.camera.centery = check_lt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.LEFTDOWN:
+                self.camera.centerx = check_lt_x(self.player.rect.centerx)
+                self.camera.centery = check_gt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.RIGHTDOWN:
+                self.camera.centerx = check_gt_x(self.player.rect.centerx)
+                self.camera.centery = check_gt_y(self.player.rect.centery)
+
+            if self.camera.x < 0:
+                self.camera.x = new_x
+            elif self.camera.x > self.tilemap_rect.right:
+                self.camera.x = new_x
+
+        new_x, new_y = tools.fix_edge_bounds(rect=self.camera, highest_x=self.tilemap_rect.right, highest_y=self.tilemap_rect.bottom, x_vel=self.camera_x_vel, y_vel=self.camera_y_vel)
+
+        if self.camera.y != new_y:
+            if self.direction == c.Direction.UP:
+                self.camera.centery = check_lt_y(self.player.rect.centery)
+            elif self.direction == c.Direction.DOWN:
+                self.camera.centery = check_gt_y(self.player.rect.centery)
+
+            if self.camera.y < 0:
+                self.camera.y = new_y
+            elif self.camera.y > self.tilemap_rect.bottom:
+                self.camera.y = new_y
+
+        #self.camera.centerx = self.player.rect.centerx
+        #self.camera.centery = self.player.rect.centery
+
 
 
     def set_camera_velocity(self) -> None:
@@ -180,14 +212,11 @@ class CommonArea(control.State):
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)
 
         self.tilemap.update(self.entire_area, self.camera)
-        self.player_group.draw(self.entire_area)
-        #self.enemy_group.draw(self.entire_area)
         self.npc_group.draw(self.entire_area)
 
-        # Put things here that should be drawn over npcs
+        # Draw player over npc's, to make player feel more important...
+        self.player_group.draw(self.entire_area)
         self.tilemap.tree_top_group.draw(self.entire_area)
-
-        #self.glaive_group.draw(self.entire_area)
 
         # Finally, draw everything to the screen surface.
         surface.blit(self.entire_area, (0, 0), self.camera)

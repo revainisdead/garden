@@ -129,8 +129,7 @@ class Player(pg.sprite.Sprite):
 
 
     def walk(self) -> None:
-        # The camera and the hero should set the velocity
-        # at the same time, so that they are in sync.
+        self.previous_direction = self.direction
 
         if binds.INPUT.held("left"):
             if binds.INPUT.held("up"):
@@ -175,8 +174,7 @@ class Player(pg.sprite.Sprite):
     def check_x_collisions(self, collided: pg.sprite.Sprite) -> None:
         if self.rect.x < collided.rect.x:
             self.rect.right = collided.rect.left
-        #elif self.rect.x > collided.rect.x:
-        else:
+        elif self.rect.x > collided.rect.x:
             self.rect.left = collided.rect.right
         self.x_vel = 0
 
@@ -184,8 +182,7 @@ class Player(pg.sprite.Sprite):
     def check_y_collisions(self, collided: pg.sprite.Sprite) -> None:
         if self.rect.y > collided.rect.y:
             self.rect.y = collided.rect.bottom
-        #elif self.rect.y < collided.rect.y
-        else:
+        elif self.rect.y < collided.rect.y:
             self.rect.bottom = collided.rect.top
         self.y_vel = 0
 
