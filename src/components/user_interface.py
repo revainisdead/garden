@@ -215,15 +215,28 @@ class Hud:
         Ex. 8:15 AM
         """
         time = datetime.now()
-        #hour = time.hour
-        #minute = time.minute
-
         time = time.strftime("%I:%M %p")
 
-        #if minute < 10:
-            #minute = "0" + str(minute)
+        # Remove the starting zero from the hour if it exists.
+        if time.startswith("0"):
+            time = time[1:]
+        """
+        # Make the minutes start with a zero if it is less than 2 in length.
+        time_split = time.split(":")
+        # Save the last 3 characters of the second list item: " AM"
+        #am_pm = time_split[1][:3]
+        #time_split[1] = time_split[1][:3]
+        if len(time_split[1]) < 5: # 2 (10 minutes) + Last 3 characters: " AM"
+            time_split[1] = ":0" + time_split[1]
+        else:
+            # Add the semi-colon back in either way.
+            time_split[1] = ":" + time_split[1]
 
-        #self.clock = "{}:{}".format(hour, minute)
+        # Save back into time.
+        time = ""
+        for part in time_split:
+            time += part
+        """
         self.clock = time
 
 

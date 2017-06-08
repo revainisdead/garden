@@ -159,21 +159,17 @@ def fix_edge_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y
 
     new_x = rect.x + x_vel
     new_y = rect.y + y_vel
-    hit_wall = False
     if new_x < lowest_x:
-        hit_wall = True
         new_x = lowest_x
     elif new_x + rect.w > highest_x:
-        hit_wall = True
-        new_x = rect.x
+        # Apply y fix to x for fixing the camera on top of player.
+        new_x = rect.x + (highest_x - rect.right)
 
     # New if statement because x and y both need to be checked each frame.
     if new_y < lowest_y:
-        hit_wall = True
         new_y = lowest_y
     elif new_y + rect.h > highest_y:
         # Remember: y is inverted... The highest point is on the bottom.
-        hit_wall = True
         # Interesting bug was here. When the camera is about the move off
         # the map, the camera speed will be added to new_y and if the camera
         # displacement would have moved the camera off the screen, it will
