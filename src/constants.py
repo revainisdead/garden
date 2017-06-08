@@ -23,7 +23,7 @@ def flip_player_camera_combo() -> None:
     DEBUG_CAMERA = True
     global DEBUG_PLAYER
     DEBUG_PLAYER = True
-flip_player_camera_combo()
+#flip_player_camera_combo()
 
 
 class MainState(enum.Enum):
@@ -127,7 +127,10 @@ GRID_HEIGHT = int(round(MAP_HEIGHT / TILE_SIZE))
 
 CORNER_SIZE = 15
 
-FONT_SIZE = 22
+FONT_SIZE_DICT = {
+    "menu": 22,
+    "game": 14,
+}
 
 # Full size(1) for tile_size = 64
 # Half size(0.5)  for tile_size = 32
@@ -169,6 +172,8 @@ MAX_FENCE_LENGTH = 5
 
 MIN_NPC_AMOUNT = 3
 MAX_NPC_AMOUNT = 8
+MIN_STAIRS_AMOUNT = 2
+MAX_STAIRS_AMOUNT = 4
 
 
 # Offsets.
@@ -182,8 +187,9 @@ MENU_SELECTION_OFFSET = 73
 IMMUTABLE_BUTTON_X = 120
 IMMUTABLE_BUTTON_Y_OFFSET = 100
 STARTING_MENU_Y = int(DEFAULT_SCREEN_HEIGHT / 3.5)
-
 MENU_WIDTH = 218 # Size of the menu item sprites after transformation.
+IMMUTABLE_HUD_X_OFFSET = 70
+IMMUTABLE_HUD_Y = 20
 
 
 # Scalers.

@@ -70,22 +70,21 @@ class Control:
         self.state.update(self.screen_surface, self.current_time)
 
         # In Game User Interface.
-        self.game_ui.update(self.screen_surface, self.state_name)
+        self.game_ui.update(self.screen_surface, self.current_time, self.state_name)
 
 
-    def setup_states(self, state_dict, start_state):
+    def setup_states(self, state_dict, start_state) -> None:
         self.state_dict = state_dict
         self.state_name = start_state
         self.state = self.state_dict[self.state_name]
-
         print("Initial state in control object: {}".format(self.state_name))
 
 
-    def setup_game_ui(self):
+    def setup_game_ui(self) -> None:
         self.game_ui = user_interface.GameUI()
 
 
-    def flip_state(self):
+    def flip_state(self) -> None:
         previous, self.state_name = self.state_name, self.state.next
         # Get game_info before setting new state
         game_info = self.state.dump_game_info()

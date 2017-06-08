@@ -1,6 +1,7 @@
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from collections import OrderedDict
+from datetime import datetime
 import time
 
 import pygame as pg
@@ -38,7 +39,7 @@ class MenuSelection(pg.sprite.Sprite):
 
         self.sprite = setup.GFX["green_button01"]
         self.sprite_selected = setup.GFX["green_button00"]
-        self.font = setup.FONTS["kenvector_future_thin"]
+        self.font = setup.FONTS["menu_kenvector_future_thin"]
 
         self.frames = self.load_sprites_from_sheet()
         self.image = self.frames[0]
@@ -83,6 +84,26 @@ class MenuSelection(pg.sprite.Sprite):
         surface.blit(text, text_rect)
 
 
+class Tooltip(pg.sprite.Sprite):
+    def __init__(self, x: int, y: int) -> None:
+        super().__init__()
+        sprite = setup.GFX["tooltip_bubble"]
+
+        self.name = sprite_name
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TOOLTIP_MULT)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
+    def render_text(self) -> None:
+        pass
+
+
+    def scale_to_text_size(self) -> None:
+        pass
+
+
 class Button(pg.sprite.Sprite):
     def __init__(self, x, y, name) -> None:
         super().__init__()
@@ -120,9 +141,8 @@ class Button(pg.sprite.Sprite):
         return frames
 
 
-    def update(self) -> None:
-        self.current_time = time.time()
-
+    def update(self, current_time: int) -> None:
+        self.current_time = current_time
         self.handle_state()
 
 
@@ -150,6 +170,9 @@ class Button(pg.sprite.Sprite):
             self.image = self.frames[0]
 
 
+    # XXX Unused but can be used to either write to keybind onto the
+    # button or used to draw the tooltip, which can include the description
+    # and probably the keybind as well.
     def render_name(self, surface) -> None:
         if self.pressed:
             text = self.font.render(menu_labels[self.name], True, c.WHITE)
@@ -158,6 +181,79 @@ class Button(pg.sprite.Sprite):
 
         text_rect = text.get_rect(center=(setup.screen_size.get_width()/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
+
+
+class Hud:
+    def __init__(self) -> None:
+        self.font = setup.FONTS["game_kenvector_future_thin"]
+
+        self.x = setup.screen_size.get_width() - c.IMMUTABLE_HUD_X_OFFSET
+        self.y = c.IMMUTABLE_HUD_Y
+        self.clock = ""
+        self.coords = ""
+
+
+    def update_sizes(self) -> None:
+        if setup.screen_size.changed():
+            self.x = setup.screen_size.get_width() - c.IMMUTABLE_HUD_X_OFFSET
+            self.y = c.IMMUTABLE_HUD_Y
+
+
+    def update(self, screen: pg.Surface, game_info: Dict[str, Any], player: pg.sprite.Sprite, map_height: int) -> None:
+        self.update_sizes()
+
+        # Don't need game_info for clock but will still need it later.
+        self.update_clock()
+        self.update_coords(player.rect.x, player.rect.y, map_height)
+
+        self.render_clock(screen)
+        self.render_coords(screen)
+
+
+    def update_clock(self) -> None:
+        """Get the real time and save it as a string.
+        Ex. 8:15 AM
+        """
+        time = datetime.now()
+        #hour = time.hour
+        #minute = time.minute
+
+        time = time.strftime("%I:%M %p")
+
+        #if minute < 10:
+            #minute = "0" + str(minute)
+
+        #self.clock = "{}:{}".format(hour, minute)
+        self.clock = time
+
+
+    def update_coords(self, x: int, y: int, map_height: int) -> None:
+        self.coords = "({}, {})".format(x, map_height - y)
+
+
+    def render_clock(self, surface: pg.Surface) -> None:
+        text = self.font.render(self.clock, True, c.WHITE)
+        text_rect = text.get_rect(center=(self.x, self.y))
+        surface.blit(text, text_rect)
+
+
+    def render_coords(self, surface: pg.Surface) -> None:
+        text = self.font.render(self.coords, True, c.SELECTED_GRAY)
+        text_rect = text.get_rect(center=(self.x - c.IMMUTABLE_HUD_X_OFFSET*2, self.y))
+        surface.blit(text, text_rect)
+
+
+    def notification(self) -> None: pass
+    def detect_item_change(self) -> None:
+        # Compare stored game info inventory to new game info
+        # and display a notification for a period of time that
+        # displays the items gained? But also if the items gained
+        # are within the period of time that the notification would
+        # be displayed, then add it to the notifcation instead of
+        # overwriting. Show Lumber + 1! and if another lumber is
+        # gained within the time of the notification being displayed,
+        # show Lumber + 2! and reset the display timer.
+        pass
 
 
 class GameUI:
@@ -177,12 +273,12 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pg.Surface, mainstate: c.MainState) -> None:
+    def update(self, screen: pg.Surface, current_time: int, mainstate: c.MainState) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
             self.update_sizes()
-            self.button_group.update()
+            self.button_group.update(current_time)
             self.blit_images(screen)
 
 

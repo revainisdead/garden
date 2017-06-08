@@ -27,6 +27,7 @@ class CommonArea(control.State):
         self.setup_player()
         self.npc_group = self.setup_npcs()
         self.setup_camera()
+        self.setup_hud()
 
 
     def setup_map(self) -> None:
@@ -74,14 +75,32 @@ class CommonArea(control.State):
         self.player_group = pg.sprite.Group(self.player)
 
 
+    def setup_stash(self) -> None:
+        #x, y = self.tilemap.find_random_open_location()
+        pass
+
+
+    def setup_stairs(self) -> None:
+        pass
+
+
+    def setup_hud(self) -> None:
+        self.hud = user_interface.Hud()
+
+
     def update(self, surface: pg.Surface, current_time: float) -> None:
         """Update the state every frame"""
+        # create function/class to handle game info.
         self.game_info["current_time"] = current_time
 
         self.update_sizes()
         self.update_sprites()
         self.handle_states()
         self.blit_images(surface)
+
+        # Draw the hud to the screen over everything else.
+        # Similar to Game UI but the hud needs access to game_info.
+        self.hud.update(surface, self.game_info, self.player, self.tilemap_rect.bottom)
 
 
     def handle_states(self) -> None:

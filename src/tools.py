@@ -63,14 +63,8 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
             img = pg.image.load(pic_path)
 
             if img.get_alpha():
-                if name == "tree_shadow":
-                    print("unconverted tree shadow alpha: {}".format(img.get_alpha()))
                 #img = img.convert_alpha()
                 img.convert_alpha()
-
-                # Debug.
-                if name == "tree_shadow":
-                    print("converted tree shadow alpha: {}".format(img.get_alpha()))
             else:
                 img = img.convert()
                 img.set_colorkey(colorkey)
@@ -83,7 +77,6 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
                     "Path: {}\n" \
                     "Name: {}\n" \
                     "Ext: {}\n".format(pic_path, name, ext))
-
     return graphics
 
 
@@ -111,15 +104,21 @@ def load_gfx(path):
     return graphics
 
 
+# Load all the fonts for all the sizes that I want to use.
 def load_fonts(path, accept=(".ttf")):
     fonts = {}
-    for font in os.listdir(path):
-        name, ext = os.path.splitext(font)
 
-        if ext.lower() in accept:
-            fonts[name] = pg.font.Font(os.path.join(path, font), c.FONT_SIZE)
-        else:
-            print("Received invalid font. {}".format(font))
+    for pair in c.FONT_SIZE_DICT.items():
+        font_size_name = pair[0] # Ex. menu, game, etc.
+        font_size = pair[1]
+        for font in os.listdir(path):
+            name, ext = os.path.splitext(font)
+            if ext.lower() in accept:
+                # Add the intended size use to the name.
+                name = "{}_{}".format(font_size_name, name)
+                fonts[name] = pg.font.Font(os.path.join(path, font), font_size)
+            else:
+                print("Received invalid font. {}".format(font))
 
     return fonts
 

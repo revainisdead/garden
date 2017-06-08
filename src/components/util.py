@@ -15,23 +15,3 @@ class Collidable(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-
-
-class Tooltip(pg.sprite.Sprite):
-    def __init__(self, x: int, y: int):
-        super().__init__()
-        sprite = setup.GFX["tooltip_bubble"]
-
-        self.name = sprite_name
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-
-    def render_text(self) -> None:
-        pass
-
-
-    def scale_to_text_size(self) -> None:
-        pass
