@@ -234,3 +234,7 @@ class Npc(pg.sprite.Sprite):
                 self.walking_timer = self.current_time
 
         self.image = self.current_frames[self.frame_index]
+
+
+class Worm: pass
+class Bat: pass

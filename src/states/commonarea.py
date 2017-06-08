@@ -11,7 +11,7 @@ from .. import control
 from .. import setup
 from .. import tools
 
-from .. components import non_player_controlled, player, tilemap, user_interface
+from .. components import non_player_controlled, player, scenery, tilemap, user_interface
 
 
 class CommonArea(control.State):
@@ -24,8 +24,11 @@ class CommonArea(control.State):
         self.game_info = game_info
         self.state = c.MainState.COMMONAREA
 
+        self.stairs_down_group = self.setup_stairs_down()
+
         self.setup_player()
         self.npc_group = self.setup_npcs()
+
         self.setup_camera()
         self.setup_hud()
 
@@ -54,18 +57,14 @@ class CommonArea(control.State):
 
 
     def setup_npcs(self) -> pg.sprite.Group:
-        npcs = [] # type: List[non_player_controlled.Npc]
-        npc_group = pg.sprite.Group()
+        temp_group = pg.sprite.Group()
 
-        # min_npc_amount
-        # max_npc_amount
         random_npcs_limit = random.randint(c.MIN_NPC_AMOUNT, c.MAX_NPC_AMOUNT)
-
         for _ in range(random_npcs_limit):
             x, y = self.tilemap.find_random_open_location()
-            npc_group.add(non_player_controlled.Npc(x, y))
+            temp_group.add(non_player_controlled.Npc(x, y))
 
-        return npc_group
+        return temp_group
 
 
     def setup_player(self) -> None:
@@ -80,15 +79,28 @@ class CommonArea(control.State):
         pass
 
 
-    def setup_stairs(self) -> None:
-        pass
+    def setup_stairs_down(self) -> pg.sprite.Group:
+        temp_group = pg.sprite.Group()
+
+        random_limit = random.randint(c.MIN_STAIRS_AMOUNT, c.MAX_STAIRS_AMOUNT)
+        for _ in range(random_limit):
+            x, y = self.tilemap.find_random_open_location()
+            # Stairs should draw over bushes, so don't worry about the fact
+            # that an "open location" only means no collidables.
+            temp_group.add(scenery.StairsDown(x, y))
+
+        # XXX Unfortunately since the state is creating the stairs, and I'm
+        # doing that because 
+        #self.collidable_group
+
+        return temp_group
 
 
     def setup_hud(self) -> None:
         self.hud = user_interface.Hud()
 
 
-    def update(self, surface: pg.Surface, current_time: float) -> None:
+    def update(self, surface: pg.Surface, current_time: int) -> None:
         """Update the state every frame"""
         # create function/class to handle game info.
         self.game_info["current_time"] = current_time
@@ -120,6 +132,9 @@ class CommonArea(control.State):
     def update_sprites(self) -> None:
         self.player_group.update(self.game_info["current_time"], self.collidable_group)
         self.npc_group.update(self.game_info["current_time"], self.collidable_group)
+
+        self.stairs_down_group.update(self.player.rect)
+
 
 
     def move_camera(self) -> None:
@@ -258,8 +273,9 @@ class CommonArea(control.State):
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)
 
         self.tilemap.update(self.entire_area, self.camera)
-        self.npc_group.draw(self.entire_area)
 
+        self.stairs_down_group.draw(self.entire_area)
+        self.npc_group.draw(self.entire_area)
         # Draw player over npc's, to make player feel more important...
         self.player_group.draw(self.entire_area)
         self.tilemap.tree_top_group.draw(self.entire_area)

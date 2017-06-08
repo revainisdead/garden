@@ -341,7 +341,7 @@ class Map:
         return tilename, swapped
 
 
-    def create_corner(self, x, y, movex: bool, movey: bool, flipx: bool, flipy: bool):
+    def create_corner(self, x: int, y: int, movex: bool, movey: bool, flipx: bool, flipy: bool) -> None:
         corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y* c.TILE_SIZE)
         if movex:
             corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
@@ -351,16 +351,16 @@ class Map:
         self.water_corner_cut_group.add(corner)
 
 
-    def create_farm_biome(self):
+    def create_farm_biome(self) -> None:
         pass
 
 
-    def create_cave_biome(self):
+    def create_cave_biome(self) -> None:
         pass
 
 
-    def simulation_step(self):
-        # copy grid
+    def simulation_step(self) -> None:
+        # Copy grid
         new_grid = self.grid
 
         for y in range(self.height):

@@ -55,11 +55,20 @@ class TreeTop(pg.sprite.Sprite):
         self.rect.y = y
 
         # If treetop is harvested, kill it's shadow
+        # Not necessary, maybe, I also want to kill trees so that they
+        # can be walked through. Stumps should probably be walk-through
+        # able, and they maybe still have a shadow but certain not the
+        # same shadow as the whole tree.
+
         # If treetop is harvested, how to know whether to draw it? Need public method to see if it needs to be drawn
 
 
     def update(self) -> None:
         self.handle_state()
+
+
+    def destroy(self) -> None:
+        self.kill()
 
 
     def handle_state(self) -> None:
@@ -101,3 +110,32 @@ class WaterCornerCut(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+class StairsDown(pg.sprite.Sprite):
+    def __init__(self, x, y) -> None:
+        super().__init__()
+        sprite = setup.GFX["stairs_down"]
+
+        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        # Flip some stairs around. So that it's realistic for the player
+        # to "walk" down the correct side of the stairs. Should only be
+        # left or right (because art).
+        self.stairs_dir = c.Direction.LEFT
+
+
+    def update(self, player_rect: pg.Rect) -> None:
+        if self.stairs_dir == c.Direction.LEFT:
+            # XXX For now just check if the player's rect collides with
+            # this one. Later check if it hits the correct side.
+            if self.rect.colliderect(player_rect):
+                print("Collided with stairs.")
+        elif self.stairs_dir == c.Direction.RIGHT:
+            if self.rect.colliderect(player_rect):
+                pass
+
+
