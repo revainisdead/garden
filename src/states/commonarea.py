@@ -11,13 +11,15 @@ from .. import control
 from .. import setup
 from .. import tools
 
-from .. components import non_player_controlled, player, scenery, tilemap, user_interface
+from .. components import non_player_controlled, player, scenery, tilemap, user_interface, util
 
 
 class CommonArea(control.State):
     def __init__(self) -> None:
         super().__init__()
-        self.setup_map()
+
+        self.biome = setup.map_size.get_biome()
+        self.setup_map(self.biome)
 
 
     def startup(self, game_info: Dict[str, Any]) -> None:
@@ -33,8 +35,8 @@ class CommonArea(control.State):
         self.setup_hud()
 
 
-    def setup_map(self) -> None:
-        self.tilemap = tilemap.Map()
+    def setup_map(self, biome: c.Biome) -> None:
+        self.tilemap = tilemap.Map(setup.map_size.get_grid_width(), setup.map_size.get_grid_height(), setup.map_size.get_width(), setup.map_size.get_height(), biome)
         self.collidable_group = self.tilemap.create_collidables()
         self.tilemap_rect = self.tilemap.map_surface.get_rect()
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
@@ -89,9 +91,8 @@ class CommonArea(control.State):
             # that an "open location" only means no collidables.
             temp_group.add(scenery.StairsDown(x, y))
 
-        # XXX Unfortunately since the state is creating the stairs, and I'm
-        # doing that because 
-        #self.collidable_group
+            # XXX Collidables for stairs should probably be handled by tilemap.
+            self.collidable_group.add(util.Collidable(x, y))
 
         return temp_group
 
@@ -102,7 +103,10 @@ class CommonArea(control.State):
 
     def update(self, surface: pg.Surface, current_time: int) -> None:
         """Update the state every frame"""
-        # create function/class to handle game info.
+        # Let this state control the map size update.
+        setup.map_size.update(self.biome)
+
+        # XXX Create function/class to handle game info.
         self.game_info["current_time"] = current_time
 
         self.update_sizes()
@@ -123,53 +127,26 @@ class CommonArea(control.State):
 
 
     def update_sizes(self) -> None:
-        """Used when changing the screen resolution"""
         if setup.screen_size.changed():
             # Start new camera at the same position as before.
             self.camera = pg.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+
+        if setup.map_size.changed():
+            self.setup_map(self.biome)
 
 
     def update_sprites(self) -> None:
         self.player_group.update(self.game_info["current_time"], self.collidable_group)
         self.npc_group.update(self.game_info["current_time"], self.collidable_group)
-
         self.stairs_down_group.update(self.player.rect)
 
+        for stairs in self.stairs_down_group:
+            # Check stairs state change.
+            if stairs.hit:
+                self.biome = c.Biome.CAVE
 
 
     def move_camera(self) -> None:
-        """
-        if binds.INPUT.held("left"):
-            # XXX Hacking different directions into each of these directions
-            # doesn't help. The if statement priority still takes
-            # precedence. How to make it so that the new button pressed
-            # is the one that takes priority? Maybe change Input class.
-            if binds.INPUT.held("up"):
-                self.direction = c.Direction.LEFTUP
-            elif binds.INPUT.held("down"):
-                self.direction = c.Direction.LEFTDOWN
-            else:
-                self.direction = c.Direction.LEFT
-            self.move_camera()
-
-        elif binds.INPUT.held("right"):
-            if binds.INPUT.held("up"):
-                self.direction = c.Direction.RIGHTUP
-            elif binds.INPUT.held("down"):
-                self.direction = c.Direction.RIGHTDOWN
-            else:
-                self.direction = c.Direction.RIGHT
-            self.move_camera()
-        elif binds.INPUT.held("up"):
-            self.direction = c.Direction.UP
-            self.move_camera()
-        elif binds.INPUT.held("down"):
-            self.direction = c.Direction.DOWN
-            self.move_camera()
-        else:
-            self.direction = c.Direction.NONE
-        """
-
         self.direction = self.player.direction
         self.set_camera_velocity()
 

@@ -1,4 +1,8 @@
+from typing import Optional
+
 import pygame as pg
+
+import random
 
 from . import helpers
 
@@ -125,17 +129,25 @@ class StairsDown(pg.sprite.Sprite):
         # Flip some stairs around. So that it's realistic for the player
         # to "walk" down the correct side of the stairs. Should only be
         # left or right (because art).
-        self.stairs_dir = c.Direction.LEFT
+        if random.randint(0, 2) == 0:
+            self.stairs_dir = c.Direction.LEFT
+        else:
+            self.stairs_dir = c.Direction.RIGHT
+            self.image = pg.transform.flip(self.image, True, False)
+
+        self.biome = None
 
 
     def update(self, player_rect: pg.Rect) -> None:
+        # Setting hit to true when hit should work even if it's just
+        # for one frame.
+        self.hit = False
+
         if self.stairs_dir == c.Direction.LEFT:
-            # XXX For now just check if the player's rect collides with
-            # this one. Later check if it hits the correct side.
-            if self.rect.colliderect(player_rect):
-                print("Collided with stairs.")
+            if player_rect.right == self.rect.left:
+                if player_rect.centery > self.rect.top and player_rect.centery < self.rect.bottom:
+                    self.hit = True
         elif self.stairs_dir == c.Direction.RIGHT:
-            if self.rect.colliderect(player_rect):
-                pass
-
-
+            if player_rect.left == self.rect.right:
+                if player_rect.centery > self.rect.top and player_rect.centery < self.rect.bottom:
+                    self.hit = True

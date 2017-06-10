@@ -176,7 +176,7 @@ class Npc(pg.sprite.Sprite):
         if self.walking_dir_change_counter == self.walking_dir_change_interval:
             self.direction = self.pick_new_direction()
 
-        new_x, new_y = tools.fix_edge_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        new_x, new_y = tools.fix_edge_bounds(rect=self.rect, highest_x=setup.map_size.get_width(), highest_y=setup.map_size.get_height(), x_vel=self.x_vel, y_vel=self.y_vel)
 
         hit_edge = False
         if new_x == self.rect.x and new_y == self.rect.y:

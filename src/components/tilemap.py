@@ -29,15 +29,14 @@ class Tile(pg.sprite.Sprite):
 
 
 class Map:
-    def __init__(self) -> None:
+    def __init__(self, grid_width: int, grid_height: int, map_width: int, map_height: int, biome: c.Biome) -> None:
         self.tile_names = [
             "grass", # 0, Starting value for grid
             "black_brick", # 1, Fill in cell value
             "dirt", # XXX How to use dirt?
         ]
 
-        # Test a grass biome
-        self.biome = "island"
+        self.biome = biome
 
         self.water_choices = {
             c.Direction.UP: "water_top_grass",
@@ -61,12 +60,12 @@ class Map:
 
         # Position 0 = default
         # Position 1 = fill
-        if self.biome == "island":
+        if self.biome == c.Biome.FARMLAND:
             self.tile_names = [
                 "grass",
                 "water",
             ]
-        elif self.biome == "cave":
+        elif self.biome == c.Biome.CAVE:
             self.tile_names = [
                 "black_brick",
                 "gray_brick",
@@ -101,8 +100,11 @@ class Map:
         self.fence_link_group = pg.sprite.Group()
         self.fence_end_group = pg.sprite.Group()
 
-        self.width = c.GRID_WIDTH
-        self.height = c.GRID_HEIGHT
+        # Initialize grid size.
+        self.width = grid_width
+        self.height = grid_height
+        #self.width = c.GRID_WIDTH
+        #self.height = c.GRID_HEIGHT
 
         # cellular automata values
         self.num_sim_steps = 4
@@ -116,7 +118,8 @@ class Map:
         self.__generate_grid()
         self.tiles = self.create_tiles()
 
-        self.map_surface = pg.Surface((c.MAP_WIDTH, c.MAP_HEIGHT)).convert()
+        # Let the caller determine map size.
+        self.map_surface = pg.Surface((map_width, map_height)).convert()
 
 
     def __generate_grid(self) -> Set[Tile]:
@@ -127,7 +130,9 @@ class Map:
         for _ in range(self.num_sim_steps):
             self.simulation_step()
 
-        if self.biome == "island":
+        if self.biome == c.Biome.FARMLAND:
+            # Checking for swaps from water to grass is only done for
+            # farmland, for now.
             num_check_swaps = 3
             for _ in range(num_check_swaps):
                 # Do a check for swaps before actually creating tiles.
@@ -169,7 +174,7 @@ class Map:
 
                 # Select names based on biome.
 
-                if self.biome == "island":
+                if self.biome == c.Biome.FARMLAND:
                     if solid_grid_point:
                         tile_name, swapped = self.solid_tilename_calculation(gridx, gridy, True)
                         if swapped:
@@ -198,7 +203,7 @@ class Map:
 
                     if solid_grid_point or created_tree:
                         self.collidable_grid[gridx][gridy] = 1
-                elif self.biome == "cave":
+                elif self.biome == c.Biome.CAVE:
                     tile_names = self.tile_names[grid_point]
 
                     tile = Tile(x_pos, y_pos, tile_name)

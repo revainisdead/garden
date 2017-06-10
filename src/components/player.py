@@ -156,7 +156,7 @@ class Player(pg.sprite.Sprite):
         self.set_velocity()
 
 
-        new_x, new_y = tools.fix_edge_bounds(rect=self.rect, highest_x=c.MAP_WIDTH, highest_y=c.MAP_HEIGHT, x_vel=self.x_vel, y_vel=self.y_vel)
+        new_x, new_y = tools.fix_edge_bounds(rect=self.rect, highest_x=setup.map_size.get_width(), highest_y=setup.map_size.get_height(), x_vel=self.x_vel, y_vel=self.y_vel)
 
         self.rect.x = new_x
         collided = self.get_closest_collisions()
@@ -167,8 +167,6 @@ class Player(pg.sprite.Sprite):
         collided = self.get_closest_collisions()
         if collided is not None:
             self.check_y_collisions(collided)
-
-        #hit_wall = tools.test_collide(rect=self.rect, x_vel=self.x_vel, y_vel=self.y_vel, collidables=collidables)
 
 
     def check_x_collisions(self, collided: pg.sprite.Sprite) -> None:
@@ -199,6 +197,10 @@ class Player(pg.sprite.Sprite):
         # mode, when I can change the worker to auto_walking, pathfinding,
         # searching for tree, etc etc. Right now he's just walking...
         self.walk()
+
+        #if self.state == "sliding":
+        #   don't allow user input
+        #   and slide in that x or y direction until a wall is hit.
 
 
     def update(self, current_time: float, collidable_group: pg.sprite.Group) -> None:

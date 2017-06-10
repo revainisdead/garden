@@ -23,7 +23,7 @@ def flip_player_camera_combo() -> None:
     DEBUG_CAMERA = True
     global DEBUG_PLAYER
     DEBUG_PLAYER = True
-#flip_player_camera_combo()
+flip_player_camera_combo()
 
 
 class MainState(enum.Enum):
@@ -46,7 +46,8 @@ class Direction(enum.Enum):
 
 class CropState(enum.Enum):
     HARVESTED = 0
-    GROWN = 1
+    GROWING = 1
+    GROWN = 2
 
 
 # XXX Unused
@@ -57,9 +58,9 @@ class TimeState(enum.Enum):
 
 class Biome(enum.Enum):
     FARMLAND = 0
-    ISLAND = 1
-    CAVE = 2
-    HOUSE = 3
+    CAVE = 1
+    HOUSE = 2
+    ISLAND = 3
 
 
 class Switch(enum.Enum):
@@ -116,15 +117,6 @@ DEFAULT_SCREEN_WIDTH = 800
 DEFAULT_SCREEN_HEIGHT = 600
 DEFAULT_SCREEN_SIZE = (DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT)
 
-#***
-# Base map size off of resolution, fix it to the nearest TILE_SIZE.
-#***
-MAP_WIDTH = round(DEFAULT_SCREEN_WIDTH * map_mult[Biome.FARMLAND] / TILE_SIZE) * TILE_SIZE
-MAP_HEIGHT = round(DEFAULT_SCREEN_HEIGHT * map_mult[Biome.FARMLAND] / TILE_SIZE) * TILE_SIZE
-MAP_SIZE = (MAP_WIDTH, MAP_HEIGHT)
-GRID_WIDTH = int(round(MAP_WIDTH / TILE_SIZE))
-GRID_HEIGHT = int(round(MAP_HEIGHT / TILE_SIZE))
-
 CORNER_SIZE = 15
 
 FONT_SIZE_DICT = {
@@ -166,14 +158,13 @@ BUSH_DENSITY = 10
 FENCE_DENSITY = 65
 TREE_DENSITY = 5
 
-
 MIN_FENCE_LENGTH = 2
 MAX_FENCE_LENGTH = 5
 
 MIN_NPC_AMOUNT = 3
 MAX_NPC_AMOUNT = 8
-MIN_STAIRS_AMOUNT = 2
-MAX_STAIRS_AMOUNT = 4
+MIN_STAIRS_AMOUNT = 5
+MAX_STAIRS_AMOUNT = 8
 
 
 # Offsets.

@@ -122,7 +122,7 @@ class Button(pg.sprite.Sprite):
         # XXX
         #self.pressed_rect = self.frames[1].get_rect()
         # "Inflate" duplicate image to smaller by using negatives.
-        #self.pressed_rect = self.pressed_rect.inflate((-c.PRESSED_BUTTON_OFFSET, -c.PRESSED_BUTTON_OFFSET))
+        #self.frames[1].get_rect().inflate_ip((-c.PRESSED_BUTTON_OFFSET, -c.PRESSED_BUTTON_OFFSET))
 
         self.name = name
         self.keybind = button_binds[self.name]
