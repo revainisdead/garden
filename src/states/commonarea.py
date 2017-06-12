@@ -19,13 +19,20 @@ class CommonArea(control.State):
         super().__init__()
 
         self.biome = setup.map_size.get_biome()
-        self.setup_map(self.biome)
+        self.tilemap = self.setup_map(self.biome)
+
+        # There will be no stairs up on map initializing.
+        self.stairs_up_group = pg.sprite.Group()
+
+        # Save a copy of the first tilemap, so that we can re-create it later.
+        self.farmland = self.tilemap
 
 
     def startup(self, game_info: Dict[str, Any]) -> None:
         self.game_info = game_info
         self.state = c.MainState.COMMONAREA
 
+        self.stairs_down_copy = []
         self.stairs_down_group = self.setup_stairs_down()
 
         self.setup_player()
@@ -35,12 +42,13 @@ class CommonArea(control.State):
         self.setup_hud()
 
 
-    def setup_map(self, biome: c.Biome) -> None:
-        self.tilemap = tilemap.Map(setup.map_size.get_grid_width(), setup.map_size.get_grid_height(), setup.map_size.get_width(), setup.map_size.get_height(), biome)
-        self.collidable_group = self.tilemap.create_collidables()
-        self.tilemap_rect = self.tilemap.map_surface.get_rect()
+    def setup_map(self, biome: c.Biome) -> tilemap.Map:
+        temp_map = tilemap.Map(setup.map_size.get_grid_width(), setup.map_size.get_grid_height(), setup.map_size.get_width(), setup.map_size.get_height(), biome)
+        self.collidable_group = temp_map.create_collidables()
+        self.tilemap_rect = temp_map.map_surface.get_rect()
         self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
+        return temp_map
 
 
     def setup_camera(self) -> None:
@@ -89,12 +97,26 @@ class CommonArea(control.State):
             x, y = self.tilemap.find_random_open_location()
             # Stairs should draw over bushes, so don't worry about the fact
             # that an "open location" only means no collidables.
-            temp_group.add(scenery.StairsDown(x, y))
+            temp_group.add(scenery.Stairs(x, y, "stairs_down"))
 
             # XXX Collidables for stairs should probably be handled by tilemap.
             self.collidable_group.add(util.Collidable(x, y))
 
         return temp_group
+
+
+    def setup_stairs_up(self) -> None:
+        """Need 1 stairs up when entering a cave.
+
+        I could put it next to the player but how would I know
+        if it's an open location. Just put it in a random open
+        location as usual.
+        """
+        x, y = self.tilemap.find_random_open_location()
+        self.stairs_up_group.add(scenery.Stairs(x, y, "stairs_up"))
+
+        # XXX Collidables for stairs should probably be handled by tilemap.
+        self.collidable_group.add(util.Collidable(x, y))
 
 
     def setup_hud(self) -> None:
@@ -110,6 +132,7 @@ class CommonArea(control.State):
         self.game_info["current_time"] = current_time
 
         self.update_sizes()
+        self.update_map()
         self.update_sprites()
         self.handle_states()
         self.blit_images(surface)
@@ -131,8 +154,21 @@ class CommonArea(control.State):
             # Start new camera at the same position as before.
             self.camera = pg.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
 
+
+    def update_map(self) -> None:
         if setup.map_size.changed():
-            self.setup_map(self.biome)
+            self.tilemap = self.setup_map(self.biome)
+            self.npc_group = self.setup_npcs()
+            self.setup_player()
+
+            # What about going back up to farmland. I want to create
+            # the same map as before, and have the same stairs...
+            # So I need to save the old map, and un-kill all the stairs.
+            for stairs in self.stairs_down_group:
+                self.stairs_down_copy.append(stairs)
+                stairs.kill()
+
+            self.setup_stairs_up()
 
 
     def update_sprites(self) -> None:
@@ -140,10 +176,40 @@ class CommonArea(control.State):
         self.npc_group.update(self.game_info["current_time"], self.collidable_group)
         self.stairs_down_group.update(self.player.rect)
 
-        for stairs in self.stairs_down_group:
+        # XXX separate into: def handle_biome(self)
+        for stairs_down in self.stairs_down_group:
             # Check stairs state change.
-            if stairs.hit:
+            if stairs_down.hit:
                 self.biome = c.Biome.CAVE
+
+        # If in cave, check for a hit on stairs up.
+        if self.biome == c.Biome.CAVE:
+            self.stairs_up_group.update(self.player.rect)
+            for stairs_up in self.stairs_up_group:
+                if stairs_up.hit:
+                    # XXX This won't entirely work. I need to re-create everything in setup_map when I change the map BACK to farmland as well.
+                    #self.tilemap = self.farmland
+                    # For now just re-setup map, it won't be the same map, but at least it will work. It should be the same map later. I should:
+                    #   - Set up 1 farmland and save it's info, including rect.
+                    #   - Set up 1 cave map for every stairs down and save it.
+                    #   - The random part should be only once. Maybe?
+                    #   - I want the farm to save it's state. Including it's look! The look of the farmland could be saved in game info, and caves could be their own state. Like even the worker's location I want to be exactly the same when the player leaves the cave. As for the amount of stuff gathered while the player was gone, that can be calculating, including the amount of growth plants have had.
+                    self.tilemap = self.setup_map(c.Biome.FARMLAND)
+
+                    if not self.stairs_down_group:
+                        self.stairs_down_group = self.setup_stairs_down() # or just try over-writing the stairs_down group that is empty with new stairs!
+
+                    # And kill stairs up.
+                    for stairs in self.stairs_up_group:
+                        stairs.kill()
+        else:
+            # If the biome is not cave. Restore old stairs.
+            # XXX This places them in the same old location. Which is good
+            # for re-loading an old map, but right now it's going to create
+            # a new map.
+            #for stairs in self.stairs_down_copy:
+            #self.stairs_down_group.add(stairs)
+            pass
 
 
     def move_camera(self) -> None:
@@ -252,6 +318,7 @@ class CommonArea(control.State):
         self.tilemap.update(self.entire_area, self.camera)
 
         self.stairs_down_group.draw(self.entire_area)
+        self.stairs_up_group.draw(self.entire_area)
         self.npc_group.draw(self.entire_area)
         # Draw player over npc's, to make player feel more important...
         self.player_group.draw(self.entire_area)

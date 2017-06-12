@@ -67,8 +67,8 @@ class Map:
             ]
         elif self.biome == c.Biome.CAVE:
             self.tile_names = [
+                "lightbrown_brick",
                 "black_brick",
-                "gray_brick",
             ]
 
 

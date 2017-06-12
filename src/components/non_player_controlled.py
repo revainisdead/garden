@@ -161,8 +161,8 @@ class Npc(pg.sprite.Sprite):
 
 
     def auto_walk(self) -> None:
-        interval_change_sec_min = c.FPS * 2
-        interval_change_sec_max = c.FPS * 3
+        interval_change_sec_min = c.FPS * 1
+        interval_change_sec_max = c.FPS * 2
         self.set_velocity()
 
         if self.walking_dir_change_interval is None:

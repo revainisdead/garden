@@ -116,10 +116,10 @@ class WaterCornerCut(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class StairsDown(pg.sprite.Sprite):
-    def __init__(self, x, y) -> None:
+class Stairs(pg.sprite.Sprite):
+    def __init__(self, x, y, name) -> None:
         super().__init__()
-        sprite = setup.GFX["stairs_down"]
+        sprite = setup.GFX[name]
 
         self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
         self.rect = self.image.get_rect()
@@ -135,7 +135,7 @@ class StairsDown(pg.sprite.Sprite):
             self.stairs_dir = c.Direction.RIGHT
             self.image = pg.transform.flip(self.image, True, False)
 
-        self.biome = None
+        self.hit = False
 
 
     def update(self, player_rect: pg.Rect) -> None:
