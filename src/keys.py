@@ -36,7 +36,6 @@ class Keybinds:
         if os.path.exists(self.__conf_path):
             with open(self.__conf_path, "r") as f:
                 data = json.loads(f.read()) # Load string and save into dict.
-                print(data)
                 binds_temp = data
         else:
             self.reset_to_defaults()
