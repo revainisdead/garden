@@ -14,7 +14,9 @@
 #       import module
 from typing import Any, Dict
 
+import threading
 import time
+import queue
 
 import pygame as pg
 
@@ -32,6 +34,8 @@ class Control:
         pg.display.set_caption(caption)
         self.clock = pg.time.Clock()
 
+        self.__thread_queue = queue.Queue()
+
         self.screen_surface = pg.display.get_surface()
 
         self.state = None # type: State
@@ -41,12 +45,13 @@ class Control:
 
     def game_loop(self) -> None:
         while not self.quit:
-            self.event_loop()
-            self.update()
-            pg.display.update()
-            self.clock.tick(self.fps)
+            def kickoff(q: queue.Queue, func: Any) -> None:
+                q.put(func)
 
-            binds.INPUT.reset()
+            threading.Thread(target=kickoff, args=(self.__thread_queue, self.update()))
+            threading.Thread(target=kickoff, args=(self.__thread_queue, pg.display.update()))
+
+            self.clock.tick(self.fps)
 
 
     def event_loop(self) -> None:
@@ -61,6 +66,8 @@ class Control:
         """Connects to the main game loop.
         Do any updates needed.
         """
+        self.event_loop()
+
         self.current_time = pg.time.get_ticks()
         if self.state.quit:
             self.quit = True
@@ -71,6 +78,8 @@ class Control:
 
         # In Game User Interface.
         self.game_ui.update(self.screen_surface, self.current_time, self.state_name)
+
+        binds.INPUT.reset()
 
 
     def setup_states(self, state_dict, start_state) -> None:
