@@ -1,10 +1,16 @@
+# XXX: Rename to input.py
+
 from typing import Optional, Tuple
 
 import pygame as pg
 
+from . import keys
 from . import constants as c
 from . import setup
 
+
+# Allow this file to interface with the keys file.
+keybinds = keys.Keybinds().keybinds
 
 # XXX Load keys from json file
 # Allow json file to be manipulated from main menu
@@ -15,6 +21,28 @@ from . import setup
 # Need to have a list of all available keybinds: shift, letters, numbers, etc.
 
 #default_keybinds = {}
+
+# Key: unchangable: action
+# Value: changable: { current_key_in_config }
+
+# config layout:
+# "up" = "w"
+# "down" = "s"
+
+# translate = confirm first word exists:
+# all_actions = {"up", "down", "left", "right"} # unordered set of strings
+# all_keys = { "w": pg.K_w }
+# action in all_actions
+# key in all_keys
+
+# modifiers
+# ex.
+# "up" = shift+"w"
+# "down" = ctrl+"s"
+# "left" = alt+"a"
+# NOTE: Or don't use quotes in text file, just get word and convert to string.
+
+# all_mods = { "none": KMOD_NONE, "shift": KMOD_SHIFT, "ctrl": KMOD_CTRL, "alt": KMOD_ALT }
 
 keybinds = {
     "up": pg.K_w,

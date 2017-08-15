@@ -18,12 +18,13 @@ DEBUG_PLAYER = False
 DEBUG_NPC = False
 
 
-def flip_player_camera_combo() -> None:
-    global DEBUG_CAMERA
-    DEBUG_CAMERA = True
-    global DEBUG_PLAYER
-    DEBUG_PLAYER = True
-flip_player_camera_combo()
+def flip_player_camera_combo(flip: bool) -> None:
+    if flip:
+        global DEBUG_CAMERA
+        DEBUG_CAMERA = True
+        global DEBUG_PLAYER
+        DEBUG_PLAYER = True
+flip_player_camera_combo(False)
 
 
 class MainState(enum.Enum):

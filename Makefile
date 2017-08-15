@@ -1,7 +1,10 @@
-.PHONY=all clean
+.PHONY=all clean mypy
 
 all:
 	python3 -m src.main
+
+mypy:
+	mypy $$(git ls-files -- "*.py")
 
 clean:
 	@echo "Removing compiled python files . . ."
