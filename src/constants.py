@@ -30,6 +30,7 @@ flip_player_camera_combo(False)
 class StateName(enum.Enum):
     MAINMENU = 0
     COMMONAREA = 1
+    INGAMEMENU = 2
 
 
 class Direction(enum.Enum):

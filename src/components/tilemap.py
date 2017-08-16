@@ -122,7 +122,7 @@ class Map:
         self.map_surface = pygame.Surface((map_width, map_height)).convert()
 
 
-    def __generate_grid(self) -> Set[Tile]:
+    def __generate_grid(self) -> None:
         # Initialize grid with random values.
         # 60% chance a 1 will occur.
         self.grid = [[0 if random.randint(0, 4) == 0 else 1 for y in range(self.height)] for x in range(self.width)]

@@ -51,7 +51,7 @@ class Control:
             threading.Thread(target=kickoff, args=(self.__thread_queue, self.update()))
             threading.Thread(target=kickoff, args=(self.__thread_queue, pygame.display.update()))
 
-            self.clock.tick(self.fps)
+            self.dt = self.clock.tick(self.fps)
 
 
     def event_loop(self) -> None:

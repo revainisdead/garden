@@ -8,7 +8,7 @@ from .. components import user_interface
 
 
 class MainMenu(control.State):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.game_info = {
             "current_time": 0,
@@ -25,7 +25,7 @@ class MainMenu(control.State):
         self.allow_input = True
 
 
-    def startup(self, game_info):
+    def startup(self, game_info: Dict[str, Any]) -> None:
         """Called each time the state is entered
 
         Currently takes in game_info so that the main menu can
