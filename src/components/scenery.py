@@ -57,6 +57,7 @@ class TreeTop(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.state = None
 
         # If treetop is harvested, kill it's shadow
         # Not necessary, maybe, I also want to kill trees so that they

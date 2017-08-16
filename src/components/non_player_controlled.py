@@ -56,7 +56,7 @@ class Npc(pygame.sprite.Sprite):
         self.set_velocity()
 
         self.walking_dir_change_counter = 0
-        self.walking_dir_change_interval = None
+        self.walking_dir_change_interval = None # type: int
         self.standing_still_direction_index = 4 # Index for c.Direction.NONE in direction
 
         # Affect standing still frequency.
@@ -145,7 +145,7 @@ class Npc(pygame.sprite.Sprite):
             direction_index = direction_chance
 
         self.walking_dir_change_counter = 0
-        self.walking_dir_change_interval = None
+        self.walking_dir_change_interval = None # type: int
 
         # Save previous direction.
         self.previous_direction = self.direction

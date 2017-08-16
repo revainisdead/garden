@@ -1,0 +1,3 @@
+from . surface import Surface
+
+def scale(Surface, Tuple[int, int], dest_surf: Surfce=None) -> Surface: ...
