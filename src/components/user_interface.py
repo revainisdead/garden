@@ -214,13 +214,13 @@ class Hud:
         """Get the real time and save it as a string.
         Ex. 8:15 AM
         """
-        time = datetime.now()
-        time = time.strftime("%I:%M %p")
+        dt_t = datetime.now()
 
-        # Remove the starting zero from the hour if it exists.
-        if time.startswith("0"):
-            time = time[1:]
-        self.clock = time
+        # Don't overwrite dt_t (for mypy), because it has a different type.
+        t = t.strftime("%I:%M %p")
+        if t.startswith("0"):
+            time = t[1:]
+        self.clock = t
 
 
     def update_coords(self, x: int, y: int, map_height: int) -> None:
