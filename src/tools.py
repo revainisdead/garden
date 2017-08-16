@@ -3,7 +3,7 @@ from typing import List, Tuple
 import os
 
 from PIL import Image
-import pygame as pg
+import pygame as pygame
 
 from . import constants as c
 from . components import util
@@ -33,12 +33,12 @@ def convert_png(name_path, convert_to_ext=".bmp"):
         os.unlink(original_name)
 
 
-def colorize(images: List[pg.Surface], color: Tuple[int, int, int]) -> List[pg.Surface]:
+def colorize(images: List[pygame.Surface], color: Tuple[int, int, int]) -> List[pygame.Surface]:
     colored = []
     for image in images:
         image = image.copy()
-        #image.fill((0, 0, 0, 255), None, pg.BLEND_RGBA_MULT)
-        image.fill(color + (0,), None, pg.BLEND_RGBA_ADD)
+        #image.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
+        image.fill(color + (0,), None, pygame.BLEND_RGBA_ADD)
         colored.append(image)
 
     return colored
@@ -60,7 +60,7 @@ def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
         name, ext = os.path.splitext(pic)
 
         if ext.lower() in accept:
-            img = pg.image.load(pic_path)
+            img = pygame.image.load(pic_path)
 
             if img.get_alpha():
                 #img = img.convert_alpha()
@@ -116,7 +116,7 @@ def load_fonts(path, accept=(".ttf")):
             if ext.lower() in accept:
                 # Add the intended size use to the name.
                 name = "{}_{}".format(font_size_name, name)
-                fonts[name] = pg.font.Font(os.path.join(path, font), font_size)
+                fonts[name] = pygame.font.Font(os.path.join(path, font), font_size)
             else:
                 print("Received invalid font. {}".format(font))
 
@@ -129,7 +129,7 @@ def load_sfx(path, accept=(".wav", ".mpe", ".ogg", ".mdi")):
         name, ext = os.path.splitext(sound)
 
         if ext.lower() in accept:
-            sounds[name] = pg.mixer.Sound(os.path.join(path, sound))
+            sounds[name] = pygame.mixer.Sound(os.path.join(path, sound))
         else:
             print("Received invalid sound effect. {}".format(sound))
 
@@ -140,7 +140,7 @@ def load_music(path, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     pass
 
 
-def fix_edge_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int) -> Tuple[int, int]:
+def fix_edge_bounds(rect: pygame.Rect, highest_x: int, highest_y: int, x_vel: int, y_vel: int) -> Tuple[int, int]:
     """Universal utility to correct x and y values based on fixed bounds.
 
     Useful for checking if something has gone past the highest possible
@@ -184,7 +184,7 @@ def fix_edge_bounds(rect: pg.Rect, highest_x: int, highest_y: int, x_vel: int, y
     return new_x, new_y
 
 
-def test_collide(sprite: pg.sprite.Sprite, x_vel: int, y_vel: int, collidable_group: pg.sprite.Group) -> bool:
+def test_collide(sprite: pygame.sprite.Sprite, x_vel: int, y_vel: int, collidable_group: pygame.sprite.Group) -> bool:
     """
     Test for the rect's collision into collidables and fix bounds.
     Only use for horizontal and vertical movement, not diagonal.
@@ -194,7 +194,7 @@ def test_collide(sprite: pg.sprite.Sprite, x_vel: int, y_vel: int, collidable_gr
     hit_wall = False
     neg_x, pos_x = x_vel < 0, x_vel > 0
     neg_y, pos_y = y_vel < 0, y_vel > 0
-    collider = pg.sprite.spritecollideany(sprite, collidable_group)
+    collider = pygame.sprite.spritecollideany(sprite, collidable_group)
 
     if collider is not None:
         if pos_x:

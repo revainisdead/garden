@@ -1,6 +1,6 @@
 from typing import Tuple
 
-import pygame as pg
+import pygame as pygame
 
 from .. import constants as c
 
@@ -10,17 +10,17 @@ def get_image(
         y: int,
         width: int,
         height: int,
-        sprite_sheet: pg.Surface,
+        sprite_sheet: pygame.Surface,
         mult: float=1,
         y_mult: float=None,
         colorkey: Tuple[int, int, int]=c.BLACK,
-        transparent: bool=True) -> pg.Surface:
+        transparent: bool=True) -> pygame.Surface:
     """Extracts from the sprite sheet, or just the sprite."""
     if transparent:
         # For images without transparency in them
-        image = pg.Surface((width, height), pg.SRCALPHA, 32)
+        image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
     else:
-        image = pg.Surface((width, height)).convert()
+        image = pygame.Surface((width, height)).convert()
         image.set_colorkey(colorkey)
 
     rect = image.get_rect()
@@ -32,5 +32,5 @@ def get_image(
     if y_mult is None:
         y_mult = mult
     size_delta = (int(rect.width * mult), int(rect.height * y_mult))
-    image = pg.transform.scale(image, size_delta)
+    image = pygame.transform.scale(image, size_delta)
     return image

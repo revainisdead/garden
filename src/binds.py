@@ -2,7 +2,7 @@
 
 from typing import Optional, Tuple
 
-import pygame as pg
+import pygame as pygame
 
 from . import keys
 from . import constants as c
@@ -31,7 +31,7 @@ keybinds = keys.Keybinds().keybinds
 
 # translate = confirm first word exists:
 # all_actions = {"up", "down", "left", "right"} # unordered set of strings
-# all_keys = { "w": pg.K_w }
+# all_keys = { "w": pygame.K_w }
 # action in all_actions
 # key in all_keys
 
@@ -45,16 +45,16 @@ keybinds = keys.Keybinds().keybinds
 # all_mods = { "none": KMOD_NONE, "shift": KMOD_SHIFT, "ctrl": KMOD_CTRL, "alt": KMOD_ALT }
 
 keybinds = {
-    "up": pg.K_w,
-    "down": pg.K_s,
-    "left": pg.K_a,
-    "right": pg.K_d,
-    "escape": pg.K_ESCAPE,
-    "enter": pg.K_RETURN,
-    "arrow_up": pg.K_UP,
-    "arrow_down": pg.K_DOWN,
-    "one": pg.K_1,
-    "two": pg.K_2,
+    "up": pygame.K_w,
+    "down": pygame.K_s,
+    "left": pygame.K_a,
+    "right": pygame.K_d,
+    "escape": pygame.K_ESCAPE,
+    "enter": pygame.K_RETURN,
+    "arrow_up": pygame.K_UP,
+    "arrow_down": pygame.K_DOWN,
+    "one": pygame.K_1,
+    "two": pygame.K_2,
 }
 
 
@@ -62,8 +62,8 @@ keybinds = {
 # But moving a menu item, aka up and down, should be unchanging.
 # NOTE: This is not actually frozen. It can be changed but shouldn't be.
 frozen_binds = {
-    "arrow_up": pg.K_UP,
-    "arrow_down": pg.K_DOWN,
+    "arrow_up": pygame.K_UP,
+    "arrow_down": pygame.K_DOWN,
 }
 
 
@@ -131,22 +131,22 @@ class Input:
             self.__last_mouse_drop = point
 
 
-    def update(self, event: Optional[pg.event.Event]) -> None:
-        if event.type == pg.KEYDOWN:
+    def update(self, event: Optional[pygame.event.Event]) -> None:
+        if event.type == pygame.KEYDOWN:
             self.__set_last_keys_pressed(event.key)
-            self.__set_held_keys(pg.key.get_pressed())
-        elif event.type == pg.KEYUP:
-            self.__set_held_keys(pg.key.get_pressed())
-        elif event.type == pg.MOUSEMOTION:
-            point = pg.mouse.get_pos()
+            self.__set_held_keys(pygame.key.get_pressed())
+        elif event.type == pygame.KEYUP:
+            self.__set_held_keys(pygame.key.get_pressed())
+        elif event.type == pygame.MOUSEMOTION:
+            point = pygame.mouse.get_pos()
             self.__set_mouse_pos(point)
-        elif event.type == pg.MOUSEBUTTONDOWN:
-            point = pg.mouse.get_pos()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            point = pygame.mouse.get_pos()
             self.__set_last_mouse_click(point)
-        elif event.type == pg.MOUSEBUTTONUP:
-            point = pg.mouse.get_pos()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            point = pygame.mouse.get_pos()
             self.__set_last_mouse_drop(point)
-        elif event.type == pg.VIDEORESIZE:
+        elif event.type == pygame.VIDEORESIZE:
             w, h = event.size
             setup.screen_size.update(w, h)
 

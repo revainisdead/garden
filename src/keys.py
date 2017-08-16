@@ -3,22 +3,22 @@ from typing import Optional, Dict
 import json
 import os
 
-import pygame as pg
+import pygame as pygame
 
 
 class Keybinds:
     def __init__(self) -> None:
         self.__default_keybinds = {
-            "up": pg.K_w,
-            "down": pg.K_s,
-            "left": pg.K_a,
-            "right": pg.K_d,
-            "escape": pg.K_ESCAPE,
-            "enter": pg.K_RETURN,
-            "arrow_up": pg.K_UP,
-            "arrow_down": pg.K_DOWN,
-            "one": pg.K_1,
-            "two": pg.K_2,
+            "up": pygame.K_w,
+            "down": pygame.K_s,
+            "left": pygame.K_a,
+            "right": pygame.K_d,
+            "escape": pygame.K_ESCAPE,
+            "enter": pygame.K_RETURN,
+            "arrow_up": pygame.K_UP,
+            "arrow_down": pygame.K_DOWN,
+            "one": pygame.K_1,
+            "two": pygame.K_2,
         }
 
         conf_name = "keys_config.json"

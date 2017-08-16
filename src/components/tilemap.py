@@ -2,7 +2,7 @@ from typing import List, Set, Tuple
 
 import random
 
-import pygame as pg
+import pygame as pygame
 
 from . import helpers, scenery, util
 
@@ -13,7 +13,7 @@ from .. import setup
 #all_tile_names
 
 
-class Tile(pg.sprite.Sprite):
+class Tile(pygame.sprite.Sprite):
     def __init__(self, x, y, sprite_name) -> None:
         super().__init__()
 
@@ -92,13 +92,13 @@ class Map:
             ["green_treebottom", "green_treetop"],
         ]
 
-        self.bush_group = pg.sprite.Group()
-        self.tree_bottom_group = pg.sprite.Group()
-        self.tree_top_group = pg.sprite.Group()
-        self.tree_shadow_group = pg.sprite.Group()
-        self.water_corner_cut_group = pg.sprite.Group()
-        self.fence_link_group = pg.sprite.Group()
-        self.fence_end_group = pg.sprite.Group()
+        self.bush_group = pygame.sprite.Group()
+        self.tree_bottom_group = pygame.sprite.Group()
+        self.tree_top_group = pygame.sprite.Group()
+        self.tree_shadow_group = pygame.sprite.Group()
+        self.water_corner_cut_group = pygame.sprite.Group()
+        self.fence_link_group = pygame.sprite.Group()
+        self.fence_end_group = pygame.sprite.Group()
 
         # Initialize grid size.
         self.width = grid_width
@@ -119,7 +119,7 @@ class Map:
         self.tiles = self.create_tiles()
 
         # Let the caller determine map size.
-        self.map_surface = pg.Surface((map_width, map_height)).convert()
+        self.map_surface = pygame.Surface((map_width, map_height)).convert()
 
 
     def __generate_grid(self) -> Set[Tile]:
@@ -328,7 +328,7 @@ class Map:
                 if not leftup:
                     corner = scenery.WaterCornerCut(x * c.TILE_SIZE, y * c.TILE_SIZE)
                     #corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
-                    corner.image = pg.transform.flip(corner.image, False, False)
+                    corner.image = pygame.transform.flip(corner.image, False, False)
                     self.water_corner_cut_group.add(corner)
             return self.water_choices[c.Direction.RIGHTDOWN], swapped
         elif not left and not down and right and up:
@@ -352,7 +352,7 @@ class Map:
             corner.rect.x += (c.TILE_SIZE - c.CORNER_SIZE)
         if movey:
             corner.rect.y += (c.TILE_SIZE - c.CORNER_SIZE)
-        corner.image = pg.transform.flip(corner.image, flipx, flipy)
+        corner.image = pygame.transform.flip(corner.image, flipx, flipy)
         self.water_corner_cut_group.add(corner)
 
 
@@ -517,8 +517,8 @@ class Map:
     #for island: __do a completely different map
 
 
-    def create_collidables(self) -> pg.sprite.Group:
-        collidable_group = pg.sprite.Group()
+    def create_collidables(self) -> pygame.sprite.Group:
+        collidable_group = pygame.sprite.Group()
 
         for y in range(self.height):
             for x in range(self.width):
@@ -539,7 +539,7 @@ class Map:
                 return x * c.TILE_SIZE, y * c.TILE_SIZE
 
 
-    def update(self, surface: pg.Surface, camera: pg.Rect) -> bool:
+    def update(self, surface: pygame.Surface, camera: pygame.Rect) -> bool:
         # Test tiles as dict
         #for tile in list(self.tiles.values()):
         for tile in self.tiles:

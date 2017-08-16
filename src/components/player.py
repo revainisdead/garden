@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import random
 
-import pygame as pg
+import pygame as pygame
 
 from . import helpers, util
 
@@ -12,7 +12,7 @@ from .. import setup
 from .. import tools
 
 
-class Player(pg.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
         super().__init__()
 
@@ -49,7 +49,7 @@ class Player(pg.sprite.Sprite):
         self.animation_speed_static = 120
 
 
-    def load_up_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_up_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -61,7 +61,7 @@ class Player(pg.sprite.Sprite):
         return images
 
 
-    def load_down_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_down_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -73,7 +73,7 @@ class Player(pg.sprite.Sprite):
         return images
 
 
-    def load_left_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_left_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -85,7 +85,7 @@ class Player(pg.sprite.Sprite):
         return images
 
 
-    def load_right_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_right_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -169,7 +169,7 @@ class Player(pg.sprite.Sprite):
             self.check_y_collisions(collided)
 
 
-    def check_x_collisions(self, collided: pg.sprite.Sprite) -> None:
+    def check_x_collisions(self, collided: pygame.sprite.Sprite) -> None:
         if self.rect.x < collided.rect.x:
             self.rect.right = collided.rect.left
         elif self.rect.x > collided.rect.x:
@@ -177,7 +177,7 @@ class Player(pg.sprite.Sprite):
         self.x_vel = 0
 
 
-    def check_y_collisions(self, collided: pg.sprite.Sprite) -> None:
+    def check_y_collisions(self, collided: pygame.sprite.Sprite) -> None:
         if self.rect.y > collided.rect.y:
             self.rect.y = collided.rect.bottom
         elif self.rect.y < collided.rect.y:
@@ -185,10 +185,10 @@ class Player(pg.sprite.Sprite):
         self.y_vel = 0
 
 
-    def get_closest_collisions(self) -> Optional[pg.sprite.Sprite]:
+    def get_closest_collisions(self) -> Optional[pygame.sprite.Sprite]:
         # XXX Check for the collidable that is the closest to the player's
         # center.
-        return pg.sprite.spritecollideany(self, self.collidable_group)
+        return pygame.sprite.spritecollideany(self, self.collidable_group)
 
 
     def handle_state(self) -> None:
@@ -203,7 +203,7 @@ class Player(pg.sprite.Sprite):
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, current_time: float, collidable_group: pg.sprite.Group) -> None:
+    def update(self, current_time: float, collidable_group: pygame.sprite.Group) -> None:
         self.current_time = current_time
         self.collidable_group = collidable_group
 

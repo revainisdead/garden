@@ -2,7 +2,7 @@ from typing import List
 
 import random
 
-import pygame as pg
+import pygame as pygame
 
 from . import helpers, util
 
@@ -27,7 +27,7 @@ opposite_directions = {
 }
 
 
-class Npc(pg.sprite.Sprite):
+class Npc(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
         super().__init__()
 
@@ -69,7 +69,7 @@ class Npc(pg.sprite.Sprite):
         self.animation_speed_static = 120
 
 
-    def load_up_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_up_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -81,7 +81,7 @@ class Npc(pg.sprite.Sprite):
         return images
 
 
-    def load_down_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_down_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -93,7 +93,7 @@ class Npc(pg.sprite.Sprite):
         return images
 
 
-    def load_left_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_left_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -105,7 +105,7 @@ class Npc(pg.sprite.Sprite):
         return images
 
 
-    def load_right_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_right_sprites_from_sheet(self) -> List[pygame.Surface]:
         images = []
         # Duplicate first image, use first image as a placeholder
         # indicating that the animation hasn't ran yet
@@ -201,7 +201,7 @@ class Npc(pg.sprite.Sprite):
         self.auto_walk()
 
 
-    def update(self, current_time: float, collidable_group: pg.sprite.Group) -> None:
+    def update(self, current_time: float, collidable_group: pygame.sprite.Group) -> None:
         self.current_time = current_time
         self.collidable_group = collidable_group
 

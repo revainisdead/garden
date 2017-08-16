@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple
 import time
 import random
 
-import pygame as pg
+import pygame as pygame
 
 from .. import binds
 from .. import constants as c
@@ -22,7 +22,7 @@ class CommonArea(control.State):
         self.tilemap = self.setup_map(self.biome)
 
         # There will be no stairs up on map initializing.
-        self.stairs_up_group = pg.sprite.Group()
+        self.stairs_up_group = pygame.sprite.Group()
 
         # Save a copy of the first tilemap, so that we can re-create it later.
         self.farmland = self.tilemap
@@ -46,14 +46,14 @@ class CommonArea(control.State):
         temp_map = tilemap.Map(setup.map_size.get_grid_width(), setup.map_size.get_grid_height(), setup.map_size.get_width(), setup.map_size.get_height(), biome)
         self.collidable_group = temp_map.create_collidables()
         self.tilemap_rect = temp_map.map_surface.get_rect()
-        self.entire_area = pg.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
+        self.entire_area = pygame.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
         return temp_map
 
 
     def setup_camera(self) -> None:
         # Start the camera on top of the player.
-        self.camera = pg.Rect((self.player.rect.x, self.player.rect.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+        self.camera = pygame.Rect((self.player.rect.x, self.player.rect.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
         self.camera.centerx = self.player.rect.centerx
         self.camera.centery = self.player.rect.centery
 
@@ -66,8 +66,8 @@ class CommonArea(control.State):
         self.move_camera()
 
 
-    def setup_npcs(self) -> pg.sprite.Group:
-        temp_group = pg.sprite.Group()
+    def setup_npcs(self) -> pygame.sprite.Group:
+        temp_group = pygame.sprite.Group()
 
         random_npcs_limit = random.randint(c.MIN_NPC_AMOUNT, c.MAX_NPC_AMOUNT)
         for _ in range(random_npcs_limit):
@@ -81,7 +81,7 @@ class CommonArea(control.State):
         # But should the player's location be random? Maybe, go find your farm!
         x, y = self.tilemap.find_random_open_location()
         self.player = player.Player(x, y)
-        self.player_group = pg.sprite.Group(self.player)
+        self.player_group = pygame.sprite.Group(self.player)
 
 
     def setup_stash(self) -> None:
@@ -89,8 +89,8 @@ class CommonArea(control.State):
         pass
 
 
-    def setup_stairs_down(self) -> pg.sprite.Group:
-        temp_group = pg.sprite.Group()
+    def setup_stairs_down(self) -> pygame.sprite.Group:
+        temp_group = pygame.sprite.Group()
 
         random_limit = random.randint(c.MIN_STAIRS_AMOUNT, c.MAX_STAIRS_AMOUNT)
         for _ in range(random_limit):
@@ -123,7 +123,7 @@ class CommonArea(control.State):
         self.hud = user_interface.Hud()
 
 
-    def update(self, surface: pg.Surface, current_time: int) -> None:
+    def update(self, surface: pygame.Surface, current_time: int) -> None:
         """Update the state every frame"""
         # Let this state control the map size update.
         setup.map_size.update(self.biome)
@@ -152,7 +152,7 @@ class CommonArea(control.State):
     def update_sizes(self) -> None:
         if setup.screen_size.changed():
             # Start new camera at the same position as before.
-            self.camera = pg.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+            self.camera = pygame.Rect((self.camera.x, self.camera.y), (setup.screen_size.get_width(), setup.screen_size.get_height()))
 
 
     def update_map(self) -> None:
@@ -310,7 +310,7 @@ class CommonArea(control.State):
             self.camera_y_vel = 0
 
 
-    def blit_images(self, surface: pg.Surface) -> None:
+    def blit_images(self, surface: pygame.Surface) -> None:
         # This is responsible for showing only a certain area
         # of the tilemap surface, the area shown is the area of the camera.
         self.entire_area.blit(self.tilemap.map_surface, self.camera, self.camera)

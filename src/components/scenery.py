@@ -1,6 +1,6 @@
 from typing import Optional
 
-import pygame as pg
+import pygame as pygame
 
 import random
 
@@ -10,7 +10,7 @@ from .. import constants as c
 from .. import setup
 
 
-class Bush(pg.sprite.Sprite):
+class Bush(pygame.sprite.Sprite):
     def __init__(self, x, y, sprite_name) -> None:
         super().__init__()
         sprite = setup.GFX[sprite_name]
@@ -22,7 +22,7 @@ class Bush(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class TreeShadow(pg.sprite.Sprite):
+class TreeShadow(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
         super().__init__()
         sprite = setup.GFX["tree_shadow"]
@@ -34,7 +34,7 @@ class TreeShadow(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class TreeBottom(pg.sprite.Sprite):
+class TreeBottom(pygame.sprite.Sprite):
     def __init__(self, x, y, sprite_name) -> None:
         super().__init__()
         sprite = setup.GFX[sprite_name]
@@ -47,7 +47,7 @@ class TreeBottom(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class TreeTop(pg.sprite.Sprite):
+class TreeTop(pygame.sprite.Sprite):
     def __init__(self, x, y, sprite_name) -> None:
         super().__init__()
         sprite = setup.GFX[sprite_name]
@@ -83,7 +83,7 @@ class TreeTop(pg.sprite.Sprite):
             pass
 
 
-class FenceLink(pg.sprite.Sprite):
+class FenceLink(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
         super().__init__()
         sprite = setup.GFX["fence_link"]
@@ -94,7 +94,7 @@ class FenceLink(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class FenceEnd(pg.sprite.Sprite):
+class FenceEnd(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
         super().__init__()
         sprite = setup.GFX["fence_end"]
@@ -105,7 +105,7 @@ class FenceEnd(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class WaterCornerCut(pg.sprite.Sprite):
+class WaterCornerCut(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
         super().__init__()
         sprite = setup.GFX["water_top_left_corner_grass"]
@@ -116,7 +116,7 @@ class WaterCornerCut(pg.sprite.Sprite):
         self.rect.y = y
 
 
-class Stairs(pg.sprite.Sprite):
+class Stairs(pygame.sprite.Sprite):
     def __init__(self, x, y, name) -> None:
         super().__init__()
         sprite = setup.GFX[name]
@@ -133,12 +133,12 @@ class Stairs(pg.sprite.Sprite):
             self.stairs_dir = c.Direction.LEFT
         else:
             self.stairs_dir = c.Direction.RIGHT
-            self.image = pg.transform.flip(self.image, True, False)
+            self.image = pygame.transform.flip(self.image, True, False)
 
         self.hit = False
 
 
-    def update(self, player_rect: pg.Rect) -> None:
+    def update(self, player_rect: pygame.Rect) -> None:
         # Setting hit to true when hit should work even if it's just
         # for one frame.
         self.hit = False

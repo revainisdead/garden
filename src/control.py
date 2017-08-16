@@ -18,7 +18,7 @@ import threading
 import time
 import queue
 
-import pygame as pg
+import pygame as pygame
 
 from . import binds
 from . import constants as c
@@ -31,12 +31,12 @@ class Control:
         self.quit = False
         self.current_time = 0
         self.fps = c.FPS
-        pg.display.set_caption(caption)
-        self.clock = pg.time.Clock()
+        pygame.display.set_caption(caption)
+        self.clock = pygame.time.Clock()
 
         self.__thread_queue = queue.Queue()
 
-        self.screen_surface = pg.display.get_surface()
+        self.screen_surface = pygame.display.get_surface()
 
         self.state = None # type: State
         self.state_name = None # type: Dict[c.MainState, State]
@@ -49,14 +49,14 @@ class Control:
                 q.put(func)
 
             threading.Thread(target=kickoff, args=(self.__thread_queue, self.update()))
-            threading.Thread(target=kickoff, args=(self.__thread_queue, pg.display.update()))
+            threading.Thread(target=kickoff, args=(self.__thread_queue, pygame.display.update()))
 
             self.clock.tick(self.fps)
 
 
     def event_loop(self) -> None:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 self.quit = True
             else:
                 binds.INPUT.update(event)
@@ -68,7 +68,7 @@ class Control:
         """
         self.event_loop()
 
-        self.current_time = pg.time.get_ticks()
+        self.current_time = pygame.time.get_ticks()
         if self.state.quit:
             self.quit = True
         elif self.state.state_done:

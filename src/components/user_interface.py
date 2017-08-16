@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 import time
 
-import pygame as pg
+import pygame as pygame
 
 from . import helpers
 
@@ -33,7 +33,7 @@ button_icon_color = OrderedDict([
 ])
 
 
-class MenuSelection(pg.sprite.Sprite):
+class MenuSelection(pygame.sprite.Sprite):
     def __init__(self, x, y, name) -> None:
         super().__init__()
 
@@ -52,7 +52,7 @@ class MenuSelection(pg.sprite.Sprite):
         self.selected = False
 
 
-    def load_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_sprites_from_sheet(self) -> List[pygame.Surface]:
         frames = []
         frames.append(helpers.get_image(0, 0, 190, 49, self.sprite, mult=c.MENU_MULT))
         frames.append(helpers.get_image(0, 0, 190, 49, self.sprite_selected, mult=c.MENU_MULT))
@@ -84,7 +84,7 @@ class MenuSelection(pg.sprite.Sprite):
         surface.blit(text, text_rect)
 
 
-class Tooltip(pg.sprite.Sprite):
+class Tooltip(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int) -> None:
         super().__init__()
         sprite = setup.GFX["tooltip_bubble"]
@@ -104,7 +104,7 @@ class Tooltip(pg.sprite.Sprite):
         pass
 
 
-class Button(pg.sprite.Sprite):
+class Button(pygame.sprite.Sprite):
     def __init__(self, x, y, name) -> None:
         super().__init__()
 
@@ -134,7 +134,7 @@ class Button(pg.sprite.Sprite):
         self.animation_speed = 40
 
 
-    def load_sprites_from_sheet(self) -> List[pg.Surface]:
+    def load_sprites_from_sheet(self) -> List[pygame.Surface]:
         frames = []
         frames.append(helpers.get_image(0, 0, c.ORIGINAL_ICON_SIZE, c.ORIGINAL_ICON_SIZE, self.sprite, mult=c.BUTTON_MULT))
         frames.append(helpers.get_image(0, 0, c.ORIGINAL_ICON_SIZE, c.ORIGINAL_ICON_SIZE, self.sprite, mult=c.PRESSED_BUTTON_MULT))
@@ -199,7 +199,7 @@ class Hud:
             self.y = c.IMMUTABLE_HUD_Y
 
 
-    def update(self, screen: pg.Surface, game_info: Dict[str, Any], player: pg.sprite.Sprite, map_height: int) -> None:
+    def update(self, screen: pygame.Surface, game_info: Dict[str, Any], player: pygame.sprite.Sprite, map_height: int) -> None:
         self.update_sizes()
 
         # Don't need game_info for clock but will still need it later.
@@ -227,13 +227,13 @@ class Hud:
         self.coords = "({}, {})".format(x, map_height - y)
 
 
-    def render_clock(self, surface: pg.Surface) -> None:
+    def render_clock(self, surface: pygame.Surface) -> None:
         text = self.font.render(self.clock, True, c.WHITE)
         text_rect = text.get_rect(center=(self.x, self.y))
         surface.blit(text, text_rect)
 
 
-    def render_coords(self, surface: pg.Surface) -> None:
+    def render_coords(self, surface: pygame.Surface) -> None:
         text = self.font.render(self.coords, True, c.SELECTED_GRAY)
         text_rect = text.get_rect(center=(self.x - c.IMMUTABLE_HUD_X_OFFSET*2, self.y))
         surface.blit(text, text_rect)
@@ -260,7 +260,7 @@ class GameUI:
 
 
     def re_setup_buttons(self) -> None:
-        self.button_group = pg.sprite.Group()
+        self.button_group = pygame.sprite.Group()
         button_y = self.button_y
         button_separation = 0
 
@@ -269,7 +269,7 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pg.Surface, current_time: int, mainstate: c.MainState) -> None:
+    def update(self, screen: pygame.Surface, current_time: int, mainstate: c.MainState) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
@@ -291,6 +291,6 @@ class GameUI:
             self.state = c.Switch.ON
 
 
-    def blit_images(self, screen: pg.Surface) -> None:
+    def blit_images(self, screen: pygame.Surface) -> None:
         # Draw sprites onto the screen
         self.button_group.draw(screen)

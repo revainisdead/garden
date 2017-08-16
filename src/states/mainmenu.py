@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame as pygame
 
 from .. import constants as c
 from .. import control
@@ -39,10 +39,10 @@ class MainMenu(control.State):
     def setup_background(self):
         self.background = setup.GFX["nature_mountain_background"]
         self.background_rect = self.background.get_rect()
-        self.view = pg.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+        self.view = pygame.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
 
         size_delta = (int(self.background_rect.width*self.background_x_mult), int(self.background_rect.height*self.background_y_mult))
-        self.background = pg.transform.scale(self.background, size_delta)
+        self.background = pygame.transform.scale(self.background, size_delta)
 
 
     def re_setup_menu(self):
@@ -63,7 +63,7 @@ class MainMenu(control.State):
             selection3
         ]
 
-        self.menu_group = pg.sprite.Group(
+        self.menu_group = pygame.sprite.Group(
                 selection1,
                 selection2,
                 selection3)
@@ -73,7 +73,7 @@ class MainMenu(control.State):
         return c.MainState.COMMONAREA
 
 
-    def update(self, surface: pg.Surface, current_time: float) -> None:
+    def update(self, surface: pygame.Surface, current_time: float) -> None:
         """Update the state every frame"""
         self.update_sizes()
 
@@ -117,17 +117,17 @@ class MainMenu(control.State):
             self.background_y_mult = setup.screen_size.get_height() * c.BACKGROUND_Y_SCALER
             self.menu_y = int(setup.screen_size.get_height() / 3.5)
 
-            self.view = pg.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
+            self.view = pygame.Rect((0, 0), (setup.screen_size.get_width(), setup.screen_size.get_height()))
 
             size_delta = (int(self.background_rect.width*self.background_x_mult), int(self.background_rect.height*self.background_y_mult))
-            self.background = pg.transform.scale(self.background, size_delta)
+            self.background = pygame.transform.scale(self.background, size_delta)
 
 
     def update_sprites(self, selection: user_interface.MenuSelection) -> None:
         self.menu_group.update(selection)
 
 
-    def blit_images(self, surface: pg.Surface) -> None:
+    def blit_images(self, surface: pygame.Surface) -> None:
         surface.blit(self.background, (0, 0), self.view)
 
         self.menu_group.draw(surface)
