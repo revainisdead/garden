@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple
 import time
 import random
 
-import pygame as pygame
+import pygame
 
 from .. import binds
 from .. import constants as c

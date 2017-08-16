@@ -2,7 +2,7 @@ from typing import List
 
 import random
 
-import pygame as pygame
+import pygame
 
 from . import helpers, util
 

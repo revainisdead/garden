@@ -1,6 +1,6 @@
 from typing import Tuple
 
-import pygame as pygame
+import pygame
 
 from .. import constants as c
 

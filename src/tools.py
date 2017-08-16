@@ -3,7 +3,7 @@ from typing import List, Tuple
 import os
 
 from PIL import Image
-import pygame as pygame
+import pygame
 
 from . import constants as c
 from . components import util

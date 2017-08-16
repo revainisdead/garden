@@ -1,6 +1,6 @@
 from typing import Optional
 
-import pygame as pygame
+import pygame
 
 import random
 

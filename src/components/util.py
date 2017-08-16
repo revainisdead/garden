@@ -1,4 +1,4 @@
-import pygame as pygame
+import pygame
 
 from .. import constants as c
 

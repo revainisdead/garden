@@ -3,7 +3,7 @@ from typing import Optional, Dict
 import json
 import os
 
-import pygame as pygame
+import pygame
 
 
 class Keybinds:

@@ -2,7 +2,7 @@
 
 from typing import Optional, Tuple
 
-import pygame as pygame
+import pygame
 
 from . import keys
 from . import constants as c

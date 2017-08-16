@@ -2,7 +2,7 @@ from typing import List, Set, Tuple
 
 import random
 
-import pygame as pygame
+import pygame
 
 from . import helpers, scenery, util
 

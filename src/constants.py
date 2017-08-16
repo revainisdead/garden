@@ -1,6 +1,6 @@
 import enum
 
-import pygame as pygame
+import pygame
 
 
 CAPTION = "Garden"

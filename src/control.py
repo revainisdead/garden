@@ -18,7 +18,7 @@ import threading
 import time
 import queue
 
-import pygame as pygame
+import pygame
 
 from . import binds
 from . import constants as c

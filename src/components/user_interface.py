@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 import time
 
-import pygame as pygame
+import pygame
 
 from . import helpers
 
