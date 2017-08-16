@@ -217,7 +217,7 @@ class Hud:
         dt_t = datetime.now()
 
         # Don't overwrite dt_t (for mypy), because it has a different type.
-        t = t.strftime("%I:%M %p")
+        t = dt_t.strftime("%I:%M %p")
         if t.startswith("0"):
             time = t[1:]
         self.clock = t

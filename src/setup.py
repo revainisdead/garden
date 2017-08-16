@@ -2,16 +2,16 @@ from typing import Any, Dict, Tuple
 
 import os
 
-import pygame as pg
+import pygame
 
 from . import constants as c
 from . import keys
 from . import tools
 
 
-GFX =   {} # type: Dict[str, pg.Surface]
-FONTS = {} # type: Dict[str, pg.font.Font]
-SFX =   {} # type: Dict[str, pg.mixer.Sound]
+GFX =   {} # type: Dict[str, pygame.Surface]
+FONTS = {} # type: Dict[str, pygame.font.Font]
+SFX =   {} # type: Dict[str, pygame.mixer.Sound]
 
 screen_size = None # type: ScreenSize
 map_size = None # type: MapSize
@@ -53,7 +53,7 @@ class ScreenSize:
         self.__resize(int(round(width)), int(round(height)))
 
         if self.__changed:
-            pg.display.set_mode((self.__width, self.__height), pg.RESIZABLE)
+            pygame.display.set_mode((self.__width, self.__height), pygame.RESIZABLE)
 
 
 class MapSize:
@@ -132,11 +132,11 @@ class MapSize:
 
 def start():
     #os.environ["SDL_VIDEO_CENTERED"] = "1"
-    pg.init()
-    pg.font.init()
+    pygame.init()
+    pygame.font.init()
 
     # Initialize screen
-    _ = pg.display.set_mode(c.DEFAULT_SCREEN_SIZE, pg.RESIZABLE)
+    _ = pygame.display.set_mode(c.DEFAULT_SCREEN_SIZE, pygame.RESIZABLE)
 
     global GFX
     GFX = tools.load_gfx(os.path.join("data", "graphics"))

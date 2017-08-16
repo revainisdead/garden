@@ -1,13 +1,28 @@
+from typing import Any
+
+
 from . rect import Rect
-from . surface import Surface
+from . surface import Surface, SRCALPHA
 
-K_w = K_s = K_a = K_d = K_1 = K_2 \
-    = K_ESCAPE = K_RETURN = K_UP = K_DOWN \
-    = K_ESCAPE = None # type: int
-
-KEYDOWN = KEYUP = MOUSEMOTION \
-    = MOUSEBUTTONDOWN = MOUSEBUTTONUP \
-    = VIDEORESIZE = QUIT = None # type: int
+K_w = \
+K_a = \
+K_s = \
+K_d = \
+K_1 = \
+K_2 = \
+K_RETURN = \
+K_ESCAPE = \
+K_UP = \
+K_DOWN = \
+KEYUP = \
+KEYDOWN = \
+MOUSEMOTION = \
+MOUSEBUTTONDOWN = \
+MOUSEBUTTONUP = \
+VIDEORESIZE = \
+RESIZABLE = \
+QUIT = \
+BLEND_RGBA_ADD = None # type: int
 
 key = Any # XXX
 
