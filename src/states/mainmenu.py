@@ -69,8 +69,8 @@ class MainMenu(control.State):
                 selection3)
 
 
-    def set_next_state(self) -> c.MainState:
-        return c.MainState.COMMONAREA
+    def set_next_state(self) -> c.StateName:
+        return c.StateName.COMMONAREA
 
 
     def update(self, surface: pygame.Surface, current_time: float) -> None:

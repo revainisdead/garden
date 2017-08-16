@@ -1,6 +1,9 @@
-from typing import Iterable
+from typing import Any, Optional, Iterable
 
 from . rect import Rect
+
+
+def spritecollideany(sprite: Sprite, group: Group, collided: Any=None) -> Optional[Sprite]: ...
 
 
 class Sprite:
@@ -9,7 +12,6 @@ class Sprite:
     def get_rect(self) -> Rect: ...
     def add(self, *groups: Group) -> None: ...
     def kill(self) -> None: ...
-    def spritecollideany(sprite: "Sprite", group: Group, collided: Any) -> Optional[Sprite]: ...
 
 
 

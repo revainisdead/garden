@@ -63,7 +63,7 @@ class MapSize:
        - It needs to be accessible everywhere.
     """
     def __init__(self) -> None:
-        self.__biome = None
+        self.__biome = None # type: c.Biome
         #self.__width = 0
         #self.__height = 0
         self.__changed = False

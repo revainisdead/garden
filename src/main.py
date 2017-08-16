@@ -10,12 +10,12 @@ def main():
     setup.start()
 
     state_dict = {
-        c.MainState.MAINMENU: mainmenu.MainMenu(),
-        c.MainState.COMMONAREA: commonarea.CommonArea(),
+        c.StateName.MAINMENU: mainmenu.MainMenu(),
+        c.StateName.COMMONAREA: commonarea.CommonArea(),
     }
 
     game = control.Control(c.CAPTION)
-    game.setup_states(state_dict, c.MainState.MAINMENU)
+    game.setup_states(state_dict, c.StateName.MAINMENU)
     game.setup_game_ui()
 
     game.game_loop()

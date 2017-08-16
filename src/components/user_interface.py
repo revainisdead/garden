@@ -34,7 +34,7 @@ button_icon_color = OrderedDict([
 
 
 class MenuSelection(pygame.sprite.Sprite):
-    def __init__(self, x, y, name) -> None:
+    def __init__(self, x: int, y: int, name: str) -> None:
         super().__init__()
 
         self.sprite = setup.GFX["green_button01"]
@@ -59,11 +59,11 @@ class MenuSelection(pygame.sprite.Sprite):
         return frames
 
 
-    def update(self, selection) -> None:
+    def update(self, selection: str) -> None:
         self.handle_state(selection)
 
 
-    def handle_state(self, selection) -> None:
+    def handle_state(self, selection: str) -> None:
         if selection == self.name:
             self.selected = True
             frame_index = 1
@@ -85,7 +85,7 @@ class MenuSelection(pygame.sprite.Sprite):
 
 
 class Tooltip(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int) -> None:
+    def __init__(self, x: int, y: int, sprite_name: str) -> None:
         super().__init__()
         sprite = setup.GFX["tooltip_bubble"]
 
@@ -173,6 +173,7 @@ class Button(pygame.sprite.Sprite):
     # XXX Unused but can be used to either write to keybind onto the
     # button or used to draw the tooltip, which can include the description
     # and probably the keybind as well.
+    """
     def render_name(self, surface) -> None:
         if self.pressed:
             text = self.font.render(menu_labels[self.name], True, c.WHITE)
@@ -181,6 +182,7 @@ class Button(pygame.sprite.Sprite):
 
         text_rect = text.get_rect(center=(setup.screen_size.get_width()/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
+    """
 
 
 class Hud:
@@ -269,7 +271,7 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pygame.Surface, current_time: int, mainstate: c.MainState) -> None:
+    def update(self, screen: pygame.Surface, current_time: int, mainstate: c.StateName) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
@@ -285,7 +287,7 @@ class GameUI:
 
 
     def handle_state(self, mainstate) -> None:
-        if mainstate == c.MainState.MAINMENU or mainstate == c.MainState.INGAMEMENU:
+        if mainstate == c.StateName.MAINMENU or mainstate == c.StateName.INGAMEMENU:
             self.state = c.Switch.OFF
         else:
             self.state = c.Switch.ON

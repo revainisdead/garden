@@ -3,10 +3,16 @@ from typing import Any
 
 from . rect import Rect
 from . surface import Surface, SRCALPHA
-from . import sprite
-from . import font
-from . import mixer
+from . import display
 from . import event
+from . import font
+from . import key
+from . import mixer
+from . import mouse
+from . import sprite
+from . import time
+from . import transform
+
 
 K_w = \
 K_a = \

@@ -27,10 +27,9 @@ def flip_player_camera_combo(flip: bool) -> None:
 flip_player_camera_combo(False)
 
 
-class MainState(enum.Enum):
+class StateName(enum.Enum):
     MAINMENU = 0
-    INGAMEMENU = 1
-    COMMONAREA = 2
+    COMMONAREA = 1
 
 
 class Direction(enum.Enum):
@@ -100,6 +99,7 @@ NPC_MULT = 0.25
 MENU_MULT = 1.15
 BUTTON_MULT = 0.10 # 0.16 makes the button the size of a tile
 PRESSED_BUTTON_MULT = 0.097
+TOOLTIP_MULT = 1
 
 map_mult = {
     Biome.FARMLAND: 5,

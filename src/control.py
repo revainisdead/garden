@@ -27,7 +27,7 @@ from . components import user_interface, util
 
 
 class Control:
-    def __init__(self, caption) -> None:
+    def __init__(self, caption: str) -> None:
         self.quit = False
         self.current_time = 0
         self.fps = c.FPS
@@ -38,9 +38,9 @@ class Control:
 
         self.screen_surface = pygame.display.get_surface()
 
-        self.state = None # type: State
-        self.state_name = None # type: Dict[c.MainState, State]
-        self.state_dict = {}
+        self.state = None # type: c.StateName
+        self.state_name = None # type: c.StateName
+        self.state_dict = {} # type: Dict[c.StateName, State]
 
 
     def game_loop(self) -> None:
@@ -114,8 +114,8 @@ class State:
         # Quit this state
         self.state_done = False
 
-        self.next = None # type: c.MainState
-        self.previous = None # type: c.MainState
+        self.next = None # type: c.StateName
+        self.previous = None # type: c.StateName
 
         # XXX Make game info it's own object.
         self.game_info = {} # type: Dict[str, Any]

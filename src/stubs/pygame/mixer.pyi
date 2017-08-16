@@ -1,5 +1,5 @@
 class Sound:
     def __init__(self,
-        path: str) -> "Sound": ...
+        path: str) -> None: ...
 
 # vim: set filetype=python :

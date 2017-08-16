@@ -30,7 +30,7 @@ class CommonArea(control.State):
 
     def startup(self, game_info: Dict[str, Any]) -> None:
         self.game_info = game_info
-        self.state = c.MainState.COMMONAREA
+        self.state = c.StateName.COMMONAREA
 
         self.stairs_down_copy = []
         self.stairs_down_group = self.setup_stairs_down()

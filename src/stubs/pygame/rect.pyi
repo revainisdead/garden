@@ -19,5 +19,8 @@ class Rect:
         self.w = self.width = None # type: int
         self.h = self.height = None # type: int
 
+    def colliderect(self, Rect) -> bool: ...
+    def collidepoint(self, x: Union[int, Tuple[int, int]], y: Optional[int]) -> bool: ...
+
 
 # vim: set filetype=python :

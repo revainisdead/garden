@@ -1,6 +1,6 @@
 # XXX: Rename to input.py
 
-from typing import Optional, Tuple
+from typing import Optional, Sequence, Tuple
 
 import pygame
 
@@ -108,7 +108,7 @@ class Input:
             self.__last_keys_pressed.append(key)
 
 
-    def __set_held_keys(self, keys: Tuple[int, ...]) -> None:
+    def __set_held_keys(self, keys: Sequence[bool]) -> None:
         """Add keys gathered from event.get_pressed."""
         self.__held_keys = keys
 
@@ -126,7 +126,7 @@ class Input:
 
     def __set_last_mouse_drop(self, point: Optional[Tuple[int, int]]) -> None:
         if point is None:
-            self.last_mouse_drop = (0, 0)
+            self.__last_mouse_drop = (0, 0)
         else:
             self.__last_mouse_drop = point
 
