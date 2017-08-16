@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import pygame
 
 from .. import constants as c

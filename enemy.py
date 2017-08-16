@@ -24,7 +24,7 @@ class Glaive(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        self.current_time = 0
+        self.dt = 0
         self.exists = True
 
         self.direction = c.Direction.LEFT
@@ -66,8 +66,8 @@ class Glaive(pg.sprite.Sprite):
         self.animate_glaive()
 
 
-    def update(self, current_time: float) -> None:
-        self.current_time = current_time
+    def update(self, dt: float) -> None:
+        self.dt = dt
 
         if self.exists:
             self.handle_state()
@@ -78,14 +78,14 @@ class Glaive(pg.sprite.Sprite):
             self.frame_index += 1
 
             # Setting shooting timer for the first time
-            self.shooting_timer = self.current_time
+            self.shooting_timer = self.dt
         else:
-            if self.current_time - self.shooting_timer > self.animation_speed:
+            if self.dt - self.shooting_timer > self.animation_speed:
                 self.frame_index += 1
 
                 if self.frame_index >= len(self.frames):
                     self.frame_index = 1
-                self.shooting_timer = self.current_time
+                self.shooting_timer = self.dt
 
         self.image = self.frames[self.frame_index]
 
@@ -108,7 +108,7 @@ class Enemy(pg.sprite.Sprite):
         self.set_velocity()
         self.walking_dir_change_interval = 0
 
-        self.current_time = 0
+        self.dt = 0
         self.shooting_timer = 0
         self.animation_speed = 80
         self.flip_speed = 400
@@ -178,8 +178,8 @@ class Enemy(pg.sprite.Sprite):
         self.auto_walk()
 
 
-    def update(self, current_time, glaive_group: pg.sprite.Group) -> None:
-        self.current_time = current_time
+    def update(self, dt, glaive_group: pg.sprite.Group) -> None:
+        self.dt = dt
 
         self.handle_state(glaive_group)
 
@@ -189,9 +189,9 @@ class Enemy(pg.sprite.Sprite):
             self.frame_index += 1
 
             # Setting shooting timer for the first time
-            self.shooting_timer = self.current_time
+            self.shooting_timer = self.dt
         else:
-            if self.current_time - self.shooting_timer > self.animation_speed:
+            if self.dt - self.shooting_timer > self.animation_speed:
                 self.frame_index += 1
 
                 # If the image is the shooting image, shoot glaive.
@@ -200,7 +200,7 @@ class Enemy(pg.sprite.Sprite):
 
                 if self.frame_index >= len(self.frames):
                     self.frame_index = 1
-                self.shooting_timer = self.current_time
+                self.shooting_timer = self.dt
 
         self.image = self.frames[self.frame_index]
 
