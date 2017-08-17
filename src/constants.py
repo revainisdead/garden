@@ -6,7 +6,7 @@ import pygame
 CAPTION = "Garden"
 
 # Frames per second.
-FPS = 20
+FPS = 60
 PG_GET_PRESSED_LENGTH = 323
 
 
@@ -133,12 +133,12 @@ TILE_MULT = TILE_SIZE / 64
 
 # Speeds.
 speeds = {
-    "player": 6 if not DEBUG_PLAYER else 20,
+    "player": 4 if not DEBUG_PLAYER else 20,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
     "npc_roaming": 3 if not DEBUG_NPC else 10,
     "npc_running": 5,
-    "camera": 6 if not DEBUG_CAMERA else 20,
+    "camera": 3 if not DEBUG_CAMERA else 20,
 }
 
 # XXX mirror movement speeds dict with proportional animation speeds.

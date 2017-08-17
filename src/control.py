@@ -12,11 +12,9 @@
 # Rule: unqualified imports before qualified
 #   Ex. from module import class
 #       import module
-from typing import Any, Callable, Dict
+from typing import Any, Optional, Callable, Dict
 
-import threading
 import time
-import queue
 
 import pygame
 
@@ -29,28 +27,22 @@ from . components import user_interface, util
 class Control:
     def __init__(self, caption: str) -> None:
         self.quit = False
-        self.dt = 0
+        self.dt = 0.0
         self.fps = c.FPS
         pygame.display.set_caption(caption)
         self.clock = pygame.time.Clock()
 
-        self.__thread_queue = queue.Queue() # type: queue.Queue[Callable[[], Any]]
-
         self.screen_surface = pygame.display.get_surface()
 
-        self.state = None # type: c.StateName
+        self.state = None # type: State
         self.state_name = None # type: c.StateName
         self.state_dict = {} # type: Dict[c.StateName, State]
 
 
     def game_loop(self) -> None:
         while not self.quit:
-            def kickoff(q: queue.Queue, func: Callable[[], Any]) -> None:
-                q.put(func)
-
-            threading.Thread(target=kickoff, args=(self.__thread_queue, self.update()))
-            threading.Thread(target=kickoff, args=(self.__thread_queue, pygame.display.update()))
-
+            self.update()
+            pygame.display.update()
             self.dt = self.clock.tick(self.fps)
 
 
@@ -125,9 +117,9 @@ class State:
         return self.game_info
 
 
-    def startup(self) -> None:
+    def startup(self, game_info: Dict[str, Any]) -> None:
         raise NotImplementedError
 
 
-    def update(self) -> None:
+    def update(self, surface: pygame.Surface, dt: int) -> None:
         raise NotImplementedError

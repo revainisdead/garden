@@ -201,7 +201,7 @@ class Npc(pygame.sprite.Sprite):
         self.auto_walk()
 
 
-    def update(self, dt: float, collidable_group: pygame.sprite.Group) -> None:
+    def update(self, dt: int, collidable_group: pygame.sprite.Group) -> None:
         self.dt = dt
         self.collidable_group = collidable_group
 

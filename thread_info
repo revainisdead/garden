@@ -1,0 +1,28 @@
+"""
+#self.__thread_queue = queue.Queue() # type: queue.Queue[Callable[[], Any]]
+#self.__thread_queue = queue.Queue() # type: queue.Queue[threading.Thread]
+
+def kickoff(q: queue.Queue, func: Callable[[], Any]) -> None:
+    q.put(func)
+threading.Thread(target=kickoff, args=(self.__thread_queue, self.update))
+threading.Thread(target=kickoff, args=(self.__thread_queue, pygame.display.update))
+# Start threads
+while not self.__thread_queue.empty():
+    self.__thread_queue.get().start()
+
+####
+
+self.__thread_queue.put(threading.Thread(target=self.update, args=(), daemon=True))
+self.__thread_queue.put(threading.Thread(target=pygame.display.update, args=(), daemon=True))
+
+
+# Start all threads in the queue.
+while not self.__thread_queue.empty():
+    self.__thread_queue.get().start()
+
+# Sync threads.
+while not self.__thread_queue.empty():
+    t = self.__thread_queue.get()
+    print(t.name)
+    t.join()
+"""

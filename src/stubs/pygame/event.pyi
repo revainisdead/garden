@@ -1,4 +1,7 @@
-from typing import Tuple
+from typing import Sequence, Tuple
+
+
+def get() -> Sequence[Event]: ...
 
 
 class Event:

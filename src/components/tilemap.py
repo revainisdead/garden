@@ -138,7 +138,7 @@ class Map:
                 # Do a check for swaps before actually creating tiles.
                 for gridy in range(self.height):
                     for gridx in range(self.width):
-                        _, swapped = self.solid_tilename_calculation(gridx, gridy, False)
+                        __, swapped = self.solid_tilename_calculation(gridx, gridy, False)
         else:
             pass
 
@@ -204,7 +204,7 @@ class Map:
                     if solid_grid_point or created_tree:
                         self.collidable_grid[gridx][gridy] = 1
                 elif self.biome == c.Biome.CAVE:
-                    tile_names = self.tile_names[grid_point]
+                    tile_name = self.tile_names[grid_point]
 
                     tile = Tile(x_pos, y_pos, tile_name)
                     tiles.add(tile) # Tile as set.
@@ -215,9 +215,10 @@ class Map:
         return tiles
 
 
+    # XXX: Unused
     def retry_swapped(self, x: int, y:int) -> Tuple[str, bool]:
         while True:
-            tile_name, swapped = self.solid_tilename_calculation(x, y)
+            tile_name, swapped = self.solid_tilename_calculation(x, y, True)
             if not swapped:
                 return tile_name, swapped
 
@@ -539,7 +540,7 @@ class Map:
                 return x * c.TILE_SIZE, y * c.TILE_SIZE
 
 
-    def update(self, surface: pygame.Surface, camera: pygame.Rect) -> bool:
+    def update(self, surface: pygame.Surface, camera: pygame.Rect) -> None:
         # Test tiles as dict
         #for tile in list(self.tiles.values()):
         for tile in self.tiles:

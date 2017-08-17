@@ -203,7 +203,7 @@ class Player(pygame.sprite.Sprite):
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, dt: float, collidable_group: pygame.sprite.Group) -> None:
+    def update(self, dt: int, collidable_group: pygame.sprite.Group) -> None:
         self.dt = dt
         self.collidable_group = collidable_group
 
