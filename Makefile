@@ -1,8 +1,5 @@
 .PHONY=all clean mypy
 
-MYPY1_W=enemy.py
-MYPY2_W=old_player.py
-
 ABS_DIR=$(shell pwd)
 MYPY_DIR=$(ABS_DIR)/src:$(ABS_DIR)/src/stubs
 
@@ -20,7 +17,7 @@ all:
 	python3 -m src.main
 
 mypy:
-	mypy $$(git ls-files -- "*.py" | grep -v $(MYPY1_W) | grep -v $(MYPY2_W))
+	mypy $$(git ls-files -- "*.py")
 
 clean:
 	@echo "Removing compiled python files . . ."

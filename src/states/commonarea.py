@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Iterable, List, Tuple
 
 import time
 import random
@@ -32,7 +32,7 @@ class CommonArea(control.State):
         self.game_info = game_info
         self.state = c.StateName.COMMONAREA
 
-        self.stairs_down_copy = []
+        self.stairs_down_copy = [] # type: List[pygame.sprite.Sprite]
         self.stairs_down_group = self.setup_stairs_down()
 
         self.setup_player()

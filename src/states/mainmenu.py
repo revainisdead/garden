@@ -125,7 +125,7 @@ class MainMenu(control.State):
             self.background = pygame.transform.scale(self.background, size_delta)
 
 
-    def update_sprites(self, selection: user_interface.MenuSelection) -> None:
+    def update_sprites(self, selection: str) -> None:
         self.menu_group.update(selection)
 
 
