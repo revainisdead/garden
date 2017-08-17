@@ -64,7 +64,7 @@ class Npc(pygame.sprite.Sprite):
         # For every one added, double the standing still chance.
         self.increase_standing_still_chance = len(directions) + 1
 
-        self.current_time = 0
+        self.dt = 0
         self.walking_timer = 0
         self.animation_speed_static = 120
 
@@ -201,8 +201,8 @@ class Npc(pygame.sprite.Sprite):
         self.auto_walk()
 
 
-    def update(self, current_time: float, collidable_group: pygame.sprite.Group) -> None:
-        self.current_time = current_time
+    def update(self, dt: float, collidable_group: pygame.sprite.Group) -> None:
+        self.dt = dt
         self.collidable_group = collidable_group
 
         self.handle_state()
@@ -218,7 +218,7 @@ class Npc(pygame.sprite.Sprite):
             self.frame_index += 1
 
             # Setting timer for the first time
-            self.walking_timer = self.current_time
+            self.walking_timer = self.dt
         elif self.direction == c.Direction.NONE:
             # Select standing still images.
             if self.previous_direction == c.Direction.UP or self.previous_direction == c.Direction.DOWN:
@@ -226,12 +226,12 @@ class Npc(pygame.sprite.Sprite):
             elif self.previous_direction == c.Direction.LEFT or self.previous_direction == c.Direction.RIGHT:
                 self.frame_index = 2
         else:
-            if self.current_time - self.walking_timer > self.animation_speed:
+            if self.dt - self.walking_timer > self.animation_speed:
                 self.frame_index += 1
 
                 if self.frame_index >= len(self.current_frames):
                     self.frame_index = 1
-                self.walking_timer = self.current_time
+                self.walking_timer = self.dt
 
         self.image = self.current_frames[self.frame_index]
 

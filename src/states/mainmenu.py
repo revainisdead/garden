@@ -13,7 +13,7 @@ class MainMenu(control.State):
     def __init__(self) -> None:
         super().__init__()
         self.game_info = {
-            "current_time": 0,
+            "dt": 0,
         }
 
         self.background_x_mult = c.DEFAULT_BACKGROUND_X_MULT
@@ -75,7 +75,7 @@ class MainMenu(control.State):
         return c.StateName.COMMONAREA
 
 
-    def update(self, surface: pygame.Surface, current_time: float) -> None:
+    def update(self, surface: pygame.Surface, dt: float) -> None:
         """Update the state every frame"""
         self.update_sizes()
 

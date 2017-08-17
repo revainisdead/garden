@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         self.x_vel = 0
         self.y_vel = 0
 
-        self.current_time = 0
+        self.dt = 0
         self.walking_timer = 0
         self.animation_speed_static = 120
 
@@ -203,8 +203,8 @@ class Player(pygame.sprite.Sprite):
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, current_time: float, collidable_group: pygame.sprite.Group) -> None:
-        self.current_time = current_time
+    def update(self, dt: float, collidable_group: pygame.sprite.Group) -> None:
+        self.dt = dt
         self.collidable_group = collidable_group
 
         self.handle_state()
@@ -225,7 +225,7 @@ class Player(pygame.sprite.Sprite):
             self.frame_index += 1
 
             # Setting timer for the first time
-            self.walking_timer = self.current_time
+            self.walking_timer = self.dt
         elif self.direction == c.Direction.NONE:
             # Select standing still images.
             if self.previous_direction == c.Direction.UP or self.previous_direction == c.Direction.DOWN:
@@ -238,11 +238,11 @@ class Player(pygame.sprite.Sprite):
                     or self.previous_direction == c.Direction.RIGHTDOWN:
                 self.frame_index = 2
         else:
-            if self.current_time - self.walking_timer > self.animation_speed:
+            if self.dt - self.walking_timer > self.animation_speed:
                 self.frame_index += 1
 
                 if self.frame_index >= len(self.current_frames):
                     self.frame_index = 1
-                self.walking_timer = self.current_time
+                self.walking_timer = self.dt
 
         self.image = self.current_frames[self.frame_index]

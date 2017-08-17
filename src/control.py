@@ -12,7 +12,7 @@
 # Rule: unqualified imports before qualified
 #   Ex. from module import class
 #       import module
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 import threading
 import time
@@ -29,12 +29,12 @@ from . components import user_interface, util
 class Control:
     def __init__(self, caption: str) -> None:
         self.quit = False
-        self.current_time = 0
+        self.dt = 0
         self.fps = c.FPS
         pygame.display.set_caption(caption)
         self.clock = pygame.time.Clock()
 
-        self.__thread_queue = queue.Queue()
+        self.__thread_queue = queue.Queue() # type: queue.Queue[Callable[[], Any]]
 
         self.screen_surface = pygame.display.get_surface()
 
@@ -45,7 +45,7 @@ class Control:
 
     def game_loop(self) -> None:
         while not self.quit:
-            def kickoff(q: queue.Queue, func: Any) -> None:
+            def kickoff(q: queue.Queue, func: Callable[[], Any]) -> None:
                 q.put(func)
 
             threading.Thread(target=kickoff, args=(self.__thread_queue, self.update()))
@@ -68,16 +68,16 @@ class Control:
         """
         self.event_loop()
 
-        self.current_time = pygame.time.get_ticks()
+        self.dt = pygame.time.get_ticks()
         if self.state.quit:
             self.quit = True
         elif self.state.state_done:
             self.flip_state()
 
-        self.state.update(self.screen_surface, self.current_time)
+        self.state.update(self.screen_surface, self.dt)
 
         # In Game User Interface.
-        self.game_ui.update(self.screen_surface, self.current_time, self.state_name)
+        self.game_ui.update(self.screen_surface, self.dt, self.state_name)
 
         binds.INPUT.reset()
 

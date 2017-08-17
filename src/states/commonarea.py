@@ -123,13 +123,13 @@ class CommonArea(control.State):
         self.hud = user_interface.Hud()
 
 
-    def update(self, surface: pygame.Surface, current_time: int) -> None:
+    def update(self, surface: pygame.Surface, dt: int) -> None:
         """Update the state every frame"""
         # Let this state control the map size update.
         setup.map_size.update(self.biome)
 
         # XXX Create function/class to handle game info.
-        self.game_info["current_time"] = current_time
+        self.game_info["dt"] = dt
 
         self.update_sizes()
         self.update_map()
@@ -172,8 +172,8 @@ class CommonArea(control.State):
 
 
     def update_sprites(self) -> None:
-        self.player_group.update(self.game_info["current_time"], self.collidable_group)
-        self.npc_group.update(self.game_info["current_time"], self.collidable_group)
+        self.player_group.update(self.game_info["dt"], self.collidable_group)
+        self.npc_group.update(self.game_info["dt"], self.collidable_group)
         self.stairs_down_group.update(self.player.rect)
 
         # XXX separate into: def handle_biome(self)

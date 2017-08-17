@@ -128,7 +128,7 @@ class Button(pygame.sprite.Sprite):
         self.keybind = button_binds[self.name]
         # key: wood_axe_icon value: current keybind for action in binds file
 
-        self.current_time = 0
+        self.dt = 0
         self.pressed_time = 0
         # Very fast animation when pressed.
         self.animation_speed = 40
@@ -141,8 +141,8 @@ class Button(pygame.sprite.Sprite):
         return frames
 
 
-    def update(self, current_time: int) -> None:
-        self.current_time = current_time
+    def update(self, dt: int) -> None:
+        self.dt = dt
         self.handle_state()
 
 
@@ -166,7 +166,7 @@ class Button(pygame.sprite.Sprite):
 
 
     def finished_animation_check(self) -> None:
-        if self.current_time - self.pressed_time > self.animation_speed:
+        if self.dt - self.pressed_time > self.animation_speed:
             self.image = self.frames[0]
 
 
@@ -271,12 +271,12 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pygame.Surface, current_time: int, mainstate: c.StateName) -> None:
+    def update(self, screen: pygame.Surface, dt: int, mainstate: c.StateName) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
             self.update_sizes()
-            self.button_group.update(current_time)
+            self.button_group.update(dt)
             self.blit_images(screen)
 
 
