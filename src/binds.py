@@ -12,6 +12,7 @@ from . import setup
 # Allow this file to interface with the keys file.
 keybinds = keys.Keybinds().keybinds
 
+
 # XXX Load keys from json file
 # Allow json file to be manipulated from main menu
 # To allow changing of keybinds
@@ -43,20 +44,6 @@ keybinds = keys.Keybinds().keybinds
 # NOTE: Or don't use quotes in text file, just get word and convert to string.
 
 # all_mods = { "none": KMOD_NONE, "shift": KMOD_SHIFT, "ctrl": KMOD_CTRL, "alt": KMOD_ALT }
-
-keybinds = {
-    "up": pygame.K_w,
-    "down": pygame.K_s,
-    "left": pygame.K_a,
-    "right": pygame.K_d,
-    "escape": pygame.K_ESCAPE,
-    "enter": pygame.K_RETURN,
-    "arrow_up": pygame.K_UP,
-    "arrow_down": pygame.K_DOWN,
-    "one": pygame.K_1,
-    "two": pygame.K_2,
-    "three": pygame.K_3,
-}
 
 
 # Some keys should be able to be set, like "use_wood_axe",

@@ -25,6 +25,7 @@ button_binds = {
     "wood_axe_icon": "one",
     "tree_icon": "two",
     "grabbers_icon": "three",
+    "flip_icon": "four",
 }
 
 
@@ -238,6 +239,7 @@ class Hud:
 
     def notification(self) -> None: pass
     def detect_item_change(self) -> None:
+        # XXX
         # Compare stored game info inventory to new game info
         # and display a notification for a period of time that
         # displays the items gained? But also if the items gained
@@ -251,10 +253,13 @@ class Hud:
 
 class GameUI:
     def __init__(self) -> None:
+        # XXX Later can dynamically add or remove items depending on
+        # which items are equipped (some items might give special power)
         self.button_icon_and_color = OrderedDict([
             ("wood_axe_icon", c.DARK_PALE),
             ("tree_icon", c.FOREST_GREEN),
             ("grabbers_icon", c.AUTUMN),
+            ("flip_icon", c.NICE_VIOLET),
         ]) # Add the name of an icon and a color to create a new button.
 
         self.button_x = c.IMMUTABLE_BUTTON_X

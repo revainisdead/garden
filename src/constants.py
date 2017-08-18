@@ -88,6 +88,7 @@ ICON_GRAY =     (136, 136, 136)
 FOREST_GREEN =  (83, 150, 78)
 DARK_PALE =     (170, 155, 82)
 AUTUMN =        (255, 167, 73)
+NICE_VIOLET =   (229, 162, 219)
 
 
 # Multipliers.

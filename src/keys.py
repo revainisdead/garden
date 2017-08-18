@@ -19,6 +19,12 @@ class Keybinds:
             "arrow_down": pygame.K_DOWN,
             "one": pygame.K_1,
             "two": pygame.K_2,
+            "three": pygame.K_3,
+            "four": pygame.K_4,
+            "five": pygame.K_5,
+            "six": pygame.K_6,
+            "seven": pygame.K_7,
+            "eight": pygame.K_8,
         }
 
         conf_name = "keys_config.json"
@@ -37,6 +43,21 @@ class Keybinds:
             with open(self.__conf_path, "r") as f:
                 data = json.loads(f.read()) # Load string and save into dict.
                 binds_temp = data
+
+                if binds_temp:
+                    # If file exists, check if the length of the default keybinds
+                    # has increased by comparing the keybinds from the file,
+                    # so that we can rewrite it.
+                    if len(self.__default_keybinds) > len(binds_temp):
+                        # Warning: this resets all the users keybinds
+                        # to the default. Will be important later to
+                        # only set to default any new keys added.
+                        self.reset_to_defaults()
+
+                        # Also need to reset binds_temp to None, so that the
+                        # run-time keybinds gets reset to the default values as well.
+                        binds_temp = None
+
         else:
             self.reset_to_defaults()
 
