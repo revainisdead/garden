@@ -55,6 +55,7 @@ keybinds = {
     "arrow_down": pygame.K_DOWN,
     "one": pygame.K_1,
     "two": pygame.K_2,
+    "three": pygame.K_3,
 }
 
 

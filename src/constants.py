@@ -19,11 +19,10 @@ DEBUG_NPC = False
 
 
 def flip_player_camera_combo(flip: bool) -> None:
-    if flip:
-        global DEBUG_CAMERA
-        DEBUG_CAMERA = True
-        global DEBUG_PLAYER
-        DEBUG_PLAYER = True
+    global DEBUG_CAMERA
+    global DEBUG_PLAYER
+    DEBUG_CAMERA = flip
+    DEBUG_PLAYER = flip
 flip_player_camera_combo(False)
 
 
@@ -88,6 +87,7 @@ ICON_GRAY =     (136, 136, 136)
 # Soothing colors for UI buttons.
 FOREST_GREEN =  (83, 150, 78)
 DARK_PALE =     (170, 155, 82)
+AUTUMN =        (255, 167, 73)
 
 
 # Multipliers.
@@ -131,12 +131,11 @@ FONT_SIZE_DICT = {
 TILE_MULT = TILE_SIZE / 64
 
 
-# Speeds.
 speeds = {
     "player": 3 if not DEBUG_PLAYER else 20,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
-    "npc_roaming": 3 if not DEBUG_NPC else 10,
+    "npc_roaming": 2 if not DEBUG_NPC else 10,
     "npc_running": 5,
     "camera": 3 if not DEBUG_CAMERA else 20,
 }

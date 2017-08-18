@@ -24,13 +24,8 @@ menu_labels = {
 button_binds = {
     "wood_axe_icon": "one",
     "tree_icon": "two",
+    "grabbers_icon": "three",
 }
-
-
-button_icon_color = OrderedDict([
-    ("wood_axe_icon", c.DARK_PALE),
-    ("tree_icon", c.FOREST_GREEN),
-])
 
 
 class MenuSelection(pygame.sprite.Sprite):
@@ -105,14 +100,14 @@ class Tooltip(pygame.sprite.Sprite):
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, x, y, name) -> None:
+    def __init__(self, x: int, y: int, name: str, color: Tuple[int, ...]) -> None:
         super().__init__()
 
         self.sprite = setup.GFX[name]
         #self.font = setup.FONTS["kenvector_future_thin"]
 
         self.frames = self.load_sprites_from_sheet()
-        self.frames = tools.colorize(self.frames, button_icon_color[name])
+        self.frames = tools.colorize(self.frames, color)
         self.image = self.frames[0]
 
         self.rect = self.image.get_rect()
@@ -256,18 +251,28 @@ class Hud:
 
 class GameUI:
     def __init__(self) -> None:
+        self.button_icon_and_color = OrderedDict([
+            ("wood_axe_icon", c.DARK_PALE),
+            ("tree_icon", c.FOREST_GREEN),
+            ("grabbers_icon", c.AUTUMN),
+        ]) # Add the name of an icon and a color to create a new button.
+
         self.button_x = c.IMMUTABLE_BUTTON_X
         self.button_y = setup.screen_size.get_height() - c.IMMUTABLE_BUTTON_Y_OFFSET
         self.re_setup_buttons()
 
 
     def re_setup_buttons(self) -> None:
+        """
+        This is responsible for the initial setup of buttons and also
+        re-setting them up when the size of the screen changes.
+        """
         self.button_group = pygame.sprite.Group()
         button_y = self.button_y
         button_separation = 0
 
-        for name in list(button_icon_color.keys()):
-            self.button_group.add(Button(self.button_x + button_separation, button_y, name))
+        for name, color in self.button_icon_and_color.items():
+            self.button_group.add(Button(self.button_x + button_separation, button_y, name, color))
             button_separation += c.BUTTON_OFFSET
 
 
