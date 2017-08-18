@@ -39,11 +39,14 @@ class Control:
         self.state_dict = {} # type: Dict[c.StateName, State]
 
 
-    def game_loop(self) -> None:
+    def game_loop(self) -> Dict[str, Any]:
         while not self.quit:
             self.update()
             pygame.display.update()
             self.dt = self.clock.tick(self.fps)
+
+        # When the game loop exits, let game info clean itself up.
+        return self.state.cleanup()
 
 
     def event_loop(self) -> None:
@@ -86,12 +89,16 @@ class Control:
 
 
     def flip_state(self) -> None:
-        previous, self.state_name = self.state_name, self.state.next
-        # Get game_info before setting new state
+        previous = self.state_name
+        self.state_name = self.state.next
+
+        # Get game_info and cleanup before setting new state
         game_info = self.state.dump_game_info()
+        self.state.cleanup()
+
         self.state = self.state_dict[self.state_name]
 
-        # Startup state when switching to it
+        # Startup state when switching to it with the dumped game info.
         self.state.startup(game_info)
         print("Main state switched to: {}".format(self.state_name))
 
@@ -115,6 +122,14 @@ class State:
 
     def dump_game_info(self) -> Dict[str, Any]:
         return self.game_info
+
+
+    def cleanup(self) -> None:
+        """
+        This must be called to give the objects in the game info
+        a chance to cleanup, let the game info object handle that.
+        """
+        self.game_info.cleanup()
 
 
     def startup(self, game_info: Dict[str, Any]) -> None:

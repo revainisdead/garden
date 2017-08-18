@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, Set, Tuple
 
 import json
 import os
@@ -7,25 +7,40 @@ import pygame
 
 
 class Keybinds:
+    """
+    Default keybinds must be in the format:
+        <action>: <key>
+
+    So that in the options menu, the player can change which key is
+    associated with that action. The rest of the game will only know
+    of the action occuring. They must supply the action as strings
+    to the Input read-only singleton.
+    """
     def __init__(self) -> None:
         self.__default_keybinds = {
-            "up": pygame.K_w,
-            "down": pygame.K_s,
-            "left": pygame.K_a,
-            "right": pygame.K_d,
-            "escape": pygame.K_ESCAPE,
-            "enter": pygame.K_RETURN,
-            "arrow_up": pygame.K_UP,
-            "arrow_down": pygame.K_DOWN,
-            "one": pygame.K_1,
-            "two": pygame.K_2,
-            "three": pygame.K_3,
-            "four": pygame.K_4,
-            "five": pygame.K_5,
-            "six": pygame.K_6,
-            "seven": pygame.K_7,
-            "eight": pygame.K_8,
-        }
+            "move_up": (pygame.K_w,
+            "move_down": pygame.K_s,
+            "move_left": pygame.K_a,
+            "move_right": pygame.K_d,
+            "escape": pygame.K_ESCAPE, # Reserved: no action
+            "enter": pygame.K_RETURN, # Reserved: no action
+            "camera_up": pygame.K_UP,
+            "camera_down": pygame.K_DOWN,
+            "camera_left": pygame.K_LEFT,
+            "camera_right": pygame.K_RIGHT,
+            "arrow_up": pygame.K_UP, # Reserved: no action
+            "arrow__down": pygame.K_DOWN, # Reserved: no action
+            "arrow__left": pygame.K_LEFT, # Reserved: no action
+            "arrow_right": pygame.K_RIGHT, # Reserved: no action
+            "cut": pygame.K_1,
+            "tree": pygame.K_2,
+            "search": pygame.K_3,
+            "flip": pygame.K_4,
+            "five": pygame.K_5, # undef
+            "six": pygame.K_6, # undef
+            "seven": pygame.K_7, # undef
+            "eight": pygame.K_8, # undef
+        } # type: Dict[str, Tuple[int, ...]]
 
         conf_name = "keys_config.json"
         self.__conf_path = os.path.join("conf", conf_name)
@@ -34,6 +49,31 @@ class Keybinds:
         if self.keybinds is None:
             # For use in game.
             self.keybinds = self.__default_keybinds
+
+        self.__used_keys = self.gather_used_keys()
+
+
+    def gather_used_keys(self) -> Set[int]:
+        used_keys = [] # type Set[int]
+
+        for keys in self.keybinds.values():
+            for key in keys:
+                self.used_keys.append(key)
+
+        return used_keys
+
+
+    def change_key(action: str, new_key: Tuple[int, ...]) -> bool:
+        """ Returns whether the change was successful. """
+        if key in self.__used_keys:
+            return False
+        else:
+            self.keybinds[action] = new_keys
+            return True
+
+
+    def does_new_key_exist(self, key: int) -> bool:
+        return key in self.__used_keys
 
 
     def __initial_conf_load(self) -> Optional[Dict[str, int]]:

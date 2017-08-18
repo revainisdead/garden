@@ -9,8 +9,9 @@ from . import constants as c
 from . import setup
 
 
-# Allow this file to interface with the keys file.
-keybinds = keys.Keybinds().keybinds
+# XXX Put this info in the game info object.
+KB = keys.Keybinds().keybinds
+keybinds = KB.keybinds
 
 
 # XXX Load keys from json file
@@ -159,14 +160,16 @@ class Input:
         return self.__last_mouse_drop
 
 
-    def pressed(self, value: str) -> bool:
+    def pressed(self, action: str) -> bool:
         """Convenience function for testing last pressed keybind"""
-        return keybinds[value] in self.__last_keys_pressed
+        keys = keybinds[action]
+        for key in keys:
+            return True if key in self.__last_keys_pressed
 
 
-    def held(self, value: str) -> bool:
+    def held(self, action:keybinds[action str) -> bool:
         """Convenience function for testing held keybinds."""
-        return bool(self.__held_keys[keybinds[value]])
+        return bool(self.__held_keys[keybinds[action]])
 
 
     def reset(self) -> None:
