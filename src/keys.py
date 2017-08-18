@@ -18,28 +18,28 @@ class Keybinds:
     """
     def __init__(self) -> None:
         self.__default_keybinds = {
-            "move_up": (pygame.K_w,
-            "move_down": pygame.K_s,
-            "move_left": pygame.K_a,
-            "move_right": pygame.K_d,
-            "escape": pygame.K_ESCAPE, # Reserved: no action
-            "enter": pygame.K_RETURN, # Reserved: no action
-            "camera_up": pygame.K_UP,
-            "camera_down": pygame.K_DOWN,
-            "camera_left": pygame.K_LEFT,
-            "camera_right": pygame.K_RIGHT,
-            "arrow_up": pygame.K_UP, # Reserved: no action
-            "arrow__down": pygame.K_DOWN, # Reserved: no action
-            "arrow__left": pygame.K_LEFT, # Reserved: no action
-            "arrow_right": pygame.K_RIGHT, # Reserved: no action
-            "cut": pygame.K_1,
-            "tree": pygame.K_2,
-            "search": pygame.K_3,
-            "flip": pygame.K_4,
-            "five": pygame.K_5, # undef
-            "six": pygame.K_6, # undef
-            "seven": pygame.K_7, # undef
-            "eight": pygame.K_8, # undef
+            "move_up": (pygame.K_w,),
+            "move_down": (pygame.K_s,),
+            "move_left": (pygame.K_a,),
+            "move_right": (pygame.K_d,),
+            "escape": (pygame.K_ESCAPE,),
+            "enter": (pygame.K_RETURN,),
+            "camera_up": (pygame.K_UP,),
+            "camera_down": (pygame.K_DOWN,),
+            "camera_left": (pygame.K_LEFT,),
+            "camera_right": (pygame.K_RIGHT,),
+            "arrow_up": (pygame.K_UP,),
+            "arrow__down": (pygame.K_DOWN,),
+            "arrow__left": (pygame.K_LEFT,),
+            "arrow_right": (pygame.K_RIGHT,),
+            "cut": (pygame.K_1,),
+            "tree": (pygame.K_2,),
+            "search": (pygame.K_3,),
+            "flip": (pygame.K_4,),
+            "five": (pygame.K_5,),
+            "six": (pygame.K_6,),
+            "seven": (pygame.K_7,),
+            "eight": (pygame.K_8,),
         } # type: Dict[str, Tuple[int, ...]]
 
         conf_name = "keys_config.json"
@@ -56,9 +56,10 @@ class Keybinds:
     def gather_used_keys(self) -> Set[int]:
         used_keys = [] # type Set[int]
 
+        # Note: values is implicitly converts the tuples to lists.
         for keys in self.keybinds.values():
             for key in keys:
-                self.used_keys.append(key)
+                used_keys.append(key)
 
         return used_keys
 

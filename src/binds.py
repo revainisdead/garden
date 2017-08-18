@@ -10,7 +10,18 @@ from . import setup
 
 
 # XXX Put this info in the game info object.
-KB = keys.Keybinds().keybinds
+# KB can be a member of input, since it's the only class
+# that can access it. Then keybinds can be put in the game_info
+# object, so that it can be accessed everywhere using "action"!!!
+# Boom no more global variables and then the game_info object
+# can
+# - be cleaned up on state exit
+# - can be cleaned up on game exit
+# - can be accessed by evertying in the game
+# - can allow multithreaded data access if game_info is made thread safe
+KB = keys.Keybinds() # do this so that KB can be called separately
+                     # for clean up. in this case it's to dump the
+                     # keybinds file.
 keybinds = KB.keybinds
 
 
@@ -164,10 +175,13 @@ class Input:
         """Convenience function for testing last pressed keybind"""
         keys = keybinds[action]
         for key in keys:
-            return True if key in self.__last_keys_pressed
+            if key in self.__last_keys_pressed:
+                return True
+
+        return False
 
 
-    def held(self, action:keybinds[action str) -> bool:
+    def held(self, action: str) -> bool:
         """Convenience function for testing held keybinds."""
         return bool(self.__held_keys[keybinds[action]])
 
