@@ -52,6 +52,7 @@ class Keybinds:
             self.keybinds = self.__default_keybinds
 
         self.__used_keys = self.gather_used_keys()
+        self.__dump_flag = False
 
 
     def gather_used_keys(self) -> Set[int]:
@@ -66,11 +67,18 @@ class Keybinds:
 
 
     def change_key(action: str, new_key: Tuple[int, ...]) -> bool:
-        """ Returns whether the change was successful. """
-        if key in self.__used_keys:
+        """
+        Change one key at a time. Recreate the tuple if key can be changed.
+        Returns whether the change was successful.
+        """
+        if new_key in self.__used_keys:
             return False
         else:
-            self.keybinds[action] = new_keys
+            current_binds = self.keybinds[action] # Save current binds
+            new_binds = current_binds + (new_key,) # Re-create tuple with new key
+            self.keybinds[action] = new_binds # Save new binds
+
+            self.__dump_flag = True
             return True
 
 
@@ -108,8 +116,21 @@ class Keybinds:
         return binds_temp
 
 
+    def __write_config(self, data) -> None:
+        with open(self.__conf_file_path, "w") as f:
+            binds_temp = data
+            f.write(json.dumps(binds_temp))
+
+
+    def __write_current_keybinds(self) -> None:
+        self.__write_config(self.__default_keybinds)
+
+
     def reset_to_defaults(self) -> None:
         """ Convert keybinds file back to defaults"""
-        with open(self.__conf_file_path, "w") as f:
-            binds_temp = self.__default_keybinds
-            f.write(json.dumps(binds_temp))
+        self.__write_config(self.keybinds)
+
+
+    def dump(self) -> None:
+        if self.__dump_flag:
+            self.__write_current_keybinds()

@@ -19,10 +19,10 @@ from . import setup
 # - can be cleaned up on game exit
 # - can be accessed by evertying in the game
 # - can allow multithreaded data access if game_info is made thread safe
-KB = keys.Keybinds() # do this so that KB can be called separately
+#KB = keys.Keybinds() # do this so that KB can be called separately
                      # for clean up. in this case it's to dump the
                      # keybinds file.
-keybinds = KB.keybinds
+#keybinds = KB.keybinds
 
 
 # XXX Load keys from json file
@@ -58,18 +58,11 @@ keybinds = KB.keybinds
 # all_mods = { "none": KMOD_NONE, "shift": KMOD_SHIFT, "ctrl": KMOD_CTRL, "alt": KMOD_ALT }
 
 
-# Some keys should be able to be set, like "use_wood_axe",
-# But moving a menu item, aka up and down, should be unchanging.
-# NOTE: This is not actually frozen. It can be changed but shouldn't be.
+# XXX Need?
 frozen_binds = {
     "arrow_up": pygame.K_UP,
     "arrow_down": pygame.K_DOWN,
 }
-
-
-def reset_keybinds(self) -> None:
-    #keybinds = default_keybinds
-    pass
 
 
 class Input:
@@ -89,12 +82,16 @@ class Input:
     Held:
         - Key sends a keydown for every frame it is held down for.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.__last_keys_pressed = []
         self.__held_keys = tuple(False for _ in range(c.PG_GET_PRESSED_LENGTH))
         self.__mouse_pos = (0, 0)
         self.__last_mouse_click = (0, 0)
         self.__last_mouse_drop = (0, 0)
+
+        # Interface to the keybinds object through this class.
+        self.__KB = keys.Keybinds()
+        self.__keybinds = self.__KB.keybinds
 
 
     def __set_last_keys_pressed(self, key: Optional[int]) -> None:
@@ -173,7 +170,7 @@ class Input:
 
     def pressed(self, action: str) -> bool:
         """Convenience function for testing last pressed keybind"""
-        keys = keybinds[action]
+        keys = self.__keybinds[action]
         for key in keys:
             if key in self.__last_keys_pressed:
                 return True
@@ -183,7 +180,7 @@ class Input:
 
     def held(self, action: str) -> bool:
         """Convenience function for testing held keybinds."""
-        keys = keybinds[action]
+        keys = self.__keybinds[action]
         for key in keys:
             if self.__held_keys[key]:
                 return True

@@ -9,7 +9,7 @@ import sys
 
 
 def main():
-    keybinds = setup.start()
+    setup.start()
 
     state_dict = {
         c.StateName.MAINMENU: mainmenu.MainMenu(),

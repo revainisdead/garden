@@ -130,7 +130,7 @@ class MapSize:
         self.__resize_grid()
 
 
-def start():
+def start() -> None:
     #os.environ["SDL_VIDEO_CENTERED"] = "1"
     pygame.init()
     pygame.font.init()

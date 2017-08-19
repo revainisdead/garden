@@ -20,8 +20,45 @@ import pygame
 
 from . import binds
 from . import constants as c
+from . import keys
 from . import setup
 from . components import user_interface, util
+
+
+class GameInfo(dict):
+    """
+    Wrapper around dict that allow dot access for game info type safety.
+
+    Usage:
+        >>> game_info = GameInfo(title="test", players=5)
+        >>> game_info.title
+        test
+        >>> game_info.players
+        5
+        >>> game_info.keys()
+        [
+    """
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__()
+        for k, v in kwargs.items():
+            if isinstance(k, str):
+                self.__setitem__(k, v)
+
+    # Overwrite the ability to access members using square brackets.
+    def __getitem__(self, *args, **kwargs):
+        pass
+
+    def __getattr__(self, key: str) -> Any:
+        return self.get(key)
+
+    def __setattr__(self, key: str, value: Any) -> None:
+        self.__setitem__(k, v)
+
+    def cleanup(self) -> None:
+        """ Call cleanup on all objects held inside game info. """
+        for k, v in self.items():
+            if isinstance(v, object):
+                v.cleanup()
 
 
 class Control:
@@ -39,7 +76,7 @@ class Control:
         self.state_dict = {} # type: Dict[c.StateName, State]
 
 
-    def game_loop(self) -> Dict[str, Any]:
+    def game_loop(self) -> None:
         while not self.quit:
             self.update()
             pygame.display.update()
@@ -100,7 +137,7 @@ class Control:
 
         # Startup state when switching to it with the dumped game info.
         self.state.startup(game_info)
-        print("Main state switched to: {}".format(self.state_name))
+        print("State switched to: {}".format(self.state_name))
 
         self.state.previous = previous
 
@@ -116,11 +153,13 @@ class State:
         self.next = None # type: c.StateName
         self.previous = None # type: c.StateName
 
-        # XXX Make game info it's own object.
-        self.game_info = {} # type: Dict[str, Any]
+        # These are things that every state needs.
+        self.game_info = GameInfo(
+            input = binds.Input()
+        )
 
 
-    def dump_game_info(self) -> Dict[str, Any]:
+    def dump_game_info(self) -> GameInfo:
         return self.game_info
 
 
@@ -129,11 +168,10 @@ class State:
         This must be called to give the objects in the game info
         a chance to cleanup, let the game info object handle that.
         """
-        #self.game_info.cleanup()
-        pass
+        self.game_info.cleanup()
 
 
-    def startup(self, game_info: Dict[str, Any]) -> None:
+    def startup(self, game_info: GameInfo) -> None:
         raise NotImplementedError
 
 
