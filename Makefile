@@ -1,4 +1,4 @@
-.PHONY=all clean mypy
+.PHONY=all run test mypy clean
 
 ABS_DIR=$(shell pwd)
 MYPY_DIR=$(ABS_DIR)/src:$(ABS_DIR)/src/stubs
@@ -13,8 +13,13 @@ export MYPYPATH
 # Replace all " as c" with ""
 # sed -i "s/ as c//g" *.py
 
-all:
+all: run
+
+run:
 	python3 -m src.main
+
+test:
+	python3 -m unittest
 
 mypy:
 	mypy $$(git ls-files -- "*.py")

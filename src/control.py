@@ -36,29 +36,26 @@ class GameInfo(dict):
         >>> game_info.players
         5
         >>> game_info.keys()
-        [
+        dict_keys(['title', 'players'])
+        >>> game_info.values()
+        dict_values(['test', 5])
+        >>> json.dumps(g__e_info)
+        '{"title": "test", "players": 5}'
     """
     def __init__(self, **kwargs: Any) -> None:
         super().__init__()
         for k, v in kwargs.items():
-            if isinstance(k, str):
-                self.__setitem__(k, v)
+            self.__setitem__(k, v)
 
-    # Overwrite the ability to access members using square brackets.
     def __getitem__(self, *args, **kwargs):
-        pass
+        """ Overwrite the ability to access members using square brackets. """
+        raise KeyError
 
     def __getattr__(self, key: str) -> Any:
         return self.get(key)
 
     def __setattr__(self, key: str, value: Any) -> None:
-        self.__setitem__(k, v)
-
-    def cleanup(self) -> None:
-        """ Call cleanup on all objects held inside game info. """
-        for k, v in self.items():
-            if isinstance(v, object):
-                v.cleanup()
+        self.__setitem__(key, value)
 
 
 class Control:
@@ -168,7 +165,10 @@ class State:
         This must be called to give the objects in the game info
         a chance to cleanup, let the game info object handle that.
         """
-        self.game_info.cleanup()
+        #self.game_info.cleanup()
+        for k, v in game_info.items():
+            if isinstance(v, object):
+                v.cleanup()
 
 
     def startup(self, game_info: GameInfo) -> None:
