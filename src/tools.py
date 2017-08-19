@@ -33,7 +33,7 @@ def convert_png(name_path, convert_to_ext=".bmp"):
         os.unlink(original_name)
 
 
-def colorize(images: List[pygame.Surface], color: Tuple[int, int, int]) -> List[pygame.Surface]:
+def colorize(images: List[pygame.Surface], color: Tuple[int, ...]) -> List[pygame.Surface]:
     colored = []
     for image in images:
         image = image.copy()

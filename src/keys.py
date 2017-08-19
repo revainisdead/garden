@@ -56,17 +56,17 @@ class Keybinds:
 
 
     def gather_used_keys(self) -> Set[int]:
-        used_keys = [] # type Set[int]
+        used_keys = set() # type: Set[int]
 
         # Note: values is implicitly converts the tuples to lists.
-        for keys in self.keybinds.values():
+        for keys in tuple(self.keybinds.values()):
             for key in keys:
-                used_keys.append(key)
+                used_keys.add(key)
 
         return used_keys
 
 
-    def change_key(action: str, new_key: Tuple[int, ...]) -> bool:
+    def change_key(self, action: str, new_key: Tuple[int, ...]) -> bool:
         """
         Change one key at a time. Recreate the tuple if key can be changed.
         Returns whether the change was successful.
@@ -74,8 +74,11 @@ class Keybinds:
         if new_key in self.__used_keys:
             return False
         else:
-            current_binds = self.keybinds[action] # Save current binds
-            new_binds = current_binds + (new_key,) # Re-create tuple with new key
+            # XXX Mypy does not yet allowed concatention of set length
+            # tuples, and it certainly does not allow concatention of
+            # varaible length tuples, ignore the type for the addition.
+            current_binds = self.keybinds[action]
+            new_binds = current_binds + (new_key,) # type: ignore
             self.keybinds[action] = new_binds # Save new binds
 
             self.__dump_flag = True
@@ -86,7 +89,7 @@ class Keybinds:
         return key in self.__used_keys
 
 
-    def __initial_conf_load(self) -> Optional[Dict[str, int]]:
+    def __initial_conf_load(self) -> Optional[Dict[str, Tuple[int, ...]]]:
         """ Load keys_config if exists and if not, dump default keybinds. """
         binds_temp = None
         if os.path.exists(self.__conf_file_path):

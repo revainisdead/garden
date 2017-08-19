@@ -12,9 +12,6 @@ from .. components import user_interface
 class MainMenu(control.State):
     def __init__(self) -> None:
         super().__init__()
-        self.game_info = {
-            "dt": 0,
-        }
 
         self.background_x_mult = c.DEFAULT_BACKGROUND_X_MULT
         self.background_y_mult = c.DEFAULT_BACKGROUND_Y_MULT
@@ -27,7 +24,7 @@ class MainMenu(control.State):
         self.allow_input = True
 
 
-    def startup(self, game_info: Dict[str, Any]) -> None:
+    def startup(self, game_info: control.GameInfo) -> None:
         """Called each time the state is entered
 
         Currently takes in game_info so that the main menu can

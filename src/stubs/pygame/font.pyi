@@ -3,6 +3,9 @@ from typing import Tuple
 from . surface import Surface
 
 
+def init() -> None: ...
+
+
 class Font:
     def __init__(self,
             path: str,

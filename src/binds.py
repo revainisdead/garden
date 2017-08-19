@@ -1,6 +1,6 @@
 # XXX: Rename to input.py
 
-from typing import Optional, Sequence, Tuple
+from typing import Optional, List, Sequence, Tuple
 
 import pygame
 
@@ -83,8 +83,8 @@ class Input:
         - Key sends a keydown for every frame it is held down for.
     """
     def __init__(self) -> None:
-        self.__last_keys_pressed = []
-        self.__held_keys = tuple(False for _ in range(c.PG_GET_PRESSED_LENGTH))
+        self.__last_keys_pressed = [] # type: List[int]
+        self.__held_keys = tuple(False for _ in range(c.PG_GET_PRESSED_LENGTH)) # type: Sequence[bool]
         self.__mouse_pos = (0, 0)
         self.__last_mouse_click = (0, 0)
         self.__last_mouse_drop = (0, 0)
@@ -148,11 +148,11 @@ class Input:
             setup.screen_size.update(w, h)
 
 
-    def last_keys_pressed(self) -> Optional[int]:
+    def last_keys_pressed(self) -> Optional[List[int]]:
         return self.__last_keys_pressed
 
 
-    def held_keys(self) -> Optional[Tuple[int, ...]]:
+    def held_keys(self) -> Optional[Sequence[bool]]:
         return self.__held_keys
 
 
@@ -170,7 +170,7 @@ class Input:
 
     def pressed(self, action: str) -> bool:
         """Convenience function for testing last pressed keybind"""
-        keys = self.__keybinds[action]
+        keys = tuple(self.__keybinds[action]) # type cast needed for mypy
         for key in keys:
             if key in self.__last_keys_pressed:
                 return True
@@ -188,7 +188,6 @@ class Input:
         return False
 
 
-
     def reset(self) -> None:
         """This should be called once per frame to reset
         keys that need to be read Once Per Frame.
@@ -196,6 +195,10 @@ class Input:
         self.__set_last_keys_pressed(None)
         self.__set_last_mouse_click(None)
         self.__set_last_mouse_drop(None)
+
+
+    def cleanup(self) -> None:
+        self.__KB.dump()
 
 
 INPUT = Input()

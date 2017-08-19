@@ -28,7 +28,7 @@ class CommonArea(control.State):
         self.farmland = self.tilemap
 
 
-    def startup(self, game_info: Dict[str, Any]) -> None:
+    def startup(self, game_info: control.GameInfo) -> None:
         self.game_info = game_info
         self.state = c.StateName.COMMONAREA
 

@@ -7,12 +7,6 @@ MYPYPATH := $(MYPY_DIR)
 export MYPYPATH
 
 
-# Replace all "c." with "constants."
-# sed -i "s/c\./constants\./g" *.py
-#
-# Replace all " as c" with ""
-# sed -i "s/ as c//g" *.py
-
 all: run
 
 run:

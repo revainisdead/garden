@@ -165,10 +165,12 @@ class State:
         This must be called to give the objects in the game info
         a chance to cleanup, let the game info object handle that.
         """
-        #self.game_info.cleanup()
-        for k, v in game_info.items():
+        for k, v in self.game_info.items():
             if isinstance(v, object):
-                v.cleanup()
+                # Mypy doesn't  like this call because I'm assuming object
+                # has a cleanup method. It isn't guarenteed to, but I can
+                # enforce that. Ignore the type.
+                v.cleanup() # type: ignore
 
 
     def startup(self, game_info: GameInfo) -> None:
