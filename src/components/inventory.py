@@ -2,6 +2,11 @@ from typing import List, Tuple
 
 from typing import Tuple
 
+import pygame
+
+from .. import binds
+from .. import setup
+
 
 class Slot:
     def __init__(self) -> None:
@@ -28,3 +33,43 @@ class EquippedItems(_SlotMesh):
 class Backpack(_SlotMesh):
     def __init__(self, *args, **kwargs) -> None:
         super.__init__(*args, **kwargs)
+
+
+class SidePanel:
+    """
+    Make a solid panel, so that slots can be transparent.
+    Indicating an empty slot, and since the background of
+    that is this panel, which is solid, it will look nice.
+    """
+    def __init__(self, width: int) -> None:
+        screenw = setup.screen_size.get_width()
+        screenh = setup.screen_size.get_height()
+        self.rect = pygame.Rect((screenw - width, 0), (width, screenh))
+        self.color = (0, 0, 255)
+
+    def update(self, surface: pygame.Surface) -> None:
+        pygame.draw.rect(surface, self.color, self.rect)
+
+
+class Inventory:
+    def __init__(self) -> None:
+        self.__panel = SidePanel(120)
+        self.__open = True
+
+
+    def switch(self) -> None:
+        self.__open = not self.__open
+
+
+    # Wherever update is called from can access game_info,
+    # pass the keybinds object in game_info in.
+    def update(self, surface: pygame.Surface, inp: binds.Input) -> None:
+        self.handle_state(inp)
+
+        if self.__open:
+            self.__panel.update(surface)
+
+
+    def handle_state(self, inp: binds.Input) -> None:
+        if inp.pressed("toggle_panel"):
+            self.switch()

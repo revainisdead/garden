@@ -82,7 +82,7 @@ class MainMenu(control.State):
 
 
     def handle_states(self):
-        if binds.INPUT.pressed("enter"):
+        if self.game_info.inp.pressed("enter"):
             if self.selection == "play":
                 self.state_done = True
             elif self.selection == "load_game":
@@ -90,7 +90,7 @@ class MainMenu(control.State):
                 pass
             elif self.selection == "quit":
                 self.quit = True
-        elif binds.INPUT.pressed("move_up") or binds.INPUT.pressed("arrow_up"):
+        elif self.game_info.inp.pressed("move_up") or self.game_info.inp.pressed("arrow_up"):
             index = self.options.index(self.selection)
             if index == 0:
                 pass # Don't exceed the beginning of the list
@@ -98,7 +98,7 @@ class MainMenu(control.State):
                 index -= 1
                 self.selection = self.options[index]
             self.allow_input = False
-        elif binds.INPUT.pressed("move_down") or binds.INPUT.pressed("arrow_down"):
+        elif self.game_info.inp.pressed("move_down") or self.game_info.inp.pressed("arrow_down"):
             index = self.options.index(self.selection)
             if index == len(self.options) - 1:
                 pass # Don't exceed the end of the list

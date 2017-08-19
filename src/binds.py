@@ -1,5 +1,3 @@
-# XXX: Rename to input.py
-
 from typing import Optional, List, Sequence, Tuple
 
 import pygame
@@ -199,6 +197,3 @@ class Input:
 
     def cleanup(self) -> None:
         self.__KB.dump()
-
-
-INPUT = Input()

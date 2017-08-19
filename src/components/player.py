@@ -128,28 +128,28 @@ class Player(pygame.sprite.Sprite):
             self.y_vel = 0
 
 
-    def walk(self) -> None:
+    def walk(self, inp: binds.Input) -> None:
         self.previous_direction = self.direction
 
-        if binds.INPUT.held("move_left"):
-            if binds.INPUT.held("move_up"):
+        if inp.held("move_left"):
+            if inp.held("move_up"):
                 self.direction = c.Direction.LEFTUP
-            elif binds.INPUT.held("move_down"):
+            elif inp.held("move_down"):
                 self.direction = c.Direction.LEFTDOWN
             else:
                 self.direction = c.Direction.LEFT
 
-        elif binds.INPUT.held("move_right"):
-            if binds.INPUT.held("move_up"):
+        elif inp.held("move_right"):
+            if inp.held("move_up"):
                 self.direction = c.Direction.RIGHTUP
-            elif binds.INPUT.held("move_down"):
+            elif inp.held("move_down"):
                 self.direction = c.Direction.RIGHTDOWN
             else:
                 self.direction = c.Direction.RIGHT
 
-        elif binds.INPUT.held("move_up"):
+        elif inp.held("move_up"):
             self.direction = c.Direction.UP
-        elif binds.INPUT.held("move_down"):
+        elif inp.held("move_down"):
             self.direction = c.Direction.DOWN
         else:
             self.direction = c.Direction.NONE
@@ -191,23 +191,23 @@ class Player(pygame.sprite.Sprite):
         return pygame.sprite.spritecollideany(self, self.collidable_group)
 
 
-    def handle_state(self) -> None:
+    def handle_state(self, inp: binds.Input) -> None:
         # Let walking handle input.
         # XXX Later if the player has a certain state, such as set to worker
         # mode, when I can change the worker to auto_walking, pathfinding,
         # searching for tree, etc etc. Right now he's just walking...
-        self.walk()
+        self.walk(inp)
 
         #if self.state == "sliding":
         #   don't allow user input
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, dt: int, collidable_group: pygame.sprite.Group) -> None:
+    def update(self, dt: int, collidable_group: pygame.sprite.Group, inp: binds.Input) -> None:
         self.dt = dt
         self.collidable_group = collidable_group
 
-        self.handle_state()
+        self.handle_state(inp)
         self.animate_walk()
 
 

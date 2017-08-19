@@ -88,7 +88,8 @@ class Control:
             if event.type == pygame.QUIT:
                 self.quit = True
             else:
-                binds.INPUT.update(event)
+                self.state.game_info.inp.update(event)
+                #binds.INPUT.update(event)
 
 
     def update(self) -> None:
@@ -106,9 +107,10 @@ class Control:
         self.state.update(self.screen_surface, self.dt)
 
         # In Game User Interface.
-        self.game_ui.update(self.screen_surface, self.dt, self.state_name)
+        self.game_ui.update(self.screen_surface, self.dt, self.state_name, self.state.game_info)
 
-        binds.INPUT.reset()
+        self.state.game_info.inp.reset()
+        #binds.INPUT.reset()
 
 
     def setup_states(self, state_dict, start_state) -> None:
@@ -152,7 +154,7 @@ class State:
 
         # These are things that every state needs.
         self.game_info = GameInfo(
-            input = binds.Input()
+            inp = binds.Input()
         )
 
 
@@ -166,7 +168,7 @@ class State:
         a chance to cleanup, let the game info object handle that.
         """
         for k, v in self.game_info.items():
-            if isinstance(v, object):
+            if hasattr(v, "__name__"):
                 # Mypy doesn't  like this call because I'm assuming object
                 # has a cleanup method. It isn't guarenteed to, but I can
                 # enforce that. Ignore the type.

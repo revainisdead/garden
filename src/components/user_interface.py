@@ -137,14 +137,14 @@ class Button(pygame.sprite.Sprite):
         return frames
 
 
-    def update(self, dt: int) -> None:
+    def update(self, dt: int, inp: binds.Input) -> None:
         self.dt = dt
-        self.handle_state()
+        self.handle_state(inp)
 
 
-    def handle_state(self) -> None:
+    def handle_state(self, inp: binds.Input) -> None:
         # Ex. if near_tree: cut.
-        if binds.INPUT.pressed(self.keybind) or self.rect.collidepoint(*binds.INPUT.last_mouse_click()):
+        if inp.pressed(self.keybind) or self.rect.collidepoint(*inp.last_mouse_click()):
             self.pressed_animation()
             self.action()
         else:
@@ -281,12 +281,12 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pygame.Surface, dt: int, mainstate: c.StateName) -> None:
+    def update(self, screen: pygame.Surface, dt: int, mainstate: c.StateName, game_info: "control.GameInfo") -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
             self.update_sizes()
-            self.button_group.update(dt)
+            self.button_group.update(dt, game_info.inp)
             self.blit_images(screen)
 
 

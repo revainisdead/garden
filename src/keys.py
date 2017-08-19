@@ -9,12 +9,12 @@ import pygame
 class Keybinds:
     """
     Default keybinds must be in the format:
-        <action>: <key>
+        <action>: Tuple[<key>, Optional[<key>]] # XXX not enforced yet.
 
     So that in the options menu, the player can change which key is
     associated with that action. The rest of the game will only know
     of the action occuring. They must supply the action as strings
-    to the Input read-only singleton.
+    to Input.
     """
     def __init__(self) -> None:
         self.__default_keybinds = {
@@ -40,6 +40,7 @@ class Keybinds:
             "six": (pygame.K_6,),
             "seven": (pygame.K_7,),
             "eight": (pygame.K_8,),
+            "toggle_panel" : (pygame.K_TAB,),
         } # type: Dict[str, Tuple[int, ...]]
 
         conf_name = "keys_config.json"
@@ -126,12 +127,12 @@ class Keybinds:
 
 
     def __write_current_keybinds(self) -> None:
-        self.__write_config(self.__default_keybinds)
+        self.__write_config(self.keybinds)
 
 
     def reset_to_defaults(self) -> None:
         """ Convert keybinds file back to defaults"""
-        self.__write_config(self.keybinds)
+        self.__write_config(self.__default_keybinds)
 
 
     def dump(self) -> None:

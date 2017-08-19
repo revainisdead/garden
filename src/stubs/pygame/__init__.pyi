@@ -4,6 +4,7 @@ from typing import Any
 from . rect import Rect
 from . surface import Surface, SRCALPHA
 from . import display
+from . import draw
 from . import event
 from . import font
 from . import key
@@ -27,6 +28,7 @@ K_6 = \
 K_7 = \
 K_8 = \
 K_RETURN = \
+K_TAB = \
 K_ESCAPE = \
 K_UP = \
 K_DOWN = \

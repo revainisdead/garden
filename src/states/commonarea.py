@@ -11,7 +11,7 @@ from .. import control
 from .. import setup
 from .. import tools
 
-from .. components import non_player_controlled, player, scenery, tilemap, user_interface, util
+from .. components import inventory, non_player_controlled, player, scenery, tilemap, user_interface, util
 
 
 class CommonArea(control.State):
@@ -26,6 +26,9 @@ class CommonArea(control.State):
 
         # Save a copy of the first tilemap, so that we can re-create it later.
         self.farmland = self.tilemap
+
+        # Inventory is only visible in the common area
+        self.inv = inventory.Inventory()
 
 
     def startup(self, game_info: control.GameInfo) -> None:
@@ -128,8 +131,7 @@ class CommonArea(control.State):
         # Let this state control the map size update.
         setup.map_size.update(self.biome)
 
-        # XXX Create function/class to handle game info.
-        self.game_info["dt"] = dt
+        self.game_info.dt = dt
 
         self.update_sizes()
         self.update_map()
@@ -141,9 +143,11 @@ class CommonArea(control.State):
         # Similar to Game UI but the hud needs access to game_info.
         self.hud.update(surface, self.game_info, self.player, self.tilemap_rect.bottom)
 
+        self.inv.update(surface, self.game_info.inp)
+
 
     def handle_states(self) -> None:
-        if binds.INPUT.pressed("escape"):
+        if self.game_info.inp.pressed("escape"):
             self.quit = True
         else:
             self.move_camera()
@@ -172,8 +176,8 @@ class CommonArea(control.State):
 
 
     def update_sprites(self) -> None:
-        self.player_group.update(self.game_info["dt"], self.collidable_group)
-        self.npc_group.update(self.game_info["dt"], self.collidable_group)
+        self.player_group.update(self.game_info.dt, self.collidable_group, self.game_info.inp)
+        self.npc_group.update(self.game_info.dt, self.collidable_group)
         self.stairs_down_group.update(self.player.rect)
 
         # XXX separate into: def handle_biome(self)
