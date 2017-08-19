@@ -93,7 +93,7 @@ class MainMenu(control.State):
                 pass
             elif self.selection == "quit":
                 self.quit = True
-        elif binds.INPUT.pressed("up"):
+        elif binds.INPUT.pressed("move_up") or binds.INPUT.pressed("arrow_up"):
             index = self.options.index(self.selection)
             if index == 0:
                 pass # Don't exceed the beginning of the list
@@ -101,7 +101,7 @@ class MainMenu(control.State):
                 index -= 1
                 self.selection = self.options[index]
             self.allow_input = False
-        elif binds.INPUT.pressed("down"):
+        elif binds.INPUT.pressed("move_down") or binds.INPUT.pressed("arrow_down"):
             index = self.options.index(self.selection)
             if index == len(self.options) - 1:
                 pass # Don't exceed the end of the list

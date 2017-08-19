@@ -22,10 +22,10 @@ menu_labels = {
 
 
 button_binds = {
-    "wood_axe_icon": "one",
-    "tree_icon": "two",
-    "grabbers_icon": "three",
-    "flip_icon": "four",
+    "wood_axe_icon": "cut",
+    "tree_icon": "tree",
+    "grabbers_icon": "search",
+    "flip_icon": "flip",
 }
 
 

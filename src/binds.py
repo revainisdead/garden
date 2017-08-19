@@ -39,20 +39,20 @@ keybinds = KB.keybinds
 # Value: changable: { current_key_in_config }
 
 # config layout:
-# "up" = "w"
-# "down" = "s"
+# "move_up" = "w"
+# "move_down" = "s"
 
 # translate = confirm first word exists:
-# all_actions = {"up", "down", "left", "right"} # unordered set of strings
+# all_actions = {"move_up", "move_down", "move_left", "move_right"} # unordered set of strings
 # all_keys = { "w": pygame.K_w }
 # action in all_actions
 # key in all_keys
 
 # modifiers
 # ex.
-# "up" = shift+"w"
-# "down" = ctrl+"s"
-# "left" = alt+"a"
+# "move_up" = shift+"w"
+# "move_down" = ctrl+"s"
+# "move_left" = alt+"a"
 # NOTE: Or don't use quotes in text file, just get word and convert to string.
 
 # all_mods = { "none": KMOD_NONE, "shift": KMOD_SHIFT, "ctrl": KMOD_CTRL, "alt": KMOD_ALT }

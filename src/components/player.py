@@ -131,25 +131,25 @@ class Player(pygame.sprite.Sprite):
     def walk(self) -> None:
         self.previous_direction = self.direction
 
-        if binds.INPUT.held("left"):
-            if binds.INPUT.held("up"):
+        if binds.INPUT.held("move_left"):
+            if binds.INPUT.held("move_up"):
                 self.direction = c.Direction.LEFTUP
-            elif binds.INPUT.held("down"):
+            elif binds.INPUT.held("move_down"):
                 self.direction = c.Direction.LEFTDOWN
             else:
                 self.direction = c.Direction.LEFT
 
-        elif binds.INPUT.held("right"):
-            if binds.INPUT.held("up"):
+        elif binds.INPUT.held("move_right"):
+            if binds.INPUT.held("move_up"):
                 self.direction = c.Direction.RIGHTUP
-            elif binds.INPUT.held("down"):
+            elif binds.INPUT.held("move_down"):
                 self.direction = c.Direction.RIGHTDOWN
             else:
                 self.direction = c.Direction.RIGHT
 
-        elif binds.INPUT.held("up"):
+        elif binds.INPUT.held("move_up"):
             self.direction = c.Direction.UP
-        elif binds.INPUT.held("down"):
+        elif binds.INPUT.held("move_down"):
             self.direction = c.Direction.DOWN
         else:
             self.direction = c.Direction.NONE
