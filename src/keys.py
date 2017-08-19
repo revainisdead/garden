@@ -29,8 +29,8 @@ class Keybinds:
             "camera_left": (pygame.K_LEFT,),
             "camera_right": (pygame.K_RIGHT,),
             "arrow_up": (pygame.K_UP,),
-            "arrow__down": (pygame.K_DOWN,),
-            "arrow__left": (pygame.K_LEFT,),
+            "arrow_down": (pygame.K_DOWN,),
+            "arrow_left": (pygame.K_LEFT,),
             "arrow_right": (pygame.K_RIGHT,),
             "cut": (pygame.K_1,),
             "tree": (pygame.K_2,),
@@ -43,7 +43,8 @@ class Keybinds:
         } # type: Dict[str, Tuple[int, ...]]
 
         conf_name = "keys_config.json"
-        self.__conf_path = os.path.join("conf", conf_name)
+        self.__conf_dir_path = os.path.join("conf")
+        self.__conf_file_path = os.path.join("conf", conf_name)
         self.keybinds = self.__initial_conf_load()
 
         if self.keybinds is None:
@@ -80,8 +81,8 @@ class Keybinds:
     def __initial_conf_load(self) -> Optional[Dict[str, int]]:
         """ Load keys_config if exists and if not, dump default keybinds. """
         binds_temp = None
-        if os.path.exists(self.__conf_path):
-            with open(self.__conf_path, "r") as f:
+        if os.path.exists(self.__conf_file_path):
+            with open(self.__conf_file_path, "r") as f:
                 data = json.loads(f.read()) # Load string and save into dict.
                 binds_temp = data
 
@@ -100,6 +101,8 @@ class Keybinds:
                         binds_temp = None
 
         else:
+            if not os.path.exists(self.__conf_dir_path):
+                os.makedirs(self.__conf_dir_path)
             self.reset_to_defaults()
 
         return binds_temp
@@ -107,6 +110,6 @@ class Keybinds:
 
     def reset_to_defaults(self) -> None:
         """ Convert keybinds file back to defaults"""
-        with open(self.__conf_path, "w") as f:
+        with open(self.__conf_file_path, "w") as f:
             binds_temp = self.__default_keybinds
             f.write(json.dumps(binds_temp))

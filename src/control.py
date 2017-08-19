@@ -129,7 +129,8 @@ class State:
         This must be called to give the objects in the game info
         a chance to cleanup, let the game info object handle that.
         """
-        self.game_info.cleanup()
+        #self.game_info.cleanup()
+        pass
 
 
     def startup(self, game_info: Dict[str, Any]) -> None:

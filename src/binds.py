@@ -91,7 +91,7 @@ class Input:
     """
     def __init__(self):
         self.__last_keys_pressed = []
-        self.__held_keys = tuple(0 for _ in range(c.PG_GET_PRESSED_LENGTH))
+        self.__held_keys = tuple(False for _ in range(c.PG_GET_PRESSED_LENGTH))
         self.__mouse_pos = (0, 0)
         self.__last_mouse_click = (0, 0)
         self.__last_mouse_drop = (0, 0)
@@ -183,7 +183,13 @@ class Input:
 
     def held(self, action: str) -> bool:
         """Convenience function for testing held keybinds."""
-        return bool(self.__held_keys[keybinds[action]])
+        keys = keybinds[action]
+        for key in keys:
+            if self.__held_keys[key]:
+                return True
+
+        return False
+
 
 
     def reset(self) -> None:
