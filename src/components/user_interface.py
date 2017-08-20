@@ -186,7 +186,8 @@ class Hud:
     def __init__(self) -> None:
         self.font = setup.FONTS["game_kenvector_future_thin"]
 
-        self.x = setup.screen_size.get_width() - c.IMMUTABLE_HUD_X_OFFSET
+        #self.x = setup.screen_size.get_width() - c.IMMUTABLE_HUD_X_OFFSET
+        self.x = 0 + c.IMMUTABLE_HUD_X_OFFSET
         self.y = c.IMMUTABLE_HUD_Y
         self.clock = ""
         self.coords = ""
@@ -194,7 +195,7 @@ class Hud:
 
     def update_sizes(self) -> None:
         if setup.screen_size.changed():
-            self.x = setup.screen_size.get_width() - c.IMMUTABLE_HUD_X_OFFSET
+            self.x = 0 + c.IMMUTABLE_HUD_X_OFFSET
             self.y = c.IMMUTABLE_HUD_Y
 
 
@@ -234,7 +235,7 @@ class Hud:
 
     def render_coords(self, surface: pygame.Surface) -> None:
         text = self.font.render(self.coords, True, c.SELECTED_GRAY)
-        text_rect = text.get_rect(center=(self.x - c.IMMUTABLE_HUD_X_OFFSET*2, self.y))
+        text_rect = text.get_rect(center=(self.x + c.IMMUTABLE_HUD_X_OFFSET*2, self.y))
         surface.blit(text, text_rect)
 
 
@@ -284,7 +285,9 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pygame.Surface, dt: int, mainstate: c.StateName, game_info: "control.GameInfo") -> None:
+    # XXX Importing control.GameInfo causes circular import.
+    # Change game_info from Any to GameInfo at some point.
+    def update(self, screen: pygame.Surface, dt: int, mainstate: c.StateName, game_info: Any) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:

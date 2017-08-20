@@ -90,6 +90,8 @@ DARK_PALE =     (170, 155, 82)
 AUTUMN =        (255, 167, 73)
 NICE_VIOLET =   (229, 162, 219)
 
+PANEL_GRAY =    (186, 186, 186)
+
 
 # Multipliers.
 DEFAULT_BACKGROUND_X_MULT = 0.26042 # Resolution w / background w
@@ -183,6 +185,8 @@ STARTING_MENU_Y = int(DEFAULT_SCREEN_HEIGHT / 3.5)
 MENU_WIDTH = 218 # Size of the menu item sprites after transformation.
 IMMUTABLE_HUD_X_OFFSET = 70
 IMMUTABLE_HUD_Y = 20
+
+SIDE_PANEL_WIDTH = 290
 
 
 # Scalers.

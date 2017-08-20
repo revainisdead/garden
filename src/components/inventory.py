@@ -5,6 +5,7 @@ from typing import Tuple
 import pygame
 
 from .. import binds
+from .. import constants as c
 from .. import setup
 
 
@@ -55,7 +56,7 @@ class SidePanel:
     def __init__(self, width: int) -> None:
         self.width = width
         self.setup_panel()
-        self.color = (0, 0, 255)
+        self.color = c.PANEL_GRAY
 
     def setup_panel(self) -> None:
         screenw = setup.screen_size.get_width()
@@ -74,7 +75,7 @@ class Inventory:
         self.equipped = EquippedItems((6, 3))
         self.workers = Workers((6, 1))
 
-        self.__panel = SidePanel(200)
+        self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)
         self.__open = True
 
 
