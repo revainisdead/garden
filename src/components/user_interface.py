@@ -7,6 +7,7 @@ import time
 import pygame
 
 from . import helpers
+from . import inventory
 
 from .. import binds
 from .. import constants as c
@@ -266,6 +267,8 @@ class GameUI:
         self.button_y = setup.screen_size.get_height() - c.IMMUTABLE_BUTTON_Y_OFFSET
         self.re_setup_buttons()
 
+        self.inv = inventory.Inventory()
+
 
     def re_setup_buttons(self) -> None:
         """
@@ -285,6 +288,7 @@ class GameUI:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
+            self.inv.update(screen, game_info.inp)
             self.update_sizes()
             self.button_group.update(dt, game_info.inp)
             self.blit_images(screen)

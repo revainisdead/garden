@@ -24,15 +24,26 @@ class _SlotMesh:
         # Makes groking really difficult, and arbitrary access
         self.__slots = [[Slot() for y in range(size[0])] for x in range(size[1])] # type: List[List[Slot]]
 
+        self.__open = True
+
+    def switch(self) -> None:
+        self.__open = not self.__open
+
+
 
 class EquippedItems(_SlotMesh):
     def __init__(self, *args, **kwargs) -> None:
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class Backpack(_SlotMesh):
     def __init__(self, *args, **kwargs) -> None:
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+
+class Workers(_SlotMesh):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
 
 class SidePanel:
@@ -42,23 +53,36 @@ class SidePanel:
     that is this panel, which is solid, it will look nice.
     """
     def __init__(self, width: int) -> None:
+        self.width = width
+        self.setup_panel()
+        self.color = (0, 0, 255)
+
+    def setup_panel(self) -> None:
         screenw = setup.screen_size.get_width()
         screenh = setup.screen_size.get_height()
-        self.rect = pygame.Rect((screenw - width, 0), (width, screenh))
-        self.color = (0, 0, 255)
+        self.rect = pygame.Rect((screenw - self.width, 0), (self.width, screenh))
 
     def update(self, surface: pygame.Surface) -> None:
         pygame.draw.rect(surface, self.color, self.rect)
+        if setup.screen_size.changed():
+            self.setup_panel()
 
 
 class Inventory:
     def __init__(self) -> None:
-        self.__panel = SidePanel(120)
+        self.backpack = Backpack((6, 5))
+        self.equipped = EquippedItems((6, 3))
+        self.workers = Workers((6, 1))
+
+        self.__panel = SidePanel(200)
         self.__open = True
 
 
     def switch(self) -> None:
         self.__open = not self.__open
+        self.backpack.switch()
+        self.equipped.switch()
+        self.workers.switch()
 
 
     # Wherever update is called from can access game_info,

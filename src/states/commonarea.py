@@ -11,7 +11,7 @@ from .. import control
 from .. import setup
 from .. import tools
 
-from .. components import inventory, non_player_controlled, player, scenery, tilemap, user_interface, util
+from .. components import non_player_controlled, player, scenery, tilemap, user_interface, util
 
 
 class CommonArea(control.State):
@@ -26,9 +26,6 @@ class CommonArea(control.State):
 
         # Save a copy of the first tilemap, so that we can re-create it later.
         self.farmland = self.tilemap
-
-        # Inventory is only visible in the common area
-        self.inv = inventory.Inventory()
 
 
     def startup(self, game_info: control.GameInfo) -> None:
@@ -142,8 +139,6 @@ class CommonArea(control.State):
         # Draw the hud to the screen over everything else.
         # Similar to Game UI but the hud needs access to game_info.
         self.hud.update(surface, self.game_info, self.player, self.tilemap_rect.bottom)
-
-        self.inv.update(surface, self.game_info.inp)
 
 
     def handle_states(self) -> None:
