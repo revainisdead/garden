@@ -118,6 +118,8 @@ TILE_SIZE = 64
 ORIGINAL_ICON_SIZE = 400
 BUTTON_SIZE = ORIGINAL_ICON_SIZE * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
 
+#DEFAULT_SCREEN_WIDTH = 800
+#DEFAULT_SCREEN_HEIGHT = 600
 DEFAULT_SCREEN_WIDTH = 800
 DEFAULT_SCREEN_HEIGHT = 600
 DEFAULT_SCREEN_SIZE = (DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT)
@@ -135,7 +137,7 @@ TILE_MULT = TILE_SIZE / 64
 
 
 speeds = {
-    "player": 3 if not DEBUG_PLAYER else 20,
+    "player": 6 if not DEBUG_PLAYER else 20,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
     "npc_roaming": 2 if not DEBUG_NPC else 10,

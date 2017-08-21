@@ -15,8 +15,28 @@ class Slot:
         # stores surface
         # stores image
         # move to new slot by moving rect
-        #
         self.taken = False
+        self.item = None # type: Optional[Item]
+        self.hide = False # dragging, don't dra
+
+        #self.rect = self.item.rect
+
+
+    def update(self, action: str) -> None:
+        # ONLY UPDATE IF SLOTMESH SAYS IT NEEDS TO CHANGE
+        pass
+
+
+    def drop(self, item: _Item) -> None:
+        self.taken = True
+
+        if item:
+            self.item = item
+
+
+    def pickup(self) -> None: pass
+    def drag(self) -> None: self.hide = True
+
 
 
 class _SlotMesh:
@@ -27,8 +47,48 @@ class _SlotMesh:
 
         self.__open = True
 
+
+    def update(self, inp: binds.Input) -> None:
+        self.handle_state(inp)
+
+
+    def handle_state(self, inp: binds.Input) -> None:
+        slot_changed = False
+
+        self.dragging 
+
+        lmc = inp.last_mouse_click()
+        lmd = inp.last_mouse_drop()
+        mp = inp.mouse_pos()
+
+        if lmc:
+            s = check_slots(lmc)
+            if s:
+                s.pickup()
+
+        if lmd:
+            s = check_slots(lmd)
+            if s:
+                s.drop()
+
+        if mp:
+            s = check_slots(mp)
+            if s:
+                s.drag()
+
+
     def switch(self) -> None:
         self.__open = not self.__open
+
+
+    def check_slots(self, pos: Tuple[int, int]) -> Optional[Slot]:
+        """ Returns a slot if one contains that position.
+        That was this function can be used for mousedown
+        (pickup) and mouseup (dropping)"""
+        x, y = *pos
+        for s in self.__slots:
+            if s.collidepoint(pos):
+                s.dragging = True
 
 
 
