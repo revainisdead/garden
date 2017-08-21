@@ -117,6 +117,7 @@ map_mult = {
 TILE_SIZE = 64
 ORIGINAL_ICON_SIZE = 400
 BUTTON_SIZE = ORIGINAL_ICON_SIZE * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
+SLOT_SIZE = 32
 
 #DEFAULT_SCREEN_WIDTH = 800
 #DEFAULT_SCREEN_HEIGHT = 600
@@ -134,6 +135,7 @@ FONT_SIZE_DICT = {
 # Full size(1) for tile_size = 64
 # Half size(0.5)  for tile_size = 32
 TILE_MULT = TILE_SIZE / 64
+
 
 
 speeds = {

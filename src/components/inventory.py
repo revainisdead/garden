@@ -17,8 +17,13 @@ class Slot:
         # move to new slot by moving rect
         self.taken = False
         self.item = None # type: Optional[Item]
-        self.hide = False # dragging, don't dra
 
+        # we need the surface here so we can get the rect and pos
+        self.surface = pygame.Surface((c.SLOT_SIZE, c.SLOT_SIZE)).convert()
+        self.rect = self.surface.get_rect()
+
+        # when dragging, don't hide, need to draw it on mouse
+        #self.hide = False # dragging, don't draw
         #self.rect = self.item.rect
 
 
@@ -27,16 +32,29 @@ class Slot:
         pass
 
 
-    def drop(self, item: _Item) -> None:
+    def drop(self, item: Item, pos: Tuple[int, int]) -> None:
+        """
+        If spot is taken, this will throw ```SlotTaken```
+        """
         self.taken = True
 
-        if item:
-            self.item = item
+        newx, newy = pos
+        self.rect.x = newx
+        self.rect.y = newy
+        #draw???
+
+        #if item:
+        self.item = item
 
 
-    def pickup(self) -> None: pass
-    def drag(self) -> None: self.hide = True
+    def pickup(self) -> None:
+        pass
 
+
+    def drag(self, pos: Tuple[int, int]) -> None:
+        #self.hide = True
+        # draw the rect where the mouse is
+        self.rect.x, self.rect.y = pos
 
 
 class _SlotMesh:
@@ -45,7 +63,8 @@ class _SlotMesh:
         # Makes groking really difficult, and arbitrary access
         self.__slots = [[Slot() for y in range(size[0])] for x in range(size[1])] # type: List[List[Slot]]
 
-        self.__open = True
+        self.__hide = False
+        self.__drag_slot = None # type: Slot
 
 
     def update(self, inp: binds.Input) -> None:
@@ -55,8 +74,6 @@ class _SlotMesh:
     def handle_state(self, inp: binds.Input) -> None:
         slot_changed = False
 
-        self.dragging 
-
         lmc = inp.last_mouse_click()
         lmd = inp.last_mouse_drop()
         mp = inp.mouse_pos()
@@ -64,21 +81,25 @@ class _SlotMesh:
         if lmc:
             s = check_slots(lmc)
             if s:
+                slot_changed = True
+                s = self.__drag_slot
                 s.pickup()
 
         if lmd:
             s = check_slots(lmd)
             if s:
+                slot_changed = True
                 s.drop()
 
         if mp:
             s = check_slots(mp)
             if s:
+                slot_changed = True
                 s.drag()
 
 
     def switch(self) -> None:
-        self.__open = not self.__open
+        self.__hide = not self.__hide
 
 
     def check_slots(self, pos: Tuple[int, int]) -> Optional[Slot]:
