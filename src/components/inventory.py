@@ -1,12 +1,17 @@
-from typing import List, Tuple
+from typing import Optional, List, Tuple
 
 from typing import Tuple
 
 import pygame
 
+from . import item
+
 from .. import binds
 from .. import constants as c
 from .. import setup
+
+
+class SlotTaken(Exception): pass
 
 
 class Slot:
@@ -16,7 +21,7 @@ class Slot:
         # stores image
         # move to new slot by moving rect
         self.taken = False
-        self.item = None # type: Optional[Item]
+        self.item = None # type: Optional[item.Item]
 
         # we need the surface here so we can get the rect and pos
         self.surface = pygame.Surface((c.SLOT_SIZE, c.SLOT_SIZE)).convert()
@@ -32,28 +37,31 @@ class Slot:
         pass
 
 
-    def drop(self, item: Item, pos: Tuple[int, int]) -> None:
+    def drop(self, item: item.Item, pos: Tuple[int, int]) -> None:
         """
         If spot is taken, this will throw ```SlotTaken```
         """
-        self.taken = True
-
-        newx, newy = pos
-        self.rect.x = newx
-        self.rect.y = newy
-        #draw???
+        if self.taken:
+            raise SlotTaken
+        else:
+            self.taken = True
+            self.rect.x, self.rect.y = pos
 
         #if item:
         self.item = item
 
 
     def pickup(self) -> None:
-        pass
+        """ Pickup is not equivalent to drag.
+
+        This is because when it is picked up, we need to get the location,
+        in case it's dropped on a taken slot or dropped where there is no
+        slot, then we can reset the position.
+        """
+        self.__last_pos = (self.rect.x, self.rect.y)
 
 
     def drag(self, pos: Tuple[int, int]) -> None:
-        #self.hide = True
-        # draw the rect where the mouse is
         self.rect.x, self.rect.y = pos
 
 
@@ -64,7 +72,7 @@ class _SlotMesh:
         self.__slots = [[Slot() for y in range(size[0])] for x in range(size[1])] # type: List[List[Slot]]
 
         self.__hide = False
-        self.__drag_slot = None # type: Slot
+        self.__drag_slot = None # type: Optional[Slot]
 
 
     def update(self, inp: binds.Input) -> None:
@@ -79,23 +87,32 @@ class _SlotMesh:
         mp = inp.mouse_pos()
 
         if lmc:
-            s = check_slots(lmc)
+            s = self.check_slots(lmc)
             if s:
                 slot_changed = True
                 s = self.__drag_slot
                 s.pickup()
 
         if lmd:
-            s = check_slots(lmd)
+            s = self.check_slots(lmd)
             if s:
                 slot_changed = True
-                s.drop()
+                try:
+                    s.drop()
+                except SlotTaken:
+                    self.__drag_slot = None
+            else:
+                # Slot was not dropped on an existing slot.
+                self.__drag_slot.reset()
+                self.__drag_slot = None
 
-        if mp:
-            s = check_slots(mp)
+
+        # For dragging, ensure there is a dragging slot at the moment.
+        if mp and self.__drag_slot:
+            s = self.check_slots(mp)
             if s:
                 slot_changed = True
-                s.drag()
+                s.drag(mp)
 
 
     def switch(self) -> None:
@@ -106,10 +123,13 @@ class _SlotMesh:
         """ Returns a slot if one contains that position.
         That was this function can be used for mousedown
         (pickup) and mouseup (dropping)"""
-        x, y = *pos
-        for s in self.__slots:
-            if s.collidepoint(pos):
-                s.dragging = True
+        x, y = pos
+        for slot_list in self.__slots:
+            for s in slot_list:
+                if s.rect.collidepoint(pos):
+                    return s
+
+        return None
 
 
 
