@@ -22,10 +22,15 @@ class Slot:
         # move to new slot by moving rect
         self.taken = False
         self.item = None # type: Optional[item.Item]
+        # XXX surface should be in item because that's where the sprite
+        # will be stored
+        # Needed the interface to slot so that the item in this particular
+        # slot can change easily
+
 
         # we need the surface here so we can get the rect and pos
-        self.surface = pygame.Surface((c.SLOT_SIZE, c.SLOT_SIZE)).convert()
-        self.rect = self.surface.get_rect()
+        #self.surface = pygame.Surface((c.SLOT_SIZE, c.SLOT_SIZE)).convert()
+        #self.rect = self.surface.get_rect()
 
         # when dragging, don't hide, need to draw it on mouse
         #self.hide = False # dragging, don't draw

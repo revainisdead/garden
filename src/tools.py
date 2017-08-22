@@ -40,7 +40,6 @@ def colorize(images: List[pygame.Surface], color: Tuple[int, ...]) -> List[pygam
         #image.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
         image.fill(color + (0,), None, pygame.BLEND_RGBA_ADD)
         colored.append(image)
-
     return colored
 
 
