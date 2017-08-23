@@ -50,9 +50,8 @@ class Slot:
             raise SlotTaken
         else:
             self.taken = True
-            self.rect.x, self.rect.y = pos
+            self.item.rect.x, self.item.rect.y = pos
 
-        #if item:
         self.item = item
 
 
@@ -74,17 +73,17 @@ class _SlotMesh:
     def __init__(self, size: Tuple[int, int]) -> None:
         # Anything else I could use besides a 2d list? Identifiable by pos only
         # Makes groking really difficult, and arbitrary access
-        self.__slots = [[Slot() for y in range(size[0])] for x in range(size[1])] # type: List[List[Slot]]
+        self.__slots = [[Slot() for y in range(size[1])] for x in range(size[0])] # type: List[List[Slot]]
 
         self.__hide = False
         self.__drag_slot = None # type: Optional[Slot]
 
 
-    def update(self, inp: binds.Input) -> None:
-        self.handle_state(inp)
+    def update(self, inp: binds.Input) -> bool:
+        return self.handle_state(inp)
 
 
-    def handle_state(self, inp: binds.Input) -> None:
+    def handle_state(self, inp: binds.Input) -> bool:
         slot_changed = False
 
         lmc = inp.last_mouse_click()
@@ -111,13 +110,14 @@ class _SlotMesh:
                 self.__drag_slot.reset()
                 self.__drag_slot = None
 
-
         # For dragging, ensure there is a dragging slot at the moment.
         if mp and self.__drag_slot:
             s = self.check_slots(mp)
             if s:
                 slot_changed = True
                 s.drag(mp)
+
+        return slot_changed
 
 
     def switch(self) -> None:
@@ -184,6 +184,18 @@ class Inventory:
         self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)
         self.__open = True
 
+        self.__items = self.__create_items()
+
+
+    # XXX: Later the items will be created on a random chance
+    #      when gathering nodes.
+    def __create_items(self) -> List[item.Item]:
+        items = [] # type: List[Item]
+        for name in item.item_map.keys():
+            print(name)
+            items.append(item.Item(100, 100, name))
+        return items
+
 
     def switch(self) -> None:
         self.__open = not self.__open
@@ -199,6 +211,9 @@ class Inventory:
 
         if self.__open:
             self.__panel.update(surface)
+            bp_change = self.backpack.update(inp)
+            eq_change = self.equipped.update(inp)
+            wrk_change = self.workers.update(inp)
 
 
     def handle_state(self, inp: binds.Input) -> None:

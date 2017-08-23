@@ -4,10 +4,12 @@ import random
 
 import pygame
 
-from . import helpers, util
+from . import helpers
+from . import util
 
 from .. import binds
 from .. import constants as c
+from .. import phys
 from .. import setup
 from .. import tools
 
@@ -38,7 +40,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        self.walking_speed = c.speeds["player"]
+        self.vel = c.speeds["player"] * c.FPS
+
         self.direction = c.Direction.NONE
         self.previous_direction = c.Direction.NONE
         self.x_vel = 0
@@ -99,30 +102,33 @@ class Player(pygame.sprite.Sprite):
 
     def set_velocity(self) -> None:
         """Set the speed based on the direction"""
+        self.walk_sp = self.vel * self.dt
+        self.diag_sp = phys.normalize(self.vel, self.vel) * self.dt
+
         if self.direction == c.Direction.LEFT:
-            self.x_vel = -self.walking_speed
+            self.x_vel = -self.walk_sp
             self.y_vel = 0
         elif self.direction == c.Direction.RIGHT:
-            self.x_vel = self.walking_speed
+            self.x_vel = self.walk_sp
             self.y_vel = 0
         elif self.direction == c.Direction.UP:
             self.x_vel = 0
-            self.y_vel = -self.walking_speed
+            self.y_vel = -self.walk_sp
         elif self.direction == c.Direction.DOWN:
             self.x_vel = 0
-            self.y_vel = self.walking_speed
+            self.y_vel = self.walk_sp
         elif self.direction == c.Direction.LEFTUP:
-            self.x_vel = -self.walking_speed
-            self.y_vel = -self.walking_speed
+            self.x_vel = -self.diag_sp
+            self.y_vel = -self.diag_sp
         elif self.direction == c.Direction.LEFTDOWN:
-            self.x_vel = -self.walking_speed
-            self.y_vel = self.walking_speed
+            self.x_vel = -self.diag_sp
+            self.y_vel = self.diag_sp
         elif self.direction == c.Direction.RIGHTUP:
-            self.x_vel = self.walking_speed
-            self.y_vel = -self.walking_speed
+            self.x_vel = self.diag_sp
+            self.y_vel = -self.diag_sp
         elif self.direction == c.Direction.RIGHTDOWN:
-            self.x_vel = self.walking_speed
-            self.y_vel = self.walking_speed
+            self.x_vel = self.diag_sp
+            self.y_vel = self.diag_sp
         else:
             self.x_vel = 0
             self.y_vel = 0

@@ -2,6 +2,7 @@
 Item workflow.
 
 """
+from typing import Dict
 
 import pygame
 
@@ -30,20 +31,22 @@ from .. import setup
 #       axe: cut trees
 
 
+class Stat(enum.Enum):
+    WRK_MV_SPEED = 0
+    PLY_MV_SPEED = 1
+    WRK_GATHER_SPEED = 2
+    PLY_GATHER_SPEED = 3
+    NODE_RESPAWN_RATE = 4
+    WATER_WALKING = 5
+    CHOP = 6
+
+
 class ItemType(enum.Enum):
     WORKER = 0
     EQ_ITEM = 1
 
 
-class Quality(enum.Enum):
-    """
-    Don't follow the typical enum declaration with all cap
-    members because I can just call ```Quality.Organic.name```
-    to get the string I need.
-
-    And ```Quality.Organic.value``` to get the order of the
-    variable, or the quality "level".
-    """
+class Qlty(enum.Enum):
     Enslaving = 0
     Sacrificial = 1
     Arduous = 2
@@ -55,6 +58,19 @@ class Quality(enum.Enum):
     Bountiful = 8
     Godly = 9
 
+
+qualities = [
+    "Enslaving",
+    "Sacrificial",
+    "Arduous",
+    "Artistic",
+    "Organic",
+    "Collective",
+    "Synergistic",
+    "Burning",
+    "Bountiful",
+    "Godly",
+]
 
 # Maps 1 to 1 to ```class Quality```
 quality_color = [
@@ -93,26 +109,16 @@ item_map = {
 
 # Also need to map the item names to their icons.
 item_icon = {
-    "Man":
-    "Woman":
-    "Vindicator":
+    "Man": "team_icon",
+    "Woman": "team_icon",
+    "Vindicator": "team_icon",
     "Team": "team_icon",
 
-    "Gravekeeper":
-    "Weeds":
+    "Gravekeeper": "gem_icon",
+    "Weeds": "gem_icon",
     "Gem": "gem_icon",
     "Moon boots": "moonboots_icon",
 } # type: Dict[str, str]
-
-
-class Stat(enum.Enum):
-    WRK_MV_SPEED = 0
-    PLY_MV_SPEED = 1
-    WRK_GATHER_SPEED = 2
-    PLY_GATHER_SPEED = 3
-    NODE_RESPAWN_RATE = 4
-    WATER_WALKING = 5
-    CHOP
 
 
 class Item(pygame.sprite.Sprite):
@@ -130,9 +136,14 @@ class Item(pygame.sprite.Sprite):
     - Name noun associated with certain icon
     - Name adjective associated with quality
     """
-    def __init__(self) -> None:
-        super().__init__(self, x, y)
-        sprite = setup.GFX[sprite_name]
+    def __init__(self, x: int, y: int, item_name: str) -> None:
+        super().__init__()
+        sprite = setup.GFX[item_icon[item_name]]
+
+        self.image = helpers.get_image(0, 0, 32, 32, sprite, mult=c.BUTTON_MULT)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
         self.__quality = self.__get_rand_quality()
         self.__item_name = self.__get_rand_item()
@@ -140,8 +151,10 @@ class Item(pygame.sprite.Sprite):
         self.__stats = self.__gen_stats()
 
         self.__name = str(self.__quality + self.__item_name)
+
         # Id should be unique and is used to identify this specific item.
-        self.__id = uuid.uuid()
+        #self.__id = uuid.uuid()
+        # Necessary? or just hash the quality and the stats together
 
         # Workers need "people icons" and items "item icons".
         self.type = ItemType.EQ_ITEM
@@ -150,12 +163,20 @@ class Item(pygame.sprite.Sprite):
         # Or add attributes directly onto this item
 
 
-    def __get_rand_item(self) -> "str":
+    def __get_rand_item(self) -> str:
+        x = random.randint(0, len(item_map.keys()) - 1)
+        return list(item_map.keys())[x]
 
-    def __gen_stats(self) -> None:
-        # randomize quality
-        # 
-        pass
+
+    def __get_rand_quality(self) -> str:
+        x = random.randint(0, len(qualities) - 1)
+        return qualities[x]
+
+
+    def __gen_stats(self) -> Dict[Stat, float]:
+        return {
+            Stat.CHOP: 1,
+        }
 
 
     #def __setattr__
