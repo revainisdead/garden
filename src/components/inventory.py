@@ -15,7 +15,7 @@ class SlotTaken(Exception): pass
 
 
 class Slot:
-    def __init__(self) -> None:
+    def __init__(self, pos: Tuple[int, int]) -> None:
         # stores rect
         # stores surface
         # stores image
@@ -36,10 +36,33 @@ class Slot:
         #self.hide = False # dragging, don't draw
         #self.rect = self.item.rect
 
+        self.__last_pos = None
 
-    def update(self, action: str) -> None:
+        # Get a rect to draw the slot background.
+        self.bg_rect = self.create_bg(pos)
+
+
+    def create_bg(self, pos: Tuple[int, int]) -> pygame.rect.Rect:
+        return pygame.rect.Rect(pos, (c.SLOT_SIZE, c.SLOT_SIZE))
+
+
+    def update(self, screen: pygame.surface.Surface) -> None:
         # ONLY UPDATE IF SLOTMESH SAYS IT NEEDS TO CHANGE
-        pass
+
+        pygame.draw.rect(screen, c.BLACK, self.bg_rect)
+
+
+    def get_rect(self) -> Optional[pygame.rect.Rect]:
+        try:
+            return self.item.rect
+        except AttributeError:
+            return None
+
+
+    def reset(self) -> None:
+        r = self.get_rect()
+        if r:
+            r.x, r.y = self.__last_pos
 
 
     def drop(self, item: item.Item, pos: Tuple[int, int]) -> None:
@@ -50,19 +73,27 @@ class Slot:
             raise SlotTaken
         else:
             self.taken = True
-            self.item.rect.x, self.item.rect.y = pos
+            r = self.get_rect()
+            if r:
+                r.x, r.y = pos
 
         self.item = item
 
 
-    def pickup(self) -> None:
+    def pickup(self, pos) -> None:
         """ Pickup is not equivalent to drag.
 
         This is because when it is picked up, we need to get the location,
         in case it's dropped on a taken slot or dropped where there is no
         slot, then we can reset the position.
         """
-        self.__last_pos = (self.rect.x, self.rect.y)
+        r = self.get_rect()
+        if r:
+            # Save the current item position
+            self.__last_pos = (r.x, r.y)
+
+            # Move center of item to mouse pos
+            r.centerx, r.centery = pos
 
 
     def drag(self, pos: Tuple[int, int]) -> None:
@@ -70,17 +101,47 @@ class Slot:
 
 
 class _SlotMesh:
-    def __init__(self, size: Tuple[int, int]) -> None:
+    def __init__(self, pos: Tuple[int, int], size: Tuple[int, int]) -> None:
         # Anything else I could use besides a 2d list? Identifiable by pos only
         # Makes groking really difficult, and arbitrary access
-        self.__slots = [[Slot() for y in range(size[1])] for x in range(size[0])] # type: List[List[Slot]]
+
+        self.__slots = self.__create_slots(pos, size)
 
         self.__hide = False
         self.__drag_slot = None # type: Optional[Slot]
 
 
-    def update(self, inp: binds.Input) -> bool:
-        return self.handle_state(inp)
+    def __create_slots(self, pos: Tuple[int, int], size: Tuple[int, int]) -> List[Slot]:
+        #self.__slots = [[Slot() for y in range(size[1])] for x in range(size[0])]
+        slots = [] # type: List[List[Slot]]
+
+        x_diff = c.SLOT_OFFSET
+        y_diff = c.SLOT_OFFSET
+
+        p_x, p_y = pos
+        s_x, s_y = size
+
+        # Make a copy of the starting x value
+        orig_x = p_x
+        for y in range(s_y):
+            # Slots is a list of lists, create tmp list.
+            tmp = []
+
+            # Reset x to original x and increase y
+            p_x = orig_x
+            p_y += (y_diff + c.SLOT_SIZE)
+            for x in range(s_x):
+                tmp.append(Slot((p_x, p_y)))
+                p_x += (x_diff + c.SLOT_SIZE)
+
+            slots.append(tmp)
+        return slots
+
+
+    def update(self, screen: pygame.surface.Surface, inp: binds.Input) -> None:
+        changed = self.handle_state(inp)
+        #if changed:
+        self.update_slots(screen)
 
 
     def handle_state(self, inp: binds.Input) -> bool:
@@ -95,7 +156,7 @@ class _SlotMesh:
             if s:
                 slot_changed = True
                 s = self.__drag_slot
-                s.pickup()
+                s.pickup(lmc)
 
         if lmd:
             s = self.check_slots(lmd)
@@ -107,8 +168,9 @@ class _SlotMesh:
                     self.__drag_slot = None
             else:
                 # Slot was not dropped on an existing slot.
-                self.__drag_slot.reset()
-                self.__drag_slot = None
+                if self.__drag_slot:
+                    self.__drag_slot.reset()
+                    self.__drag_slot = None
 
         # For dragging, ensure there is a dragging slot at the moment.
         if mp and self.__drag_slot:
@@ -131,10 +193,17 @@ class _SlotMesh:
         x, y = pos
         for slot_list in self.__slots:
             for s in slot_list:
-                if s.rect.collidepoint(pos):
-                    return s
-
+                r = s.get_rect()
+                if r:
+                    if r.collidepoint(pos):
+                        return s
         return None
+
+
+    def update_slots(self, screen: pygame.surface.Surface) -> None:
+        for slot_list in self.__slots:
+            for s in slot_list:
+                s.update(screen)
 
 
 
@@ -177,9 +246,7 @@ class SidePanel:
 
 class Inventory:
     def __init__(self) -> None:
-        self.backpack = Backpack((6, 5))
-        self.equipped = EquippedItems((6, 3))
-        self.workers = Workers((6, 1))
+        self.__setup_meshes()
 
         self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)
         self.__open = True
@@ -188,13 +255,28 @@ class Inventory:
 
 
     # XXX: Later the items will be created on a random chance
-    #      when gathering nodes.
+    #      when gathering nodes, and should be placed in the next
+    #      available slot.
     def __create_items(self) -> List[item.Item]:
         items = [] # type: List[Item]
         for name in item.item_map.keys():
             print(name)
             items.append(item.Item(100, 100, name))
         return items
+
+
+    def __setup_meshes(self) -> None:
+        # Start y value from 0, x is constant
+        screenw = setup.screen_size.get_width()
+        x = screenw - c.MESH_X_OFFSET
+
+        y = c.MESH_Y_OFFSET
+        self.backpack = Backpack((x, y), (6, 5))
+        y += c.MESH_Y_OFFSET + 6*c.SLOT_SIZE # 6: number of backpack x slots
+        self.equipped = EquippedItems((x, y), (6, 3))
+        y += c.MESH_Y_OFFSET + 3*c.SLOT_SIZE # 3: number of equipped x slots
+        self.workers = Workers((x, y), (6, 1))
+
 
 
     def switch(self) -> None:
@@ -206,14 +288,17 @@ class Inventory:
 
     # Wherever update is called from can access game_info,
     # pass the keybinds object in game_info in.
-    def update(self, surface: pygame.Surface, inp: binds.Input) -> None:
+    def update(self, screen: pygame.Surface, inp: binds.Input) -> None:
         self.handle_state(inp)
 
         if self.__open:
-            self.__panel.update(surface)
-            bp_change = self.backpack.update(inp)
-            eq_change = self.equipped.update(inp)
-            wrk_change = self.workers.update(inp)
+            self.__panel.update(screen)
+            self.backpack.update(screen, inp)
+            self.equipped.update(screen, inp)
+            self.workers.update(screen, inp)
+
+        if setup.screen_size.changed():
+            self.__setup_meshes()
 
 
     def handle_state(self, inp: binds.Input) -> None:

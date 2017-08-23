@@ -109,8 +109,9 @@ class Control:
         # In Game User Interface.
         self.game_ui.update(self.screen_surface, self.dt, self.state_name, self.state.game_info)
 
+        # End of frame. Do resets.
         self.state.game_info.inp.reset()
-        #binds.INPUT.reset()
+        setup.screen_size.reset()
 
 
     def setup_states(self, state_dict, start_state) -> None:
@@ -154,6 +155,7 @@ class State:
 
         # These are things that every state needs.
         self.game_info = GameInfo(
+            dt = 0,
             inp = binds.Input()
         )
 
@@ -165,13 +167,16 @@ class State:
     def cleanup(self) -> None:
         """
         This must be called to give the objects in the game info
-        a chance to cleanup, let the game info object handle that.
+        a chance to cleanup.
+
+        If the item in game_info is an object (a.k.a. has the __class__
+        attribute) then call its cleanup method.
         """
         for k, v in self.game_info.items():
             if hasattr(v, "__name__"):
                 # Mypy doesn't  like this call because I'm assuming object
                 # has a cleanup method. It isn't guarenteed to, but I can
-                # enforce that. Ignore the type.
+                # enforce that it does. Ignore the type.
                 v.cleanup() # type: ignore
 
 

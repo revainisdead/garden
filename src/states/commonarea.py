@@ -32,6 +32,10 @@ class CommonArea(control.State):
         self.game_info = game_info
         self.state = c.StateName.COMMONAREA
 
+        # Trigger a screen size change to setup everything at the
+        # current screen size.
+        setup.screen_size.trigger_change()
+
         self.stairs_down_copy = [] # type: List[pygame.sprite.Sprite]
         self.stairs_down_group = self.setup_stairs_down()
 

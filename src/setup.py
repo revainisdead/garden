@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Optional, Dict, Tuple
 
 import os
 
@@ -25,6 +25,10 @@ class ScreenSize:
 
     def __resize(self, width: int, height: int) -> None:
         if width != self.__width and height != self.__height:
+            print("sw: {}".format(self.__width))
+            print("sh: {}".format(self.__height))
+            print("w: {} ".format(width))
+            print("h: {} ".format(height))
             self.__width = width
             self.__height = height
             self.__changed = True
@@ -45,15 +49,30 @@ class ScreenSize:
 
 
     def changed(self) -> bool:
-        """This will spit out true for only one frame when the size changes."""
+        """ This will spit out true for only one frame when the size changes."""
         return self.__changed
 
 
-    def update(self, width: float, height: float) -> None:
+    def trigger_change(self) -> None:
+        """
+        Set ```self.__changed``` to True for one frame. Needed on initial
+        startup of game state.
+
+        Because a VIDEORESIZE won't happen on the start of the state,
+        """
+        self.__changed = True
+
+
+    def update(self, width: Optional[float], height: Optional[float]) -> None:
         self.__resize(int(round(width)), int(round(height)))
 
         if self.__changed:
             pygame.display.set_mode((self.__width, self.__height), pygame.RESIZABLE)
+
+
+    def reset(self) -> None:
+        """ Call when the frame is over to clear ```self.__changed``` """
+        self.__changed = False
 
 
 class MapSize:

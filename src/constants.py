@@ -117,7 +117,7 @@ map_mult = {
 TILE_SIZE = 64
 ORIGINAL_ICON_SIZE = 400
 BUTTON_SIZE = ORIGINAL_ICON_SIZE * BUTTON_MULT # 400 is actual the w/h of the button icon PNGs.
-SLOT_SIZE = 32
+SLOT_SIZE = 36
 
 #DEFAULT_SCREEN_WIDTH = 800
 #DEFAULT_SCREEN_HEIGHT = 600
@@ -139,11 +139,11 @@ TILE_MULT = TILE_SIZE / 64
 
 
 speeds = {
-    "player": 6 if not DEBUG_PLAYER else 20,
+    "player": 3 if not DEBUG_PLAYER else 20,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
-    "npc_roaming": 2 if not DEBUG_NPC else 10,
-    "npc_running": 5,
+    "npc_roaming": 1 if not DEBUG_NPC else 10,
+    "npc_running": 3,
     "camera": 3 if not DEBUG_CAMERA else 20,
 }
 
@@ -191,6 +191,9 @@ IMMUTABLE_HUD_X_OFFSET = 70
 IMMUTABLE_HUD_Y = 20
 
 SIDE_PANEL_WIDTH = 290
+SLOT_OFFSET = 6
+MESH_X_OFFSET = 271 # 290 - ((290 - ((6 * c.SLOT_SIZE) + (6 * SLOT_OFFSET))) / 2) = 271
+MESH_Y_OFFSET = 100
 
 
 # Scalers.
