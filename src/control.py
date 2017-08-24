@@ -109,7 +109,7 @@ class Control:
         self.state.update(self.screen_surface, self.dt, self.game_time)
 
         # In Game User Interface.
-        self.game_ui.update(self.screen_surface, self.dt, self.state_name, self.state.game_info)
+        self.game_ui.update(self.screen_surface, self.state_name, self.state.game_info)
 
         # End of frame. Do resets.
         self.state.game_info.inp.reset()

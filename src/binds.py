@@ -113,17 +113,11 @@ class Input:
 
 
     def __set_last_mouse_click(self, point: Optional[Tuple[int, int]]) -> None:
-        if point is None:
-            self.__last_mouse_click = (0, 0)
-        else:
-            self.__last_mouse_click = point
+        self.__last_mouse_click = point
 
 
     def __set_last_mouse_drop(self, point: Optional[Tuple[int, int]]) -> None:
-        if point is None:
-            self.__last_mouse_drop = (0, 0)
-        else:
-            self.__last_mouse_drop = point
+        self.__last_mouse_drop = point
 
 
     def update(self, event: Optional[pygame.event.Event]) -> None:

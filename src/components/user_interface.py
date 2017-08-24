@@ -125,7 +125,7 @@ class Button(pygame.sprite.Sprite):
         self.keybind = button_binds[self.name]
         # key: wood_axe_icon value: current keybind for action in binds file
 
-        self.dt = 0
+        self.game_time = 0
         self.pressed_time = 0
         # Very fast animation when pressed.
         self.animation_speed = 100
@@ -138,19 +138,24 @@ class Button(pygame.sprite.Sprite):
         return frames
 
 
-    def update(self, dt: int, inp: binds.Input) -> None:
-        self.dt = dt
+    def update(self, game_time: int, inp: binds.Input) -> None:
+        self.game_time = game_time
         self.handle_state(inp)
 
 
     def handle_state(self, inp: binds.Input) -> None:
         # Ex. if near_tree: cut.
-        if inp.pressed(self.keybind) or self.rect.collidepoint(*inp.last_mouse_click()):
-            self.pressed_animation()
-            self.action()
-        else:
-            # Only finished animation if the button is no longer pressed.
-            self.finished_animation_check()
+        # Use * in a function call to unpack in one go.
+        #if inp.pressed(self.keybind) or self.rect.collidepoint(*inp.last_mouse_click()):
+
+        lmc = inp.last_mouse_click()
+        if lmc:
+            if inp.pressed(self.keybind) or self.rect.collidepoint(lmc):
+                self.pressed_animation()
+                self.action()
+            else:
+                # Only finished animation if the button is no longer pressed.
+                self.finished_animation_check()
 
 
     def action(self) -> None:
@@ -163,7 +168,7 @@ class Button(pygame.sprite.Sprite):
 
 
     def finished_animation_check(self) -> None:
-        if self.dt - self.pressed_time > self.animation_speed:
+        if self.game_time - self.pressed_time > self.animation_speed:
             self.image = self.frames[0]
 
 
@@ -287,13 +292,13 @@ class GameUI:
 
     # XXX Importing control.GameInfo causes circular import.
     # Change game_info from Any to GameInfo at some point.
-    def update(self, screen: pygame.Surface, dt: int, mainstate: c.StateName, game_info: Any) -> None:
+    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: Any) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
             self.inv.update(screen, game_info.inp)
             self.update_sizes()
-            self.button_group.update(dt, game_info.inp)
+            self.button_group.update(game_info.game_time, game_info.inp)
             self.blit_images(screen)
 
 

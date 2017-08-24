@@ -80,7 +80,7 @@ UGLY_PURPLE =   (255, 0, 255)
 
 SELECTED_GRAY = (244, 244, 244)
 RESTING_GRAY =  (90, 90, 90)
-
+PANEL_GRAY =    (186, 186, 186)
 # Colorkey for pressed icons.
 ICON_GRAY =     (136, 136, 136)
 
@@ -90,7 +90,17 @@ DARK_PALE =     (170, 155, 82)
 AUTUMN =        (255, 167, 73)
 NICE_VIOLET =   (229, 162, 219)
 
-PANEL_GRAY =    (186, 186, 186)
+# Quality colors
+DIRTY_GRAY =    (128, 130, 132)
+MAROON =        (130, 0, 0)
+BROWN =         (96, 37, 3)
+BLUE =          (30, 17, 145)
+BACTERIA =      (56, 142, 17)
+TEAL =          (39, 178, 146)
+ORANGE =        (186, 58, 0)
+MAGENTA =       (158, 0, 150)
+LIME_GREEN =    (87, 155, 20)
+DARK_YELLOW =   (188, 188, 0)
 
 
 # Multipliers.
@@ -101,7 +111,8 @@ PROJECTILE_MULT = 1.25
 NPC_MULT = 0.25
 
 MENU_MULT = 1.15
-BUTTON_MULT = 0.10 # 0.16 makes the button the size of a tile
+BUTTON_MULT = 0.10  # 0.16 makes the button the size of a tile
+ITEM_MULT = 0.09     # 0.08 is 32x32, but items are 36x36, 0.09 is perfect.
 PRESSED_BUTTON_MULT = 0.097
 TOOLTIP_MULT = 1
 

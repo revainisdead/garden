@@ -12,6 +12,7 @@ from .. import setup
 
 
 class SlotTaken(Exception): pass
+class BackpackFull(Exception): pass
 
 
 class Slot:
@@ -36,7 +37,7 @@ class Slot:
         #self.hide = False # dragging, don't draw
         #self.rect = self.item.rect
 
-        self.__last_pos = None
+        self.__last_pos = None # type: Tuple[int, int]
 
         # Get a rect to draw the slot background.
         self.bg_rect = self.create_bg(pos)
@@ -47,9 +48,10 @@ class Slot:
 
 
     def update(self, screen: pygame.surface.Surface) -> None:
-        # ONLY UPDATE IF SLOTMESH SAYS IT NEEDS TO CHANGE
-
-        pygame.draw.rect(screen, c.BLACK, self.bg_rect)
+        if self.item:
+            self.taken = True
+        else:
+            pygame.draw.rect(screen, c.BLACK, self.bg_rect)
 
 
     def get_rect(self) -> Optional[pygame.rect.Rect]:
@@ -65,17 +67,18 @@ class Slot:
             r.x, r.y = self.__last_pos
 
 
-    def drop(self, item: item.Item, pos: Tuple[int, int]) -> None:
+    def drop(self, pos: Tuple[int, int], item: item.Item) -> None:
         """
         If spot is taken, this will throw ```SlotTaken```
         """
         if self.taken:
             raise SlotTaken
-        else:
-            self.taken = True
-            r = self.get_rect()
-            if r:
-                r.x, r.y = pos
+
+        #self.taken = True
+        r = self.get_rect()
+        if r:
+            print("drop.")
+            r.x, r.y = pos
 
         self.item = item
 
@@ -92,12 +95,16 @@ class Slot:
             # Save the current item position
             self.__last_pos = (r.x, r.y)
 
+            print("pickup.")
             # Move center of item to mouse pos
             r.centerx, r.centery = pos
 
 
     def drag(self, pos: Tuple[int, int]) -> None:
-        self.rect.x, self.rect.y = pos
+        r = self.get_rect()
+        if r:
+            print("drag.")
+            r.x, r.y = pos
 
 
 class _SlotMesh:
@@ -106,6 +113,7 @@ class _SlotMesh:
         # Makes groking really difficult, and arbitrary access
 
         self.__slots = self.__create_slots(pos, size)
+        self.flat_slots = [s for sublist in self.__slots for s in sublist]
 
         self.__hide = False
         self.__drag_slot = None # type: Optional[Slot]
@@ -154,18 +162,22 @@ class _SlotMesh:
         if lmc:
             s = self.check_slots(lmc)
             if s:
+                print("Slot picked on.")
                 slot_changed = True
-                s = self.__drag_slot
+                #s = self.__drag_slot
+                self.__drag_slot = s
                 s.pickup(lmc)
 
         if lmd:
+            print("mouse up")
             s = self.check_slots(lmd)
             if s:
                 slot_changed = True
-                try:
-                    s.drop()
-                except SlotTaken:
-                    self.__drag_slot = None
+                if self.__drag_slot:
+                    try:
+                        s.drop(lmd, self.__drag_slot.item)
+                    except SlotTaken:
+                        self.__drag_slot = None
             else:
                 # Slot was not dropped on an existing slot.
                 if self.__drag_slot:
@@ -174,10 +186,8 @@ class _SlotMesh:
 
         # For dragging, ensure there is a dragging slot at the moment.
         if mp and self.__drag_slot:
-            s = self.check_slots(mp)
-            if s:
-                slot_changed = True
-                s.drag(mp)
+            print("Slot dragging.")
+            self.__drag_slot.drag(mp)
 
         return slot_changed
 
@@ -195,6 +205,8 @@ class _SlotMesh:
             for s in slot_list:
                 r = s.get_rect()
                 if r:
+                    #print("slot pos: {}".format(r.topleft))
+                    #print("lmc       {}, {}".format(x, y))
                     if r.collidepoint(pos):
                         return s
         return None
@@ -204,6 +216,15 @@ class _SlotMesh:
         for slot_list in self.__slots:
             for s in slot_list:
                 s.update(screen)
+
+
+    def fill_next_slot(self, item: item.Item) -> None:
+        for slot_list in self.__slots:
+            for s in slot_list:
+                if not s.taken:
+                    s.item = item
+                    return
+        raise BackpackFull
 
 
 
@@ -258,10 +279,19 @@ class Inventory:
     #      when gathering nodes, and should be placed in the next
     #      available slot.
     def __create_items(self) -> List[item.Item]:
+        self.item_group = pygame.sprite.Group()
         items = [] # type: List[Item]
-        for name in item.item_map.keys():
-            print(name)
-            items.append(item.Item(100, 100, name))
+        flat_s = self.backpack.flat_slots
+
+        for i, name in enumerate(item.item_map.keys()):
+            r = flat_s[i].bg_rect
+            print(name, r.x, r.y)
+
+            item_tmp = item.Item((r.x, r.y), name)
+            items.append(item_tmp)
+
+            self.add_item(item_tmp)
+            print(item_tmp.name)
         return items
 
 
@@ -278,6 +308,32 @@ class Inventory:
         self.workers = Workers((x, y), (6, 1))
 
 
+    def add_item(self, item: item.Item) -> None:
+        # New items always go into the backpack.
+        try:
+            self.backpack.fill_next_slot(item)
+        except BackpackFull:
+            pass
+        else:
+            self.item_group.add(item)
+
+
+    def __move_items(self) -> None:
+        self.item_group = pygame.sprite.Group()
+        flat_s = self.backpack.flat_slots
+
+        for i, item in enumerate(self.__items):
+        #for i, item in enumerate(self.item_group):
+            s = flat_s[i] # works because slots are filled in order, 0-1-2 etc.
+            r = s.bg_rect
+            #s.item = item
+            #item_r = s.get_rect()
+            #item_r = r.x, r.y
+
+            print("move: ", item.name, r.x, r.y)
+
+            self.add_item(item)
+
 
     def switch(self) -> None:
         self.__open = not self.__open
@@ -286,8 +342,6 @@ class Inventory:
         self.workers.switch()
 
 
-    # Wherever update is called from can access game_info,
-    # pass the keybinds object in game_info in.
     def update(self, screen: pygame.Surface, inp: binds.Input) -> None:
         self.handle_state(inp)
 
@@ -297,8 +351,12 @@ class Inventory:
             self.equipped.update(screen, inp)
             self.workers.update(screen, inp)
 
+            self.item_group.draw(screen)
+
         if setup.screen_size.changed():
             self.__setup_meshes()
+            #self.__move_items()
+            self.__items = self.__create_items()
 
 
     def handle_state(self, inp: binds.Input) -> None:

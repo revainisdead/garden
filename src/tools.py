@@ -43,6 +43,16 @@ def colorize(images: List[pygame.Surface], color: Tuple[int, ...]) -> List[pygam
     return colored
 
 
+def colorize_quality(images: List[pygame.Surface], color: Tuple[int, ...]) -> List[pygame.Surface]:
+    colored = []
+    for image in images:
+        image = image.copy()
+        #image.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
+        image.fill(color + (0,), None, pygame.BLEND_RGBA_ADD)
+        colored.append(image)
+    return colored
+
+
 def recursive_load_gfx(path, accept=(".png", ".bmp", ".svg")):
     """
     Load graphics files.

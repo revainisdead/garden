@@ -15,7 +15,7 @@ from .. import tools
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y) -> None:
+    def __init__(self, x: int, y: int) -> None:
         super().__init__()
 
         self.sprite_sheet = setup.GFX["hero"]

@@ -2,7 +2,7 @@
 Item workflow.
 
 """
-from typing import Dict
+from typing import Dict, Tuple
 
 import pygame
 
@@ -14,6 +14,7 @@ from . import helpers
 
 from .. import constants as c
 from .. import setup
+from .. import tools
 
 
 # XXX: Colorize items randomly, or based on quality?
@@ -59,6 +60,20 @@ class Qlty(enum.Enum):
     Godly = 9
 
 
+quality_colors = {
+    "Enslaving": c.DIRTY_GRAY,
+    "Sacrificial": c.MAROON,
+    "Arduous": c.BROWN,
+    "Artistic": c.BLUE,
+    "Organic": c.BACTERIA,
+    "Collective": c.TEAL,
+    "Synergistic": c.ORANGE,
+    "Burning": c.MAGENTA,
+    "Bountiful": c.LIME_GREEN,
+    "Godly": c.DARK_YELLOW,
+}
+
+
 qualities = [
     "Enslaving",
     "Sacrificial",
@@ -100,10 +115,11 @@ item_map = {
     "Man": [Stat.WRK_MV_SPEED],
     "Woman": [Stat.WRK_MV_SPEED],
     "Vindicator": [Stat.WRK_MV_SPEED, Stat.PLY_MV_SPEED],
+    "Team": [Stat.NODE_RESPAWN_RATE],
 
     "Weeds": [Stat.NODE_RESPAWN_RATE],
     "Gem": [Stat.WRK_MV_SPEED],
-    "Moon boots": [Stat.WATER_WALKING]
+    "Moon boots": [Stat.WATER_WALKING],
 } # type: Dict[str, List[Stat]]
 
 
@@ -111,11 +127,10 @@ item_map = {
 item_icon = {
     "Man": "team_icon",
     "Woman": "team_icon",
-    "Vindicator": "team_icon",
+    "Vindicator": "skeleton_king_icon",
     "Team": "team_icon",
 
-    "Gravekeeper": "gem_icon",
-    "Weeds": "gem_icon",
+    "Weeds": "small_weeds_icon",
     "Gem": "gem_icon",
     "Moon boots": "moonboots_icon",
 } # type: Dict[str, str]
@@ -136,21 +151,21 @@ class Item(pygame.sprite.Sprite):
     - Name noun associated with certain icon
     - Name adjective associated with quality
     """
-    def __init__(self, x: int, y: int, item_name: str) -> None:
+    def __init__(self, pos: Tuple[int, int], item_name: str) -> None:
         super().__init__()
         sprite = setup.GFX[item_icon[item_name]]
 
-        self.image = helpers.get_image(0, 0, 32, 32, sprite, mult=c.BUTTON_MULT)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
         self.__quality = self.__get_rand_quality()
+        self.image = helpers.get_image(0, 0, c.ORIGINAL_ICON_SIZE, c.ORIGINAL_ICON_SIZE, sprite, mult=c.ITEM_MULT)
+        self.image = tools.colorize_quality([self.image], quality_colors[self.__quality])[0]
+
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = pos
+
         self.__item_name = self.__get_rand_item()
         self.__item_qualities = item_map[self.__item_name]
         self.__stats = self.__gen_stats()
-
-        self.__name = str(self.__quality + self.__item_name)
+        self.name = str(self.__quality + " " + self.__item_name)
 
         # Id should be unique and is used to identify this specific item.
         #self.__id = uuid.uuid()
@@ -164,13 +179,13 @@ class Item(pygame.sprite.Sprite):
 
 
     def __get_rand_item(self) -> str:
-        x = random.randint(0, len(item_map.keys()) - 1)
-        return list(item_map.keys())[x]
+        i = random.randint(0, len(item_map.keys()) - 1)
+        return list(item_map.keys())[i]
 
 
     def __get_rand_quality(self) -> str:
-        x = random.randint(0, len(qualities) - 1)
-        return qualities[x]
+        i = random.randint(0, len(qualities) - 1)
+        return qualities[i]
 
 
     def __gen_stats(self) -> Dict[Stat, float]:
