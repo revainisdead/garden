@@ -102,8 +102,13 @@ class Player(pygame.sprite.Sprite):
 
     def set_velocity(self) -> None:
         """Set the speed based on the direction"""
-        self.walk_sp = self.vel * self.dt
-        self.diag_sp = phys.normalize(self.vel, self.vel) * self.dt
+        # Convert dt to seconds (milliseconds / 1000)
+        dt_s = self.dt / 1000
+        self.walk_sp = self.vel * dt_s
+        self.diag_sp = phys.normalize(self.vel, self.vel) * dt_s
+
+        print("walk: {}".format(self.walk_sp))
+        print("diag: {}".format(self.diag_sp))
 
         if self.direction == c.Direction.LEFT:
             self.x_vel = -self.walk_sp
