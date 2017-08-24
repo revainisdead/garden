@@ -12,7 +12,7 @@ from .. import setup
 
 
 class SlotTaken(Exception): pass
-class BackpackFull(Exception): pass
+class AllSlotsTaken(Exception): pass
 
 
 class Slot:
@@ -107,13 +107,14 @@ class Slot:
             r.x, r.y = pos
 
 
-class _SlotMesh:
-    def __init__(self, pos: Tuple[int, int], size: Tuple[int, int]) -> None:
-        # Anything else I could use besides a 2d list? Identifiable by pos only
-        # Makes groking really difficult, and arbitrary access
+class SlotMesh:
+    def __init__(self, pos: Tuple[int, int]) -> None:
+        self.x, self.y = pos
+        self.__last_h = 0
 
-        self.__slots = self.__create_slots(pos, size)
-        self.flat_slots = [s for sublist in self.__slots for s in sublist]
+        self.__slots = [[]] # type: List[List[Slot]]
+        self.flat_slots = [] # type List[Slot]
+        #self.flat_slots = [s for sublist in self.__slots for s in sublist]
 
         self.__hide = False
         self.__drag_slot = None # type: Optional[Slot]
@@ -144,6 +145,22 @@ class _SlotMesh:
 
             slots.append(tmp)
         return slots
+
+
+    def append_grid(self, size: Tuple[int, int]) -> None:
+        # Move down the grid based on the size of the last grid.
+        self.y += c.NUM_SLOTS_WIDE * self.__last_h
+
+        tmp_slots = self.__create_slots((self.x, self.y), size)
+        for slot_list in tmp_slots:
+            self.__slots.append(slot_list)
+
+            # Append new slot_lists to flat_slots
+            for s in slot_list:
+                self.flat_slots.append(s)
+
+        # Reset last height to the current height at the end of the function.
+        self.last_h = size[1]
 
 
     def update(self, screen: pygame.surface.Surface, inp: binds.Input) -> None:
@@ -224,23 +241,13 @@ class _SlotMesh:
                 if not s.taken:
                     s.item = item
                     return
-        raise BackpackFull
+        raise AllSlotsTaken
 
 
-
-class EquippedItems(_SlotMesh):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-
-class Backpack(_SlotMesh):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-
-class Workers(_SlotMesh):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+### Slot type ###
+# Equipped
+# Backpack
+# Workers
 
 
 class SidePanel:
@@ -267,7 +274,7 @@ class SidePanel:
 
 class Inventory:
     def __init__(self) -> None:
-        self.__setup_meshes()
+        self.__setup_mesh()
 
         self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)
         self.__open = True
@@ -281,7 +288,7 @@ class Inventory:
     def __create_items(self) -> List[item.Item]:
         self.item_group = pygame.sprite.Group()
         items = [] # type: List[Item]
-        flat_s = self.backpack.flat_slots
+        flat_s = self.slot_mesh.flat_slots
 
         for i, name in enumerate(item.item_map.keys()):
             r = flat_s[i].bg_rect
@@ -295,24 +302,25 @@ class Inventory:
         return items
 
 
-    def __setup_meshes(self) -> None:
+    def __setup_mesh(self) -> None:
         # Start y value from 0, x is constant
         screenw = setup.screen_size.get_width()
         x = screenw - c.MESH_X_OFFSET
-
         y = c.MESH_Y_OFFSET
-        self.backpack = Backpack((x, y), (6, 5))
-        y += c.MESH_Y_OFFSET + 6*c.SLOT_SIZE # 6: number of backpack x slots
-        self.equipped = EquippedItems((x, y), (6, 3))
-        y += c.MESH_Y_OFFSET + 3*c.SLOT_SIZE # 3: number of equipped x slots
-        self.workers = Workers((x, y), (6, 1))
+        num_x_slots = 6
+        num_y_slots = 5
+
+        self.slot_mesh = SlotMesh((x, y))
+        for i in range(3):
+            self.slot_mesh.append_grid((num_x_slots, num_y_slots))
+            num_y_slots -= 2
 
 
     def add_item(self, item: item.Item) -> None:
         # New items always go into the backpack.
         try:
-            self.backpack.fill_next_slot(item)
-        except BackpackFull:
+            self.slot_mesh.fill_next_slot(item)
+        except AllSlotsTaken:
             pass
         else:
             self.item_group.add(item)
@@ -337,9 +345,7 @@ class Inventory:
 
     def switch(self) -> None:
         self.__open = not self.__open
-        self.backpack.switch()
-        self.equipped.switch()
-        self.workers.switch()
+        self.slot_mesh.switch()
 
 
     def update(self, screen: pygame.Surface, inp: binds.Input) -> None:
@@ -347,14 +353,11 @@ class Inventory:
 
         if self.__open:
             self.__panel.update(screen)
-            self.backpack.update(screen, inp)
-            self.equipped.update(screen, inp)
-            self.workers.update(screen, inp)
-
+            self.slot_mesh.update(screen, inp)
             self.item_group.draw(screen)
 
         if setup.screen_size.changed():
-            self.__setup_meshes()
+            self.__setup_mesh()
             #self.__move_items()
             self.__items = self.__create_items()
 
