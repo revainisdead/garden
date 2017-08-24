@@ -196,19 +196,19 @@ class Npc(pygame.sprite.Sprite):
             self.direction = self.pick_new_direction(ran_into_wall=True)
 
 
-    def handle_state(self) -> None:
-        self.animate_walk()
+    def handle_state(self, game_time: int) -> None:
+        self.animate_walk(game_time)
         self.auto_walk()
 
 
-    def update(self, dt: int, collidable_group: pygame.sprite.Group) -> None:
+    def update(self, dt: int, game_time: int, collidable_group: pygame.sprite.Group) -> None:
         self.dt = dt
         self.collidable_group = collidable_group
 
-        self.handle_state()
+        self.handle_state(game_time)
 
 
-    def animate_walk(self) -> None:
+    def animate_walk(self, game_time: int) -> None:
         if self.direction == c.Direction.NONE:
             self.animation_speed = 0
         else:
@@ -218,7 +218,7 @@ class Npc(pygame.sprite.Sprite):
             self.frame_index += 1
 
             # Setting timer for the first time
-            self.walking_timer = self.dt
+            self.walking_timer = game_time
         elif self.direction == c.Direction.NONE:
             # Select standing still images.
             if self.previous_direction == c.Direction.UP or self.previous_direction == c.Direction.DOWN:
@@ -226,12 +226,12 @@ class Npc(pygame.sprite.Sprite):
             elif self.previous_direction == c.Direction.LEFT or self.previous_direction == c.Direction.RIGHT:
                 self.frame_index = 2
         else:
-            if self.dt - self.walking_timer > self.animation_speed:
+            if game_time - self.walking_timer > self.animation_speed:
                 self.frame_index += 1
 
                 if self.frame_index >= len(self.current_frames):
                     self.frame_index = 1
-                self.walking_timer = self.dt
+                self.walking_timer = game_time
 
         self.image = self.current_frames[self.frame_index]
 

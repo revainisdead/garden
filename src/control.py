@@ -78,7 +78,6 @@ class Control:
             self.update()
             pygame.display.update()
             self.dt = self.clock.tick(self.fps)
-            print(self.dt)
 
         # When the game loop exits, let game info clean itself up.
         return self.state.cleanup()
@@ -100,14 +99,14 @@ class Control:
         self.event_loop()
 
         # This is time since start time. Will need this later but not now.
-        #self.dt = pygame.time.get_ticks()
+        self.game_time = pygame.time.get_ticks()
 
         if self.state.quit:
             self.quit = True
         elif self.state.state_done:
             self.flip_state()
 
-        self.state.update(self.screen_surface, self.dt)
+        self.state.update(self.screen_surface, self.dt, self.game_time)
 
         # In Game User Interface.
         self.game_ui.update(self.screen_surface, self.dt, self.state_name, self.state.game_info)
@@ -159,6 +158,7 @@ class State:
         # These are things that every state needs.
         self.game_info = GameInfo(
             dt = 0,
+            game_time = 0,
             inp = binds.Input()
         )
 

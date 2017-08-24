@@ -72,7 +72,7 @@ class MainMenu(control.State):
         return c.StateName.COMMONAREA
 
 
-    def update(self, surface: pygame.Surface, dt: float) -> None:
+    def update(self, surface: pygame.Surface, dt: int, game_time: int) -> None:
         """Update the state every frame"""
         self.update_sizes()
 

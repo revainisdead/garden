@@ -104,11 +104,8 @@ class Player(pygame.sprite.Sprite):
         """Set the speed based on the direction"""
         # Convert dt to seconds (milliseconds / 1000)
         dt_s = self.dt / 1000
-        self.walk_sp = self.vel * dt_s
-        self.diag_sp = phys.normalize(self.vel, self.vel) * dt_s
-
-        print("walk: {}".format(self.walk_sp))
-        print("diag: {}".format(self.diag_sp))
+        self.walk_sp = round(self.vel * dt_s)
+        self.diag_sp = round(phys.normalize(self.vel, self.vel) * dt_s)
 
         if self.direction == c.Direction.LEFT:
             self.x_vel = -self.walk_sp
@@ -214,15 +211,15 @@ class Player(pygame.sprite.Sprite):
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, dt: int, collidable_group: pygame.sprite.Group, inp: binds.Input) -> None:
+    def update(self, dt: int, game_time: int, collidable_group: pygame.sprite.Group, inp: binds.Input) -> None:
         self.dt = dt
         self.collidable_group = collidable_group
 
         self.handle_state(inp)
-        self.animate_walk()
+        self.animate_walk(game_time)
 
 
-    def animate_walk(self) -> None:
+    def animate_walk(self, game_time: int) -> None:
         if not self.direction == c.Direction.NONE:
             # If the sprite is moving, set the animation frames based on direction.
             self.current_frames = self.frames_dict[self.direction]
@@ -236,7 +233,7 @@ class Player(pygame.sprite.Sprite):
             self.frame_index += 1
 
             # Setting timer for the first time
-            self.walking_timer = self.dt
+            self.walking_timer = game_time
         elif self.direction == c.Direction.NONE:
             # Select standing still images.
             if self.previous_direction == c.Direction.UP or self.previous_direction == c.Direction.DOWN:
@@ -249,11 +246,11 @@ class Player(pygame.sprite.Sprite):
                     or self.previous_direction == c.Direction.RIGHTDOWN:
                 self.frame_index = 2
         else:
-            if self.dt - self.walking_timer > self.animation_speed:
+            if game_time - self.walking_timer > self.animation_speed:
                 self.frame_index += 1
 
                 if self.frame_index >= len(self.current_frames):
                     self.frame_index = 1
-                self.walking_timer = self.dt
+                self.walking_timer = game_time
 
         self.image = self.current_frames[self.frame_index]

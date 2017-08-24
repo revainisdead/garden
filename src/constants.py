@@ -6,7 +6,7 @@ import pygame
 CAPTION = "Garden"
 
 # Frames per second.
-FPS = 60
+FPS = 40
 PG_GET_PRESSED_LENGTH = 323
 
 
@@ -142,7 +142,7 @@ speeds = {
     "player": 3 if not DEBUG_PLAYER else 20,
     "enemy": 2 if not DEBUG_ENEMY else 30,
     "projectile": 10,
-    "npc_roaming": 1 if not DEBUG_NPC else 10,
+    "npc_roaming": 3 if not DEBUG_NPC else 10,
     "npc_running": 3,
     "camera": 3 if not DEBUG_CAMERA else 20,
 }

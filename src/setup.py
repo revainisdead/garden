@@ -25,10 +25,6 @@ class ScreenSize:
 
     def __resize(self, width: int, height: int) -> None:
         if width != self.__width and height != self.__height:
-            print("sw: {}".format(self.__width))
-            print("sh: {}".format(self.__height))
-            print("w: {} ".format(width))
-            print("h: {} ".format(height))
             self.__width = width
             self.__height = height
             self.__changed = True
