@@ -2,6 +2,8 @@ from typing import Optional, List, Tuple
 
 from typing import Tuple
 
+import traceback
+
 import pygame
 
 from . import item
@@ -32,7 +34,7 @@ class Slot:
 
     def update(self, screen: pygame.surface.Surface) -> None:
         if self.item:
-            self.taken = True
+            pass
         else:
             pygame.draw.rect(screen, c.BLACK, self.bg_rect)
 
@@ -45,9 +47,15 @@ class Slot:
 
 
     def reset(self) -> None:
-        r = self.get_rect()
-        if r:
+        if self.last_item:
             self.item = self.last_item
+
+            # Also must re-position self.item, since the last time we
+            # saw last_item it was being dragged around.
+            self.item.rect.x, self.item.rect.y = self.pos
+
+            self.last_item = None
+            self.taken = True
 
 
     def drop(self, item: item.Item) -> None:
@@ -57,11 +65,13 @@ class Slot:
         if self.taken:
             raise SlotTaken
 
-        self.item = item
-        r = self.item.rect
-        r.x, r.y = self.pos
+        if item:
+            self.item = item
+            self.item.rect.x, self.item.rect.y = self.pos
 
-        self.taken = True
+            # If a set item is set, the last item must be reset as well.
+            self.last_item = None
+            self.taken = True
 
 
     def pickup(self, pos) -> None:
@@ -79,8 +89,9 @@ class Slot:
 
 
     def drag(self, pos: Tuple[int, int]) -> None:
-        # If slot taken, is needs to stop dragging.
-        if self.last_item and not self.taken:
+        # If slot taken, it needs to stop dragging.
+        #if self.last_item and not self.taken:
+        if self.last_item:
             r = self.last_item.rect
             r.x, r.y = pos
 
@@ -161,17 +172,19 @@ class SlotMesh:
             if s:
                 if self.__drag_slot:
                     try:
+                        # Drop the old item from the drag slot into the new slot s.
                         s.drop(self.__drag_slot.last_item)
                     except SlotTaken:
                         self.__drag_slot.reset()
-                        self.__drag_slot = None
             else:
                 # Slot was not dropped on an existing slot.
                 if self.__drag_slot:
                     self.__drag_slot.reset()
-                    self.__drag_slot = None
 
-        # For dragging, ensure there is a dragging slot at the moment.
+            # Always ensure the drag slot is reset to None on mouse up.
+            self.__drag_slot = None
+
+        # For dragging, ensure the drag slot exists.
         if mp and self.__drag_slot:
             self.__drag_slot.drag(mp)
 
@@ -182,13 +195,12 @@ class SlotMesh:
 
     def check_slots(self, pos: Tuple[int, int]) -> Optional[Slot]:
         """ Returns a slot if one contains that position.
-        That was this function can be used for mousedown
+        This function can be used for mousedown
         (pickup) and mouseup (dropping)"""
-        x, y = pos
         for slot_list in self.__slots:
             for s in slot_list:
                 bg_r = s.bg_rect
-                if bg_r.collidepoint(s.pos):
+                if bg_r.collidepoint(pos):
                         return s
         return None
 
@@ -243,6 +255,7 @@ class Inventory:
         self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)
         self.__open = True
 
+        self.item_group = pygame.sprite.Group()
         self.__items = self.__create_items()
 
 
@@ -250,7 +263,6 @@ class Inventory:
     #      when gathering nodes, and should be placed in the next
     #      available slot.
     def __create_items(self) -> List[item.Item]:
-        self.item_group = pygame.sprite.Group()
         items = [] # type: List[Item]
         flat_s = self.slot_mesh.flat_slots
 
@@ -268,7 +280,7 @@ class Inventory:
         screenw = setup.screen_size.get_width()
         x = screenw - c.MESH_X_OFFSET
         y = c.MESH_Y_OFFSET
-        num_x_slots = 6
+        num_x_slots = c.NUM_SLOTS_WIDE
         num_y_slots = 5
 
         self.slot_mesh = SlotMesh((x, y))
