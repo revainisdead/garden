@@ -17,27 +17,10 @@ class AllSlotsTaken(Exception): pass
 
 class Slot:
     def __init__(self, pos: Tuple[int, int]) -> None:
-        # stores rect
-        # stores surface
-        # stores image
-        # move to new slot by moving rect
         self.taken = False
         self.item = None # type: Optional[item.Item]
-        # XXX surface should be in item because that's where the sprite
-        # will be stored
-        # Needed the interface to slot so that the item in this particular
-        # slot can change easily
-
-
-        # we need the surface here so we can get the rect and pos
-        #self.surface = pygame.Surface((c.SLOT_SIZE, c.SLOT_SIZE)).convert()
-        #self.rect = self.surface.get_rect()
-
-        # when dragging, don't hide, need to draw it on mouse
-        #self.hide = False # dragging, don't draw
-        #self.rect = self.item.rect
-
-        self.__last_pos = None # type: Tuple[int, int]
+        self.pos = pos
+        self.last_item = None # type: item.Item
 
         # Get a rect to draw the slot background.
         self.bg_rect = self.create_bg(pos)
@@ -64,46 +47,41 @@ class Slot:
     def reset(self) -> None:
         r = self.get_rect()
         if r:
-            r.x, r.y = self.__last_pos
+            self.item = self.last_item
 
 
-    def drop(self, pos: Tuple[int, int], item: item.Item) -> None:
+    def drop(self, item: item.Item) -> None:
         """
         If spot is taken, this will throw ```SlotTaken```
         """
         if self.taken:
             raise SlotTaken
 
-        #self.taken = True
-        r = self.get_rect()
-        if r:
-            print("drop.")
-            r.x, r.y = pos
-
         self.item = item
+        r = self.item.rect
+        r.x, r.y = self.pos
+
+        self.taken = True
 
 
     def pickup(self, pos) -> None:
-        """ Pickup is not equivalent to drag.
-
-        This is because when it is picked up, we need to get the location,
-        in case it's dropped on a taken slot or dropped where there is no
-        slot, then we can reset the position.
-        """
         r = self.get_rect()
         if r:
-            # Save the current item position
-            self.__last_pos = (r.x, r.y)
+            # Save a copy of the current item
+            self.last_item = self.item
 
-            print("pickup.")
+            # Remove current item from slot.
+            self.item = None
+            self.taken = False
+
             # Move center of item to mouse pos
             r.centerx, r.centery = pos
 
 
     def drag(self, pos: Tuple[int, int]) -> None:
-        r = self.get_rect()
-        if r:
-            print("drag.")
+        # If slot taken, is needs to stop dragging.
+        if self.last_item and not self.taken:
+            r = self.last_item.rect
             r.x, r.y = pos
 
 
@@ -149,8 +127,6 @@ class SlotMesh:
 
     def append_grid(self, size: Tuple[int, int]) -> None:
         # Move down the grid based on the size of the last grid.
-        self.y += c.NUM_SLOTS_WIDE * self.__last_h
-
         tmp_slots = self.__create_slots((self.x, self.y), size)
         for slot_list in tmp_slots:
             self.__slots.append(slot_list)
@@ -160,18 +136,16 @@ class SlotMesh:
                 self.flat_slots.append(s)
 
         # Reset last height to the current height at the end of the function.
-        self.last_h = size[1]
+        self.__last_h = size[1]
+        self.y += c.MESH_Y_OFFSET + self.__last_h*c.SLOT_SIZE
 
 
     def update(self, screen: pygame.surface.Surface, inp: binds.Input) -> None:
-        changed = self.handle_state(inp)
-        #if changed:
+        self.handle_state(inp)
         self.update_slots(screen)
 
 
-    def handle_state(self, inp: binds.Input) -> bool:
-        slot_changed = False
-
+    def handle_state(self, inp: binds.Input) -> None:
         lmc = inp.last_mouse_click()
         lmd = inp.last_mouse_drop()
         mp = inp.mouse_pos()
@@ -179,21 +153,17 @@ class SlotMesh:
         if lmc:
             s = self.check_slots(lmc)
             if s:
-                print("Slot picked on.")
-                slot_changed = True
-                #s = self.__drag_slot
                 self.__drag_slot = s
                 s.pickup(lmc)
 
         if lmd:
-            print("mouse up")
             s = self.check_slots(lmd)
             if s:
-                slot_changed = True
                 if self.__drag_slot:
                     try:
-                        s.drop(lmd, self.__drag_slot.item)
+                        s.drop(self.__drag_slot.last_item)
                     except SlotTaken:
+                        self.__drag_slot.reset()
                         self.__drag_slot = None
             else:
                 # Slot was not dropped on an existing slot.
@@ -203,10 +173,7 @@ class SlotMesh:
 
         # For dragging, ensure there is a dragging slot at the moment.
         if mp and self.__drag_slot:
-            print("Slot dragging.")
             self.__drag_slot.drag(mp)
-
-        return slot_changed
 
 
     def switch(self) -> None:
@@ -220,11 +187,8 @@ class SlotMesh:
         x, y = pos
         for slot_list in self.__slots:
             for s in slot_list:
-                r = s.get_rect()
-                if r:
-                    #print("slot pos: {}".format(r.topleft))
-                    #print("lmc       {}, {}".format(x, y))
-                    if r.collidepoint(pos):
+                bg_r = s.bg_rect
+                if bg_r.collidepoint(s.pos):
                         return s
         return None
 
@@ -239,7 +203,7 @@ class SlotMesh:
         for slot_list in self.__slots:
             for s in slot_list:
                 if not s.taken:
-                    s.item = item
+                    s.drop(item)
                     return
         raise AllSlotsTaken
 
@@ -291,10 +255,7 @@ class Inventory:
         flat_s = self.slot_mesh.flat_slots
 
         for i, name in enumerate(item.item_map.keys()):
-            r = flat_s[i].bg_rect
-            print(name, r.x, r.y)
-
-            item_tmp = item.Item((r.x, r.y), name)
+            item_tmp = item.Item((flat_s[i].pos), name)
             items.append(item_tmp)
 
             self.add_item(item_tmp)
@@ -337,8 +298,6 @@ class Inventory:
             #s.item = item
             #item_r = s.get_rect()
             #item_r = r.x, r.y
-
-            print("move: ", item.name, r.x, r.y)
 
             self.add_item(item)
 
