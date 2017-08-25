@@ -158,7 +158,7 @@ def start() -> None:
     global FONTS
     FONTS = tools.load_fonts(os.path.join("data", "fonts"))
     global SFX
-    #SFX = tools.load_sfx(os.path.join("data", "sounds"))
+    SFX = tools.load_sfx(os.path.join("data", "sounds"))
 
     global screen_size
     screen_size = ScreenSize()

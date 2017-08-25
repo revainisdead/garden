@@ -250,6 +250,7 @@ class SidePanel:
 
 class Inventory:
     def __init__(self) -> None:
+        print("Inventory created.")
         self.__setup_mesh()
 
         self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)
@@ -300,18 +301,18 @@ class Inventory:
 
 
     def __move_items(self) -> None:
+        """ Move all the existing items to the new slot positions. """
         self.item_group = pygame.sprite.Group()
-        flat_s = self.backpack.flat_slots
+        flat_s = self.slot_mesh.flat_slots
 
         for i, item in enumerate(self.__items):
-        #for i, item in enumerate(self.item_group):
             s = flat_s[i] # works because slots are filled in order, 0-1-2 etc.
-            r = s.bg_rect
-            #s.item = item
-            #item_r = s.get_rect()
-            #item_r = r.x, r.y
+            item.rect.x, item.rect.y = s.pos
 
+            # When the screen is resized, the slots are actually re-created.
+            # So we need to add the items back in to the slots.
             self.add_item(item)
+
 
 
     def switch(self) -> None:
@@ -329,8 +330,7 @@ class Inventory:
 
         if setup.screen_size.changed():
             self.__setup_mesh()
-            #self.__move_items()
-            self.__items = self.__create_items()
+            self.__move_items()
 
 
     def handle_state(self, inp: binds.Input) -> None:
