@@ -1,9 +1,5 @@
 from typing import Optional, List, Tuple
 
-from typing import Tuple
-
-import traceback
-
 import pygame
 
 from . import item
@@ -260,7 +256,6 @@ class SidePanel:
 
 class Inventory:
     def __init__(self) -> None:
-        print("Inventory created.")
         self.__setup_mesh()
 
         self.__panel = SidePanel(c.SIDE_PANEL_WIDTH)

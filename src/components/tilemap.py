@@ -154,7 +154,6 @@ class Map:
             Etc.
         """
         tiles = set()
-        #tiles = {}
         # x and y here represent the virtual values of the map.
         # Real point: (64, 64)
         # Virtual point: (1, 1)
@@ -558,6 +557,3 @@ class Map:
 
         self.fence_link_group.draw(surface)
         self.fence_end_group.draw(surface)
-
-        # Ensure tree tops are drawn last, they should cover tree bottoms.
-        # Let state draw tree tops, so that they can be drawn over npcs.

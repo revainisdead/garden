@@ -6,21 +6,25 @@ from . states import commonarea
 from . states import mainmenu
 
 import sys
+import traceback
 
 
 def main():
     setup.start()
 
-    state_dict = {
+    states = {
         c.StateName.MAINMENU: mainmenu.MainMenu(),
         c.StateName.COMMONAREA: commonarea.CommonArea(),
     }
 
     game = control.Control(c.CAPTION)
-    game.setup_states(state_dict, c.StateName.MAINMENU)
+    game.setup_states(states, c.StateName.MAINMENU)
     game.setup_game_ui()
 
-    game.game_loop()
+    try:
+        game.game_loop()
+    except:
+        traceback.print_exc()
 
     # The game loop has quit and we still have control of the program here.
     # Do any clean up necessary before exit.

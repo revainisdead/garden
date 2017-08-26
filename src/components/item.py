@@ -173,7 +173,7 @@ class Item(pygame.sprite.Sprite):
         # Necessary? or just hash the quality and the stats together
 
         # Workers need "people icons" and items "item icons".
-        self.type = ItemType.EQ_ITEM
+        self.type = ItemType.WORKER
 
         # Could hold data and access attributes through it
         # Or add attributes directly onto this item

@@ -146,7 +146,7 @@ class MapSize:
 
 
 def start() -> None:
-    #os.environ["SDL_VIDEO_CENTERED"] = "1"
+    os.environ["SDL_VIDEO_CENTERED"] = "1"
     pygame.init()
     pygame.font.init()
 

@@ -128,7 +128,7 @@ class Button(pygame.sprite.Sprite):
         self.game_time = 0
         self.pressed_time = 0
         # Very fast animation when pressed.
-        self.animation_speed = 100
+        self.animation_speed = 500
 
 
     def load_sprites_from_sheet(self) -> List[pygame.Surface]:

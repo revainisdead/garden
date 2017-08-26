@@ -15,6 +15,13 @@ from .. components import non_player_controlled, player, scenery, tilemap, user_
 
 
 class CommonArea(control.State):
+    """
+    def set_unique_level_data(self) -> None:
+        # Set data unique to this level
+        self.biome = None
+        self.portal_down = None
+
+    """
     def __init__(self) -> None:
         super().__init__()
 
@@ -23,6 +30,8 @@ class CommonArea(control.State):
 
         # There will be no stairs up on map initializing.
         self.stairs_up_group = pygame.sprite.Group()
+
+        self.videoresize_counter = 0
 
         # Save a copy of the first tilemap, so that we can re-create it later.
         self.farmland = self.tilemap
@@ -34,7 +43,7 @@ class CommonArea(control.State):
 
         # Trigger a screen size change to setup everything at the
         # current screen size.
-        setup.screen_size.trigger_change()
+        #setup.screen_size.trigger_change()
 
         self.stairs_down_copy = [] # type: List[pygame.sprite.Sprite]
         self.stairs_down_group = self.setup_stairs_down()
@@ -144,6 +153,8 @@ class CommonArea(control.State):
         # Draw the hud to the screen over everything else.
         # Similar to Game UI but the hud needs access to game_info.
         self.hud.update(surface, self.game_info, self.player, self.tilemap_rect.bottom)
+
+        self.periodic_videoresize(dt)
 
 
     def handle_states(self) -> None:
@@ -330,3 +341,16 @@ class CommonArea(control.State):
 
         # Finally, draw everything to the screen surface.
         surface.blit(self.entire_area, (0, 0), self.camera)
+
+
+    def periodic_videoresize(self, dt: int) -> None:
+        videoresize_rate = 3
+        self.videoresize_counter += dt
+        #print(round(game_time/1000))
+        #print(game_time)
+        #if round(game_time/1000) % videoresize_rate == 0:
+        # Convert videoresize_rate from actions per second to action.
+        if self.videoresize_counter > videoresize_rate * 2400:
+            print("Periodic resize.")
+            setup.screen_size.trigger_change()
+            self.videoresize_counter = 0
