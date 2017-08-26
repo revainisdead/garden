@@ -155,7 +155,7 @@ class CommonArea(control.State):
         # Similar to Game UI but the hud needs access to game_info.
         self.hud.update(surface, c_fps, self.player, self.tilemap_rect.bottom)
 
-        self.periodic_videoresize(dt)
+        #self.periodic_videoresize(dt)
 
 
     def handle_states(self) -> None:
@@ -345,6 +345,7 @@ class CommonArea(control.State):
 
 
     def periodic_videoresize(self, dt: int) -> None:
+        """ Debug videoresizes, or enable for linux. """
         videoresize_rate = 7    # roughly will occur this many times a second
         self.videoresize_counter += dt
 

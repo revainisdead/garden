@@ -316,7 +316,7 @@ class Inventory:
             self.item_group.add(item)
 
 
-    def readd_item(self, item: item.Item, s_index: int) -> None:
+    def re_add_item(self, item: item.Item, s_index: int) -> None:
         try:
             self.slot_mesh.refill_slot(item, s_index)
         except AllSlotsTaken:
@@ -328,21 +328,31 @@ class Inventory:
     def __move_items(self) -> None:
         """ Move all the existing items to the new slot positions. """
         self.item_group = pygame.sprite.Group()
-        flat_s = self.slot_mesh.flat_slots
+        flat_s = self.last_flat_slots
 
-        for i, item in enumerate(self.__items):
-        #for i, slot in enumerate(flat_s)
-            s = flat_s[i] # works because slots are filled in order, 0-1-2 etc.
-            item.rect.x, item.rect.y = s.pos
+        #for i, item in enumerate(self.__items):
+        for i, slot in enumerate(flat_s):
+            #s = flat_s[i] # works because slots are filled in order, 0-1-2 etc.
+            # I just need to loop over the slots
+            # put the item that used to be in the last in the newly
+            # created slot.
+            #
+            # I can put the self.__items into the game object soon.
+            last_slot = self.last_flat_slots[i]
 
-            # - When the screen is resized, the slots are actually re-created.
-            # So we need to add the items back in to the slots.
-            # - But we need to add them back into the equivalent slot they were
-            # in before.
-            self.readd_item(item, i)
+            # Only refill the slot if the slot has an item in it.
+            if last_slot.taken:
+                slot.item = last_slot.item
+                #s.item.rect.x, s.item.rect.y = ls.pos
+
+                # - When the screen is resized, the slots are actually re-created.
+                # So we need to add the items back in to the slots.
+                # - But we need to add them back into the equivalent slot they were
+                # in before.
+                self.re_add_item(slot.item, i)
 
         # Let old slots get garbage collected.
-        self.slot_mesh.flat_slots = None
+        self.last_flat_slots = None
 
 
     def switch(self) -> None:
@@ -359,6 +369,7 @@ class Inventory:
             self.item_group.draw(screen)
 
         if setup.screen_size.changed():
+            self.last_flat_slots = self.slot_mesh.flat_slots
             self.__setup_mesh()
             self.__move_items()
 
