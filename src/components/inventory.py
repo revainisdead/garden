@@ -217,7 +217,19 @@ class SlotMesh:
                 s.update(screen)
 
 
+    def refill_slot(self, item: item.Item, s_index: int) -> None:
+        """ Fill the slot that is at the given index with the item. """
+        i = -1   # Count index because it's a 2D list.
+        for slot_list in self.__slots:
+            for s in slot_list:
+                i += 1
+                if i == s_index:
+                    s.drop(item)
+                    return
+
+
     def fill_next_slot(self, item: item.Item) -> None:
+        """ Fill next open slot. """
         for slot_list in self.__slots:
             for s in slot_list:
                 if not s.taken:
@@ -304,18 +316,33 @@ class Inventory:
             self.item_group.add(item)
 
 
+    def readd_item(self, item: item.Item, s_index: int) -> None:
+        try:
+            self.slot_mesh.refill_slot(item, s_index)
+        except AllSlotsTaken:
+            pass
+        else:
+            self.item_group.add(item)
+
+
     def __move_items(self) -> None:
         """ Move all the existing items to the new slot positions. """
         self.item_group = pygame.sprite.Group()
         flat_s = self.slot_mesh.flat_slots
 
         for i, item in enumerate(self.__items):
+        #for i, slot in enumerate(flat_s)
             s = flat_s[i] # works because slots are filled in order, 0-1-2 etc.
             item.rect.x, item.rect.y = s.pos
 
-            # When the screen is resized, the slots are actually re-created.
+            # - When the screen is resized, the slots are actually re-created.
             # So we need to add the items back in to the slots.
-            self.add_item(item)
+            # - But we need to add them back into the equivalent slot they were
+            # in before.
+            self.readd_item(item, i)
+
+        # Let old slots get garbage collected.
+        self.slot_mesh.flat_slots = None
 
 
     def switch(self) -> None:
