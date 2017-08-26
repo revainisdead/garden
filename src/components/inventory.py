@@ -97,20 +97,30 @@ class Slot:
 
 
 class SlotMesh:
+    """
+    Abstraction that holds all slots and grids of slots.
+    """
     def __init__(self, pos: Tuple[int, int]) -> None:
         self.x, self.y = pos
         self.__last_h = 0
 
         self.__slots = [[]] # type: List[List[Slot]]
         self.flat_slots = [] # type List[Slot]
-        #self.flat_slots = [s for sublist in self.__slots for s in sublist]
 
         self.__hide = False
         self.__drag_slot = None # type: Optional[Slot]
 
 
     def __create_slots(self, pos: Tuple[int, int], size: Tuple[int, int]) -> List[Slot]:
-        #self.__slots = [[Slot() for y in range(size[1])] for x in range(size[0])]
+        """
+        Set up slots and their positions.
+
+        2D List comprehension example.
+        ```self.__slots = [[Slot() for y in range(size[1])] for x in range(size[0])]```
+
+        1D List comprehension example for flattening.
+        ```self.flat_slots = [s for sublist in self.__slots for s in sublist]```
+        """
         slots = [] # type: List[List[Slot]]
 
         x_diff = c.SLOT_OFFSET
@@ -277,7 +287,6 @@ class Inventory:
 
 
     def __setup_mesh(self) -> None:
-        # Start y value from 0, x is constant
         screenw = setup.screen_size.get_width()
         x = screenw - c.MESH_X_OFFSET
         y = c.MESH_Y_OFFSET

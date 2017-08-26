@@ -42,9 +42,10 @@ class Stat(enum.Enum):
     CHOP = 6
 
 
+# EQ_ITEM
 class ItemType(enum.Enum):
     WORKER = 0
-    EQ_ITEM = 1
+    EQUIPMENT = 1
 
 
 class Qlty(enum.Enum):
