@@ -21,6 +21,7 @@ def main():
     game.setup_states(states, c.StateName.MAINMENU)
     game.setup_game_ui()
 
+    # Never let exceptions crash the game loop.
     try:
         game.game_loop()
     except:

@@ -318,7 +318,6 @@ class Inventory:
             self.add_item(item)
 
 
-
     def switch(self) -> None:
         self.__open = not self.__open
         self.slot_mesh.switch()

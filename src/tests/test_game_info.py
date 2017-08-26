@@ -1,6 +1,6 @@
 from typing import Any
 
-from .. import control
+from .. import gameinfo
 
 import contextlib
 import unittest
@@ -8,7 +8,7 @@ import unittest
 
 class TestGameInfo(unittest.TestCase):
     def setUp(self) -> None:
-        self.game_info = control.GameInfo(test="cat", test_two="dog")
+        self.game_info = gameinfo.GameInfo(test="cat", test_two="dog")
 
     def tearDown(self) -> None:
         del self.game_info["test"]

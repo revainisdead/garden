@@ -8,6 +8,7 @@ import pygame
 from .. import binds
 from .. import constants as c
 from .. import control
+from .. import gameinfo
 from .. import setup
 from .. import tools
 
@@ -37,13 +38,13 @@ class CommonArea(control.State):
         self.farmland = self.tilemap
 
 
-    def startup(self, game_info: control.GameInfo) -> None:
+    def startup(self, game_info: gameinfo.GameInfo) -> None:
         self.game_info = game_info
         self.state = c.StateName.COMMONAREA
 
         # Trigger a screen size change to setup everything at the
         # current screen size.
-        #setup.screen_size.trigger_change()
+        setup.screen_size.trigger_change()
 
         self.stairs_down_copy = [] # type: List[pygame.sprite.Sprite]
         self.stairs_down_group = self.setup_stairs_down()
@@ -136,8 +137,8 @@ class CommonArea(control.State):
         self.hud = user_interface.Hud()
 
 
-    def update(self, surface: pygame.Surface, dt: int, game_time: int) -> None:
-        """Update the state every frame"""
+    def update(self, surface: pygame.Surface, dt: int, game_time: int, c_fps: int) -> None:
+        """ Update the state every frame. """
         # Let this state control the map size update.
         setup.map_size.update(self.biome)
 
@@ -152,7 +153,7 @@ class CommonArea(control.State):
 
         # Draw the hud to the screen over everything else.
         # Similar to Game UI but the hud needs access to game_info.
-        self.hud.update(surface, self.game_info, self.player, self.tilemap_rect.bottom)
+        self.hud.update(surface, c_fps, self.player, self.tilemap_rect.bottom)
 
         self.periodic_videoresize(dt)
 
@@ -344,13 +345,11 @@ class CommonArea(control.State):
 
 
     def periodic_videoresize(self, dt: int) -> None:
-        videoresize_rate = 3
+        videoresize_rate = 7    # roughly will occur this many times a second
         self.videoresize_counter += dt
-        #print(round(game_time/1000))
-        #print(game_time)
-        #if round(game_time/1000) % videoresize_rate == 0:
+
         # Convert videoresize_rate from actions per second to action.
-        if self.videoresize_counter > videoresize_rate * 2400:
+        if self.videoresize_counter > videoresize_rate * 1000:
             print("Periodic resize.")
             setup.screen_size.trigger_change()
             self.videoresize_counter = 0

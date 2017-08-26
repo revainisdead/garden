@@ -2,9 +2,10 @@ from typing import Any, Dict
 
 import pygame
 
+from .. import binds
 from .. import constants as c
 from .. import control
-from .. import binds
+from .. import gameinfo
 from .. import setup
 from .. components import user_interface
 
@@ -24,7 +25,7 @@ class MainMenu(control.State):
         self.allow_input = True
 
 
-    def startup(self, game_info: control.GameInfo) -> None:
+    def startup(self, game_info: gameinfo.GameInfo) -> None:
         """Called each time the state is entered
 
         Currently takes in game_info so that the main menu can
@@ -63,16 +64,17 @@ class MainMenu(control.State):
         ]
 
         self.menu_group = pygame.sprite.Group(
-                selection1,
-                selection2,
-                selection3)
+            selection1,
+            selection2,
+            selection3
+        )
 
 
     def set_next_state(self) -> c.StateName:
         return c.StateName.COMMONAREA
 
 
-    def update(self, surface: pygame.Surface, dt: int, game_time: int) -> None:
+    def update(self, surface: pygame.Surface, dt: int, game_time: int, c_fps: int) -> None:
         """Update the state every frame"""
         self.update_sizes()
 

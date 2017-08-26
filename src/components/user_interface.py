@@ -11,6 +11,7 @@ from . import inventory
 
 from .. import binds
 from .. import constants as c
+from .. import gameinfo
 from .. import setup
 from .. import tools
 
@@ -204,15 +205,17 @@ class Hud:
             self.y = c.IMMUTABLE_HUD_Y
 
 
-    def update(self, screen: pygame.Surface, game_info: Dict[str, Any], player: pygame.sprite.Sprite, map_height: int) -> None:
-        self.update_sizes()
+    def update(self, screen: pygame.Surface, c_fps: int, player: pygame.sprite.Sprite, map_height: int) -> None:
+        if setup.screen_size.changed():
+            self.update_sizes()
 
-        # Don't need game_info for clock but will still need it later.
         self.update_clock()
         self.update_coords(player.rect.x, player.rect.y, map_height)
+        self.c_fps = c_fps
 
         self.render_clock(screen)
         self.render_coords(screen)
+        self.render_fps(screen)
 
 
     def update_clock(self) -> None:
@@ -243,6 +246,11 @@ class Hud:
         text_rect = text.get_rect(center=(self.x + c.IMMUTABLE_HUD_X_OFFSET*2, self.y))
         surface.blit(text, text_rect)
 
+
+    def render_fps(self, surface: pygame.surface.Surface) -> None:
+        text = self.font.render(str(round(self.c_fps)), True, c.SELECTED_GRAY)
+        text_rect = text.get_rect(center=(self.x + c.IMMUTABLE_HUD_X_OFFSET*4, self.y))
+        surface.blit(text, text_rect)
 
     def notification(self) -> None: pass
     def detect_item_change(self) -> None:
@@ -290,9 +298,7 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    # XXX Importing control.GameInfo causes circular import.
-    # Change game_info from Any to GameInfo at some point.
-    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: Any) -> None:
+    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo) -> None:
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:

@@ -20,42 +20,10 @@ import pygame
 
 from . import binds
 from . import constants as c
+from . import gameinfo
 from . import keys
 from . import setup
 from . components import user_interface, util
-
-
-class GameInfo(dict):
-    """
-    Wrapper around dict that allow dot access for game info type safety.
-
-    Usage:
-        >>> game_info = GameInfo(title="test", players=5)
-        >>> game_info.title
-        test
-        >>> game_info.players
-        5
-        >>> game_info.keys()
-        dict_keys(['title', 'players'])
-        >>> game_info.values()
-        dict_values(['test', 5])
-        >>> json.dumps(g__e_info)
-        '{"title": "test", "players": 5}'
-    """
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__()
-        for k, v in kwargs.items():
-            self.__setitem__(k, v)
-
-    def __getitem__(self, *args, **kwargs):
-        """ Overwrite the ability to access members using square brackets. """
-        raise KeyError
-
-    def __getattr__(self, key: str) -> Any:
-        return self.get(key)
-
-    def __setattr__(self, key: str, value: Any) -> None:
-        self.__setitem__(key, value)
 
 
 class Control:
@@ -63,6 +31,7 @@ class Control:
         self.quit = False
         self.dt = 0.0
         self.fps = c.FPS
+        self.c_fps = 0 # Current FPS from pygame's Clock.
         pygame.display.set_caption(caption)
         self.clock = pygame.time.Clock()
 
@@ -78,8 +47,9 @@ class Control:
             self.update()
             pygame.display.update()
             self.dt = self.clock.tick(self.fps)
+            self.c_fps = self.clock.get_fps()
 
-        # When the game loop exits, let game info clean itself up.
+        # When the game loop exits, let state clean up game info.
         return self.state.cleanup()
 
 
@@ -89,13 +59,10 @@ class Control:
                 self.quit = True
             else:
                 self.state.game_info.inp.update(event)
-                #binds.INPUT.update(event)
 
 
     def update(self) -> None:
-        """Connects to the main game loop.
-        Do any updates needed.
-        """
+        """ Connects to the main game loop. """
         self.event_loop()
 
         # This is time since start time. Will need this later but not now.
@@ -106,7 +73,7 @@ class Control:
         elif self.state.state_done:
             self.flip_state()
 
-        self.state.update(self.screen_surface, self.dt, self.game_time)
+        self.state.update(self.screen_surface, self.dt, self.game_time, self.c_fps)
 
         # In Game User Interface.
         self.game_ui.update(self.screen_surface, self.state_name, self.state.game_info)
@@ -156,14 +123,14 @@ class State:
         self.previous = None # type: c.StateName
 
         # These are things that every state needs.
-        self.game_info = GameInfo(
+        self.game_info = gameinfo.GameInfo(
             dt = 0,
             game_time = 0,
             inp = binds.Input()
         )
 
 
-    def dump_game_info(self) -> GameInfo:
+    def dump_game_info(self) -> gameinfo.GameInfo:
         return self.game_info
 
 
@@ -183,7 +150,7 @@ class State:
                 v.cleanup() # type: ignore
 
 
-    def startup(self, game_info: GameInfo) -> None:
+    def startup(self, game_info: gameinfo.GameInfo) -> None:
         raise NotImplementedError
 
 
