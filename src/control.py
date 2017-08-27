@@ -39,7 +39,7 @@ class Control:
 
         self.state = None # type: State
         self.state_name = None # type: c.StateName
-        self.state_dict = {} # type: Dict[c.StateName, State]
+        self.states = {} # type: Dict[c.StateName, State]
 
 
     def game_loop(self) -> None:
@@ -83,10 +83,10 @@ class Control:
         setup.screen_size.reset()
 
 
-    def setup_states(self, state_dict, start_state) -> None:
-        self.state_dict = state_dict
+    def setup_states(self, states, start_state) -> None:
+        self.states = states
         self.state_name = start_state
-        self.state = self.state_dict[self.state_name]
+        self.state = self.states[self.state_name]
         print("Initial state in control object: {}".format(self.state_name))
 
 
@@ -102,7 +102,7 @@ class Control:
         game_info = self.state.dump_game_info()
         self.state.cleanup()
 
-        self.state = self.state_dict[self.state_name]
+        self.state = self.states[self.state_name]
 
         # Startup state when switching to it with the dumped game info.
         self.state.startup(game_info)
@@ -134,11 +134,8 @@ class State:
         return self.game_info
 
 
-    def cleanup(self) -> None:
+    def call_cleanups(self) -> None:
         """
-        This must be called to give the objects in the game info
-        a chance to cleanup.
-
         If the item in game_info is an object (a.k.a. has the __class__
         attribute) then call its cleanup method.
         """
@@ -148,6 +145,18 @@ class State:
                 # has a cleanup method. It isn't guarenteed to, but I can
                 # enforce that it does. Ignore the type.
                 v.cleanup() # type: ignore
+
+
+    def cleanup(self) -> None:
+        """
+        This must be called to give the objects in the game info
+        a chance to cleanup.
+        """
+        self.call_cleanups()
+
+        # I only need to save the npc locations when
+        #self.game_info.npc_group = self.npc_group
+        # mainmenu won't have noc_group, not sure what to do.
 
 
     def startup(self, game_info: gameinfo.GameInfo) -> None:

@@ -42,6 +42,8 @@ class CommonArea(control.State):
         self.game_info = game_info
         self.state = c.StateName.COMMONAREA
 
+        self.game_info.tilemap = self.tilemap
+
         # Trigger a screen size change to setup everything at the
         # current screen size.
         setup.screen_size.trigger_change()
