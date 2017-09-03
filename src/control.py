@@ -23,7 +23,7 @@ from . import constants as c
 from . import gameinfo
 from . import keys
 from . import setup
-from . components import user_interface, util
+from . components import user_interface
 
 
 class Control:

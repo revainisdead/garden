@@ -12,7 +12,7 @@ from .. import gameinfo
 from .. import setup
 from .. import tools
 
-from .. components import non_player_controlled, player, scenery, tilemap, user_interface, util
+from .. components import non_player_controlled, player, scenery, tilemap, user_interface
 
 
 class CommonArea(control.State):
@@ -60,7 +60,7 @@ class CommonArea(control.State):
 
     def setup_map(self, biome: c.Biome) -> tilemap.Map:
         temp_map = tilemap.Map(setup.map_size.get_grid_width(), setup.map_size.get_grid_height(), setup.map_size.get_width(), setup.map_size.get_height(), biome)
-        self.collidable_group = temp_map.create_collidables()
+        self.collidable_grid = temp_map.create_collidables()
         self.tilemap_rect = temp_map.map_surface.get_rect()
         self.entire_area = pygame.Surface((self.tilemap_rect.width, self.tilemap_rect.height)).convert()
         self.entire_area_rect = self.entire_area.get_rect()
@@ -116,7 +116,8 @@ class CommonArea(control.State):
             temp_group.add(scenery.Stairs(x, y, "stairs_down"))
 
             # XXX Collidables for stairs should probably be handled by tilemap.
-            self.collidable_group.add(util.Collidable(x, y))
+            self.collidable_grid[int(x/c.TILE_SIZE)][int(y/c.TILE_SIZE)] = 1
+            #self.collidable_group.add(util.Collidable(x, y))
 
         return temp_group
 
@@ -132,7 +133,8 @@ class CommonArea(control.State):
         self.stairs_up_group.add(scenery.Stairs(x, y, "stairs_up"))
 
         # XXX Collidables for stairs should probably be handled by tilemap.
-        self.collidable_group.add(util.Collidable(x, y))
+        self.collidable_grid[int(x/c.TILE_SIZE)][int(y/c.TILE_SIZE)] = 1
+        #self.collidable_group.add(util.Collidable(x, y))
 
 
     def setup_hud(self) -> None:
@@ -190,8 +192,8 @@ class CommonArea(control.State):
 
 
     def update_sprites(self) -> None:
-        self.player_group.update(self.game_info.dt, self.game_info.game_time, self.collidable_group, self.game_info.inp)
-        self.npc_group.update(self.game_info.dt, self.game_info.game_time, self.collidable_group)
+        self.player_group.update(self.game_info.dt, self.game_info.game_time, self.collidable_grid, self.game_info.inp)
+        self.npc_group.update(self.game_info.dt, self.game_info.game_time, self.collidable_grid)
         self.stairs_down_group.update(self.player.rect)
 
         # XXX separate into: def handle_biome(self)

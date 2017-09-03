@@ -4,7 +4,7 @@ import random
 
 import pygame
 
-from . import helpers, util
+from . import helpers
 
 from .. import constants as c
 from .. import setup
@@ -198,7 +198,9 @@ class Npc(pygame.sprite.Sprite):
 
     def handle_state(self, game_time: int) -> None:
         self.animate_walk(game_time)
-        self.auto_walk()
+
+        # XXX Rework. Player should inherit from npc.
+        #self.auto_walk()
 
 
     def update(self, dt: int, game_time: int, collidable_group: pygame.sprite.Group) -> None:

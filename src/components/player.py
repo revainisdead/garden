@@ -5,7 +5,6 @@ import random
 import pygame
 
 from . import helpers
-from . import util
 
 from .. import binds
 from .. import constants as c
@@ -177,26 +176,49 @@ class Player(pygame.sprite.Sprite):
             self.check_y_collisions(collided)
 
 
-    def check_x_collisions(self, collided: pygame.sprite.Sprite) -> None:
-        if self.rect.x < collided.rect.x:
-            self.rect.right = collided.rect.left
-        elif self.rect.x > collided.rect.x:
-            self.rect.left = collided.rect.right
+    def check_x_collisions(self, collided: pygame.rect.Rect) -> None:
+        if self.rect.x < collided.x:
+            self.rect.right = collided.left
+        elif self.rect.x > collided.x:
+            self.rect.left = collided.right
         self.x_vel = 0
 
 
-    def check_y_collisions(self, collided: pygame.sprite.Sprite) -> None:
-        if self.rect.y > collided.rect.y:
-            self.rect.y = collided.rect.bottom
-        elif self.rect.y < collided.rect.y:
-            self.rect.bottom = collided.rect.top
+    def check_y_collisions(self, collided: pygame.rect.Rect) -> None:
+        if self.rect.y > collided.y:
+            self.rect.y = collided.bottom
+        elif self.rect.y < collided.y:
+            self.rect.bottom = collided.top
         self.y_vel = 0
 
 
-    def get_closest_collisions(self) -> Optional[pygame.sprite.Sprite]:
-        # XXX Check for the collidable that is the closest to the player's
+    def get_closest_collisions(self) -> Optional[pygame.rect.Rect]:
+        """
+        # XXX Later check for the collidable that is the closest to the player's
         # center.
-        return pygame.sprite.spritecollideany(self, self.collidable_group)
+        Inefficient method: return pygame.sprite.spritecollideany(self, self.collidable_group)
+        """
+        # Find the tiles around the current tile. Loop through (-1, 0, 1).
+        for i in range(-1, 2, 1):
+            for j in range(-1, 2, 1):
+                try:
+                    x = self.rect.x
+                    y = self.rect.y
+                    ts = c.TILE_SIZE
+
+                    # Get the nearest grid point. Truncate to the nearest
+                    # multiple of 64 (Eg. 130 - 130 % 64 => 128 / 64 => 2)
+                    grid_x = int((self.rect.x - (self.rect.x % ts)) / ts)
+                    grid_y = int((self.rect.y - (self.rect.y % ts)) / ts)
+
+                    if self.collidable_grid[grid_x + i][grid_y + j] > 0:
+                        # Expand grid_x and grid_y  back into normal
+                        # coords (*64), then add the current i and j.
+                        rect = pygame.rect.Rect((grid_x*64 + i*ts, grid_y*64 + j*ts), (c.TILE_SIZE, c.TILE_SIZE))
+                        if self.rect.colliderect(rect):
+                            return rect
+                except IndexError:
+                    pass
 
 
     def handle_state(self, inp: binds.Input) -> None:
@@ -211,9 +233,9 @@ class Player(pygame.sprite.Sprite):
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, dt: int, game_time: int, collidable_group: pygame.sprite.Group, inp: binds.Input) -> None:
+    def update(self, dt: int, game_time: int, collidable_grid: List[List[int]], inp: binds.Input) -> None:
         self.dt = dt
-        self.collidable_group = collidable_group
+        self.collidable_grid = collidable_grid
 
         self.handle_state(inp)
         self.animate_walk(game_time)

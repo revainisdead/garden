@@ -4,7 +4,7 @@ import random
 
 import pygame
 
-from . import helpers, scenery, util
+from . import helpers, scenery
 
 from .. import constants as c
 from .. import setup
@@ -518,6 +518,7 @@ class Map:
 
 
     def create_collidables(self) -> pygame.sprite.Group:
+        """
         collidable_group = pygame.sprite.Group()
 
         for y in range(self.height):
@@ -526,6 +527,8 @@ class Map:
                     collidable_group.add(util.Collidable(x * c.TILE_SIZE, y * c.TILE_SIZE))
 
         return collidable_group
+        """
+        return self.collidable_grid
 
 
     def find_random_open_location(self) -> Tuple[int, int]:
@@ -543,7 +546,7 @@ class Map:
         # Test tiles as dict
         #for tile in list(self.tiles.values()):
         for tile in self.tiles:
-            if camera.colliderect(tile):
+            if camera.colliderect(tile.rect):
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
 
         self.water_corner_cut_group.draw(surface)

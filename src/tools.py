@@ -6,7 +6,6 @@ from PIL import Image
 import pygame
 
 from . import constants as c
-from . components import util
 
 
 # XXX Unused
