@@ -8,6 +8,7 @@ from . import helpers, scenery
 
 from .. import constants as c
 from .. import setup
+from .. import tools
 
 
 #all_tile_names
@@ -543,20 +544,16 @@ class Map:
 
 
     def update(self, surface: pygame.Surface, camera: pygame.Rect) -> None:
-        # Test tiles as dict
-        #for tile in list(self.tiles.values()):
         for tile in self.tiles:
             if camera.colliderect(tile.rect):
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
 
         self.water_corner_cut_group.draw(surface)
 
-        # Draw scenery after tiles
-        self.bush_group.draw(surface)
-
-        # Draw tree shadows under the tree base.
-        self.tree_shadow_group.draw(surface)
-        self.tree_bottom_group.draw(surface)
-
-        self.fence_link_group.draw(surface)
-        self.fence_end_group.draw(surface)
+        tools.draw_visible(surface, camera, [
+                self.bush_group, # Draw scenery after tiles
+                self.tree_shadow_group, # Draw tree shadows under the tree
+                self.tree_bottom_group,
+                self.fence_link_group,
+                self.fence_end_group,
+            ])

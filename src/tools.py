@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 import os
 
@@ -223,3 +223,15 @@ def test_collide(sprite: pygame.sprite.Sprite, x_vel: int, y_vel: int, collidabl
                 hit_wall = True
 
     return hit_wall
+
+
+def draw_visible(surface: pygame.surface.Surface, camera: pygame.rect.Rect, groups: List[Iterable[pygame.sprite.Sprite]]) -> None:
+    """
+    Takes a list of sprite groups or a list of sprites, as long as
+    the items in the iterable are sprites.
+    """
+    #return { item.rect for item in group if camera.colliderect(item.rect) }
+    #vis = { item for item in group if camera.colliderect(item.rect) }
+    for items in groups:
+        tmp_group = pygame.sprite.Group({ item for item in items if camera.colliderect(item.rect) })
+        tmp_group.draw(surface)

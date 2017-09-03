@@ -337,12 +337,7 @@ class CommonArea(control.State):
 
         self.tilemap.update(self.entire_area, self.camera)
 
-        self.stairs_down_group.draw(self.entire_area)
-        self.stairs_up_group.draw(self.entire_area)
-        self.npc_group.draw(self.entire_area)
-        # Draw player over npc's, to make player feel more important...
-        self.player_group.draw(self.entire_area)
-        self.tilemap.tree_top_group.draw(self.entire_area)
+        tools.draw_visible(self.entire_area, self.camera, [self.stairs_down_group, self.stairs_up_group, self.npc_group, self.player_group, self.tilemap.tree_top_group])
 
         # Finally, draw everything to the screen surface.
         surface.blit(self.entire_area, (0, 0), self.camera)
