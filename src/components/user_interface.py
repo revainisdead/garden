@@ -82,18 +82,6 @@ class MenuSelection(pygame.sprite.Sprite):
         surface.blit(text, text_rect)
 
 
-class Tooltip(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, sprite_name: str) -> None:
-        super().__init__()
-        sprite = setup.GFX["tooltip_bubble"]
-
-        self.name = sprite_name
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TOOLTIP_MULT)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-
     def render_text(self) -> None:
         pass
 
@@ -322,5 +310,4 @@ class GameUI:
 
 
     def blit_images(self, screen: pygame.Surface) -> None:
-        # Draw sprites onto the screen
         self.button_group.draw(screen)
