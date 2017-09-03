@@ -1,7 +1,9 @@
 from typing import Any, Dict, Iterable, List, Tuple
 
 import time
+import threading
 import random
+import queue
 
 import pygame
 
@@ -21,7 +23,6 @@ class CommonArea(control.State):
         # Set data unique to this level
         self.biome = None
         self.portal_down = None
-
     """
     def __init__(self) -> None:
         super().__init__()
@@ -43,6 +44,7 @@ class CommonArea(control.State):
         self.state = c.StateName.COMMONAREA
 
         self.game_info.tilemap = self.tilemap
+        self.game_info.thread_queue = queue.Queue() # type: queue.Queue[threading.Thread]
 
         # Trigger a screen size change to setup everything at the
         # current screen size.
@@ -143,6 +145,11 @@ class CommonArea(control.State):
 
     def update(self, surface: pygame.Surface, dt: int, game_time: int, c_fps: int) -> None:
         """ Update the state every frame. """
+        #self.blit_images(surface)
+        draw_thread = threading.Thread(target=self.blit_images, args=(surface,))
+        self.game_info.thread_queue.put(draw_thread)
+        draw_thread.start()
+
         # Let this state control the map size update.
         setup.map_size.update(self.biome)
 
@@ -153,7 +160,7 @@ class CommonArea(control.State):
         self.update_map()
         self.update_sprites()
         self.handle_states()
-        self.blit_images(surface)
+        #self.blit_images(surface)
 
         # Draw the hud to the screen over everything else.
         # Similar to Game UI but the hud needs access to game_info.

@@ -49,6 +49,12 @@ class Control:
             self.dt = self.clock.tick(self.fps)
             self.c_fps = self.clock.get_fps()
 
+            # Sync threads with main thread.
+            if self.state_name == c.StateName.COMMONAREA:
+                while not self.state.game_info.thread_queue.empty():
+                    t = self.state.game_info.thread_queue.get()
+                    t.join()
+
         # When the game loop exits, let state clean up game info.
         return self.state.cleanup()
 

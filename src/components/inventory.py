@@ -52,6 +52,8 @@ class Slot:
 
             self.last_item = None
             self.taken = True
+        else:
+            self.item = None
 
 
     def drop(self, item: item.Item) -> None:
@@ -90,6 +92,12 @@ class Slot:
         if self.last_item:
             r = self.last_item.rect
             r.x, r.y = pos
+
+
+    def clear(self) -> None:
+        self.item = None
+        self.last_item = None
+        self.taken = False
 
 
 class SlotMesh:
@@ -187,6 +195,7 @@ class SlotMesh:
                 if self.__drag_slot:
                     self.__drag_slot.reset()
 
+            self.__drag_slot.clear()
             # Always ensure the drag slot is reset to None on mouse up.
             self.__drag_slot = None
 

@@ -26,3 +26,9 @@ while not self.__thread_queue.empty():
     print(t.name)
     t.join()
 """
+
+
+- run main in thread
+- thread queue accessible from control
+- put thread queue in game info
+- join threads at the end of game loop
