@@ -3,6 +3,7 @@ from typing import Optional, List, Tuple
 import pygame
 
 from . import item
+from . import Tooltip
 
 from .. import binds
 from .. import constants as c
@@ -114,6 +115,8 @@ class SlotMesh:
         self.__hide = False
         self.__drag_slot = None # type: Optional[Slot]
 
+        self.tt = None # type: Tooltip
+
 
     def __create_slots(self, pos: Tuple[int, int], size: Tuple[int, int]) -> List[Slot]:
         """
@@ -166,22 +169,24 @@ class SlotMesh:
 
 
     def update(self, screen: pygame.surface.Surface, inp: binds.Input) -> None:
-        self.handle_state(inp)
+        self.handle_state(screen, inp)
         self.update_slots(screen)
 
 
-    def handle_state(self, inp: binds.Input) -> None:
+    def handle_state(self, screen: pygame.surface.Surface, inp: binds.Input) -> None:
         lmc = inp.last_mouse_click()
         lmd = inp.last_mouse_drop()
         mp = inp.mouse_pos()
 
         if lmc:
+            # XXX self.handle_click(lmc)
             s = self.check_slots(lmc)
             if s:
                 self.__drag_slot = s
                 s.pickup(lmc)
 
         if lmd:
+            # XXX self.handle_mouse_down(lmd)
             s = self.check_slots(lmd)
             if s:
                 if self.__drag_slot:
@@ -202,6 +207,21 @@ class SlotMesh:
         # For dragging, ensure the drag slot exists.
         if mp and self.__drag_slot:
             self.__drag_slot.drag(mp)
+        elif mp and not self.__drag_slot:
+            # XXX self.handle_tooltip()
+            s = self.check_slots(mp)
+            if s and not self.tt and s.taken:
+                x, y = s.pos
+                self.tt = Tooltip(x, y, s)
+            elif s and self.tt:
+                # In this case, the tooltip will be drawn. Unless the slot
+                # in the tooltip does not match the slow that is now being
+                # hovered. Which can happen if the mouse moves too fast to
+                # register the correct mp.
+                if s != self.tt.slot:
+                    self.tt = None
+            elif s is None:
+                self.tt = None
 
 
     def switch(self) -> None:
@@ -245,6 +265,11 @@ class SlotMesh:
                     s.drop(item)
                     return
         raise AllSlotsTaken
+
+
+    def update_tooltip(self, screen: pygame.surface.Surface) -> None:
+        if self.tt:
+            self.tt.show(screen)
 
 
 ### Slot type ###
@@ -376,6 +401,7 @@ class Inventory:
             self.__panel.update(screen)
             self.slot_mesh.update(screen, inp)
             self.item_group.draw(screen)
+            self.slot_mesh.update_tooltip(screen)
 
         if setup.screen_size.changed():
             self.last_flat_slots = self.slot_mesh.flat_slots
