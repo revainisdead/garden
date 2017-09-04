@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 from collections import OrderedDict
 from datetime import datetime
@@ -8,6 +8,7 @@ import pygame
 
 from . import helpers
 from . import inventory
+from . import item
 
 from .. import binds
 from .. import constants as c
@@ -164,7 +165,6 @@ class Button(pygame.sprite.Sprite):
     # XXX Unused but can be used to either write to keybind onto the
     # button or used to draw the tooltip, which can include the description
     # and probably the keybind as well.
-    """
     def render_name(self, surface) -> None:
         if self.pressed:
             text = self.font.render(menu_labels[self.name], True, c.WHITE)
@@ -173,7 +173,6 @@ class Button(pygame.sprite.Sprite):
 
         text_rect = text.get_rect(center=(setup.screen_size.get_width()/2, self.rect.y + self.rect.height/2))
         surface.blit(text, text_rect)
-    """
 
 
 class Hud:
@@ -286,11 +285,14 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo) -> None:
+    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo, item_drop_cb: Callable[[], item.Item]) -> None:
+        self.item_drop_cb = item_drop_cb
+        del item_drop_cb
+
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
-            self.inv.update(screen, game_info.inp)
+            self.inv.update(screen, game_info.inp, self.item_drop_cb)
             self.update_sizes()
             self.button_group.update(game_info.game_time, game_info.inp)
             self.blit_images(screen)
@@ -305,6 +307,7 @@ class GameUI:
     def handle_state(self, mainstate) -> None:
         if mainstate == c.StateName.MAINMENU or mainstate == c.StateName.INGAMEMENU:
             self.state = c.Switch.OFF
+            self.item_drop_cb = None
         else:
             self.state = c.Switch.ON
 

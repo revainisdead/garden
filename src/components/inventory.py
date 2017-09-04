@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple
+from typing import Optional, Callable, List, Tuple
 
 import pygame
 
@@ -262,8 +262,6 @@ class SlotMesh:
         for slot_list in self.__slots:
             for s in slot_list:
                 if not s.taken:
-                    # Also must set the item's position at this slot.
-                    item.pos = s.pos
                     s.drop(item)
                     return
         raise AllSlotsTaken
@@ -328,8 +326,6 @@ class Inventory:
             self.add_item(item_tmp)
             print(item_tmp.name)
         return items
-
-    def 
 
 
     def __setup_mesh(self) -> None:
@@ -399,8 +395,12 @@ class Inventory:
         self.slot_mesh.switch()
 
 
-    def update(self, screen: pygame.Surface, inp: binds.Input, fn: Callable[]) -> None:
+    #def update(self, screen: pygame.Surface, inp: binds.Input) -> None:
+    def update(self, screen: pygame.Surface, inp: binds.Input, item_drop_cb: Callable[[], item.Item]) -> None:
         self.handle_state(inp)
+
+        if item_drop_cb:
+            self.add_item(item_drop_cb())
 
         if self.__open:
             self.__panel.update(screen)

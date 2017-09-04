@@ -23,7 +23,7 @@ from . import constants as c
 from . import gameinfo
 from . import keys
 from . import setup
-from . components import user_interface
+from . components import item, user_interface
 
 
 class Control:
@@ -82,7 +82,7 @@ class Control:
         self.state.update(self.screen_surface, self.dt, self.game_time, self.c_fps)
 
         # In Game User Interface.
-        self.game_ui.update(self.screen_surface, self.state_name, self.state.game_info)
+        self.game_ui.update(self.screen_surface, self.state_name, self.state.game_info, self.state.game_info.item_gen_proc.drop)
 
         # End of frame. Do resets.
         self.state.game_info.inp.reset()
@@ -132,7 +132,8 @@ class State:
         self.game_info = gameinfo.GameInfo(
             dt = 0,
             game_time = 0,
-            inp = binds.Input()
+            inp = binds.Input(),
+            item_gen_proc = item.ItemGenerator(),
         )
 
 

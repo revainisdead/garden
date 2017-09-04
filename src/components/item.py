@@ -52,6 +52,18 @@ stat_readable_names = {
 }
 
 
+quality_colors = {
+    "Enslaving": c.DIRTY_GRAY,
+    "Sacrificial": c.MAROON,
+    "Arduous": c.BROWN,
+    "Artistic": c.BLUE,
+    "Organic": c.BACTERIA,
+    "Collective": c.TEAL,
+    "Synergistic": c.ORANGE,
+    "Burning": c.MAGENTA,
+    "Bountiful": c.LIME_GREEN,
+    "Godly": c.DARK_YELLOW,
+}
 #stat_readable_names_reversed = {k: v for k, v in stat_readable_names}
 
 
@@ -75,7 +87,7 @@ class Item(pygame.sprite.Sprite):
     - Name noun associated with certain icon
     - Name adjective associated with quality
     """
-    def __init__(self, pos: Tuple[int, int], values: Dict[str, Any]) -> None:
+    def __init__(self, values: Dict[str, Any]) -> None:
         super().__init__()
 
         self.__set_values(values)
@@ -86,24 +98,31 @@ class Item(pygame.sprite.Sprite):
         self.image = tools.colorize_quality([self.image], quality_colors[self.__quality])[0]
 
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = pos
+        #self.rect.x, self.rect.y = pos
 
 
-    def __set_values(values: Dict[str, Any]):
-        """ Interfaces directly to ```ItemGenerator.drop``` """
+    def __set_values(self, values: Dict[str, Any]) -> None:
+        """
+        Only store information here that is relevant
+        to the completed item.
+
+        Eg. "stats_allowed" is
+        only relevant to generating the stat values,
+        so it doesn't need to be stored.
+
+        Interfaces directly to ```ItemGenerator.drop``` 
+        """
         self.__quality = values["quality"]
         self.__icon = values["icon"]
-        self.__name = values["name"]
-        self.__full_name = str(self.__quality + " " + self.__name)
+        self.__full_name = str(self.__quality + " " + values["name"])
         self.__item_type = values["item_type"]
-        self.__stats_allowed = values["stats_allowed"]
         self.stats = values["stats"]
         self.__create_item_description(self.__full_name, self.stats)
 
 
-    def __create_item_description(self, full_name: str, stat: Dict[str, Any]) -> str:
+    def __create_item_description(self, full_name: str, stats: Dict[str, Any]) -> str:
         desc = full_name + "\n\n"
-        for stat, value in stats:
+        for stat, value in stats.items():
             desc += stat_readable_names[stat] + "\t\t {}\n".format(value)
         return desc
 
@@ -129,7 +148,6 @@ class ItemTemplate:
         #for v in list(data.values()):
             #if not isinstance(v, str):
                 #raise errors.InvalidData
-
         try:
             # Must contain all the required keys.
             self.name = data[self.keys[0]]
@@ -164,6 +182,8 @@ class ItemGenerator(threading.Thread):
               of the dict doesn't change. If it does at the icon
               name to item_icon.
         """
+        super().__init__()
+
         self.qualities = [
             "Enslaving",
             "Sacrificial",
@@ -176,18 +196,6 @@ class ItemGenerator(threading.Thread):
             "Bountiful",
             "Godly",
         ]
-        self.quality_colors = {
-            "Enslaving": c.DIRTY_GRAY,
-            "Sacrificial": c.MAROON,
-            "Arduous": c.BROWN,
-            "Artistic": c.BLUE,
-            "Organic": c.BACTERIA,
-            "Collective": c.TEAL,
-            "Synergistic": c.ORANGE,
-            "Burning": c.MAGENTA,
-            "Bountiful": c.LIME_GREEN,
-            "Godly": c.DARK_YELLOW,
-        }
 
         # Stat: Tuple[Low_range, High_range]
         self.stat_ranges = {
@@ -200,13 +208,11 @@ class ItemGenerator(threading.Thread):
             Stat(6): (0, 1),
         } # type: Dict[str, Tuple[int, int]]
 
-        self.templates = None # type: List[ItemTemplate]
+        self.templates = [] # type: List[ItemTemplate]
         self.item_names = [] # type: List[str]
 
         # Create all game templates here.
         self.create_templates()
-
-        self.remove_build_data()
 
 
     def __new_item(self, props: List[str]) -> None:
@@ -275,9 +281,9 @@ class ItemGenerator(threading.Thread):
         # select random template in self.templates
         template = self.templates[random.randint(0, len(self.templates) - 1)]
 
-        values = self.__gen_stats(template)
+        values = self.__gather_values(template)
         item = Item(values)
-
+        return item
         # create temp item
         # generate random stats for item
         # store stats in item
@@ -300,17 +306,15 @@ class ItemGenerator(threading.Thread):
         # quality
         # stat values
         # number of stats
-        pass
 
 
-    def __gen_stats(self, template: ItemTemplate) -> None:
+    def __gather_values(self, template: ItemTemplate) -> Dict[str, Any]:
         values = {
             "quality": self.__gen_rand_quality(),
-            "icon": template["icon"],
-            "name": template["name"],
-            "item_type": template["item_type"],
-            "stats_allowed": template["stats_allowed"],
-            "stats": self.__gen_stats(),
+            "icon": template.icon,
+            "name": template.name,
+            "item_type": template.item_type,
+            "stats": self.__gen_stats(template.stats_allowed),
         }
 
         return values
@@ -321,11 +325,11 @@ class ItemGenerator(threading.Thread):
         return self.qualities[i]
 
 
-    def __gen_stats(self) -> Dict[Stat, float]:
-        stats = {} # type: Dict[Stat
+    def __gen_stats(self, stats_allowed: List[Stat]) -> Dict[Stat, float]:
+        stats = {} # type: Dict[Stat, float]
 
-        for stat in self.__stat_names:
-            low, high = stat_ranges[stat]
+        for stat in stats_allowed:
+            low, high = self.stat_ranges[stat]
             if low and high < 1:
                 # Stat ranges are percentages.
                 low = int(low*100)
