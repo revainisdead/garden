@@ -215,7 +215,7 @@ class SlotMesh:
                 self.tt = Tooltip(x, y, s)
             elif s and self.tt:
                 # In this case, the tooltip will be drawn. Unless the slot
-                # in the tooltip does not match the slow that is now being
+                # in the tooltip does not match the slot that is now being
                 # hovered. Which can happen if the mouse moves too fast to
                 # register the correct mp.
                 if s != self.tt.slot:

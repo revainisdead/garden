@@ -1,6 +1,7 @@
 import pygame
 
 from . import helpers
+from . import item
 
 from .. import constants as c
 
@@ -38,3 +39,19 @@ class Tooltip:
     def show(self, surface: pygame.surface.Surface) -> None:
         # background, border, text
         pygame.draw.rect(surface, self.bg_color, self.rect)
+
+
+    def __format_item_text(self, item: item.Item) -> str:
+        # item name -> top, bold, large text
+        # item stats -> white
+        # item quality ->
+        # if three of item quality in a row, get bonus.
+        # can't use two of the same quality in a row,
+        # each row must be a unique quality
+
+        text = item.name
+        for stat in item.stats:
+            text += item.stat_readable_names[stat]
+
+
+

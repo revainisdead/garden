@@ -1,9 +1,9 @@
 from typing import Any
 
 
-class GameInfo(dict):
+class CustomDict(dict):
     """
-    Wrapper around dict that allows accessing the game info attributes
+    Wrapper around dict that allows accessing the object's attributes
     by dot access as opposed to strings as keys.
 
     Usage:
@@ -33,3 +33,6 @@ class GameInfo(dict):
 
     def __setattr__(self, key: str, value: Any) -> None:
         self.__setitem__(key, value)
+
+
+class GameInfo(CustomDict): pass
