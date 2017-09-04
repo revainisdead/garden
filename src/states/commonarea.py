@@ -14,7 +14,7 @@ from .. import gameinfo
 from .. import setup
 from .. import tools
 
-from .. components import non_player_controlled, player, scenery, tilemap, user_interface
+from .. components import item, non_player_controlled, player, scenery, tilemap, user_interface
 
 
 class CommonArea(control.State):
@@ -45,6 +45,9 @@ class CommonArea(control.State):
 
         self.game_info.tilemap = self.tilemap
         self.game_info.thread_queue = queue.Queue() # type: queue.Queue[threading.Thread]
+
+        self.game_info.item_gen_proc = item.ItemGenerator()
+        self.game_info.item_gen_proc.start()
 
         # Trigger a screen size change to setup everything at the
         # current screen size.
