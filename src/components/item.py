@@ -93,12 +93,12 @@ class Item(pygame.sprite.Sprite):
         self.__set_values(values)
 
         sprite = setup.GFX[self.__icon]
+        self.color = quality_colors[self.__quality]
 
         self.image = helpers.get_image(0, 0, c.ORIGINAL_ICON_SIZE, c.ORIGINAL_ICON_SIZE, sprite, mult=c.ITEM_MULT)
-        self.image = tools.colorize_quality([self.image], quality_colors[self.__quality])[0]
+        self.image = tools.colorize_quality([self.image], self.color)[0]
 
         self.rect = self.image.get_rect()
-        #self.rect.x, self.rect.y = pos
 
 
     def __set_values(self, values: Dict[str, Any]) -> None:
@@ -117,13 +117,13 @@ class Item(pygame.sprite.Sprite):
         self.__full_name = str(self.__quality + " " + values["name"])
         self.__item_type = values["item_type"]
         self.stats = values["stats"]
-        self.__create_item_description(self.__full_name, self.stats)
+        self.description = self.__create_item_description(self.__full_name, self.stats)
 
 
     def __create_item_description(self, full_name: str, stats: Dict[str, Any]) -> str:
         desc = full_name + "\n\n"
         for stat, value in stats.items():
-            desc += stat_readable_names[stat] + "\t\t {}\n".format(value)
+            desc += stat_readable_names[stat] + "  {}\n".format(value)
         return desc
 
 
@@ -343,5 +343,4 @@ class ItemGenerator(threading.Thread):
 
             stats[stat] = value
 
-        print(stats)
         return stats

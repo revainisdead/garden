@@ -96,7 +96,6 @@ class Button(pygame.sprite.Sprite):
         super().__init__()
 
         self.sprite = setup.GFX[name]
-        #self.font = setup.FONTS["kenvector_future_thin"]
 
         self.frames = self.load_sprites_from_sheet()
         self.frames = tools.colorize(self.frames, color)
