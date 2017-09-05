@@ -545,7 +545,7 @@ class Map:
 
     def update(self, surface: pygame.Surface, camera: pygame.Rect) -> None:
         for tile in self.tiles:
-            camera_bigger = pygame.rect.Rect((camera.x - c.CAMERA_BIGGER_SIZE, camera.y), (camera.w + c.CAMERA_BIGGER_SIZE*2, camera.h + c.CAMERA_BIGGER_SIZE*2))
+            camera_bigger = pygame.rect.Rect((camera.x - c.CAMERA_BIGGER_SIZE, camera.y - c.CAMERA_BIGGER_SIZE), (camera.w + c.CAMERA_BIGGER_SIZE*2, camera.h + c.CAMERA_BIGGER_SIZE*2))
             if tile.rect.colliderect(camera_bigger):
                 # Expand the camera slightly, because the threads that
                 # draw are sometimes behind. This is because it's no

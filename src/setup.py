@@ -18,6 +18,13 @@ map_size = None # type: MapSize
 
 
 class ScreenSize:
+    """
+    XXX:
+    - Keep the behavior of checking if the screen size changed.
+    - But should be getting the current_h and width from display.
+        ```pygame.display.current_w, pygame.display.current_h```
+    - Decouple this from biome
+    """
     def __init__(self):
         self.__width, self.__height = c.DEFAULT_SCREEN_SIZE
         self.__changed = False

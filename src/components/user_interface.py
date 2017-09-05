@@ -117,7 +117,7 @@ class Button(pygame.sprite.Sprite):
         self.game_time = 0
         self.pressed_time = 0
         # Very fast animation when pressed.
-        self.animation_speed = 500
+        self.animation_speed = 80
 
 
     def load_sprites_from_sheet(self) -> List[pygame.Surface]:
@@ -138,13 +138,13 @@ class Button(pygame.sprite.Sprite):
         #if inp.pressed(self.keybind) or self.rect.collidepoint(*inp.last_mouse_click()):
 
         lmc = inp.last_mouse_click()
-        if lmc:
-            if inp.pressed(self.keybind) or self.rect.collidepoint(lmc):
-                self.pressed_animation()
-                self.action()
-            else:
-                # Only finished animation if the button is no longer pressed.
-                self.finished_animation_check()
+        if lmc == None:
+            lmc = (0, 0)
+        if inp.pressed(self.keybind) or self.rect.collidepoint(lmc):
+            self.pressed_time = self.game_time
+            self.action()
+        else:
+            self.pressed_animation()
 
 
     def action(self) -> None:
@@ -152,26 +152,10 @@ class Button(pygame.sprite.Sprite):
 
 
     def pressed_animation(self) -> None:
-        self.pressed_timer = time.time()
-        self.image = self.frames[1]
-
-
-    def finished_animation_check(self) -> None:
         if self.game_time - self.pressed_time > self.animation_speed:
             self.image = self.frames[0]
-
-
-    # XXX Unused but can be used to either write to keybind onto the
-    # button or used to draw the tooltip, which can include the description
-    # and probably the keybind as well.
-    def render_name(self, surface) -> None:
-        if self.pressed:
-            text = self.font.render(menu_labels[self.name], True, c.WHITE)
         else:
-            text = self.font.render(menu_labels[self.name], True, c.BLACK)
-
-        text_rect = text.get_rect(center=(setup.screen_size.get_width()/2, self.rect.y + self.rect.height/2))
-        surface.blit(text, text_rect)
+            self.image = self.frames[1]
 
 
 class Hud:

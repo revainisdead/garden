@@ -57,7 +57,11 @@ class TreeTop(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.state = None
+        self.__last_groups = None # type: List[pygame.sprite.Group]
+
+        self.dead = False
+        self.__kill_time = 0
+        self.__respawn_rate = 10000
 
         # If treetop is harvested, kill it's shadow
         # Not necessary, maybe, I also want to kill trees so that they
@@ -73,15 +77,34 @@ class TreeTop(pygame.sprite.Sprite):
 
 
     def destroy(self) -> None:
+        """
+        Destroy this sprite. Provides a chance to get an item.
+
+         - Save the groups this sprite is in, so that it can
+           be re-added to them after a certain timer.
+        """
+        self.__last_groups = self.groups()
+        self.__kill_time = self.game_time
+        self.dead = True
         self.kill()
 
 
-    def handle_state(self) -> None:
-        if self.state == c.CropState.HARVESTED:
-            # Track time and regrow
-            pass
-        else:
-            pass
+    def revive(self) -> None:
+        for grp in self.__last_groups:
+            grp.add(self)
+
+        self.__kill_time = 0
+        self.dead = False
+
+
+    def handle_state(self, game_time: int) -> None:
+        if self.dead:
+            self.__check_respawn(game_time)
+
+
+    def __check_respawn(self, game_time) -> None:
+        if game_time - self.__kill_time > self.__respawn_rate:
+            self.revive()
 
 
 class FenceLink(pygame.sprite.Sprite):
