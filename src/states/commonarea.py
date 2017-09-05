@@ -122,7 +122,6 @@ class CommonArea(control.State):
 
             # XXX Collidables for stairs should probably be handled by tilemap.
             self.collidable_grid[int(x/c.TILE_SIZE)][int(y/c.TILE_SIZE)] = 1
-            #self.collidable_group.add(util.Collidable(x, y))
 
         return temp_group
 

@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from collections import OrderedDict
 from datetime import datetime
@@ -284,14 +284,15 @@ class GameUI:
             button_separation += c.BUTTON_OFFSET
 
 
-    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo, item_drop_cb: Callable[[], item.Item]) -> None:
-        self.item_drop_cb = item_drop_cb
-        del item_drop_cb
+    def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo) -> None:
+        item_tmp = None # type: item.Item
+        if not game_info.new_items.empty():
+            item_tmp = game_info.new_items.pop()
 
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
-            self.inv.update(screen, game_info.inp, self.item_drop_cb)
+            self.inv.update(screen, game_info.inp, item_tmp)
             self.update_sizes()
             self.button_group.update(game_info.game_time, game_info.inp)
             self.blit_images(screen)
@@ -306,7 +307,6 @@ class GameUI:
     def handle_state(self, mainstate) -> None:
         if mainstate == c.StateName.MAINMENU or mainstate == c.StateName.INGAMEMENU:
             self.state = c.Switch.OFF
-            self.item_drop_cb = None
         else:
             self.state = c.Switch.ON
 

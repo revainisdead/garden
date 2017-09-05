@@ -63,7 +63,7 @@ class ScreenSize:
         self.__resize(int(round(width)), int(round(height)))
 
         if self.__changed:
-            pygame.display.set_mode((self.__width, self.__height), pygame.RESIZABLE)
+            pygame.display.set_mode((self.__width, self.__height), pygame.DOUBLEBUF | pygame.RESIZABLE)
 
 
     def reset(self) -> None:

@@ -15,6 +15,7 @@
 from typing import Any, Optional, Callable, Dict
 
 import time
+import queue
 
 import pygame
 
@@ -82,7 +83,7 @@ class Control:
         self.state.update(self.screen_surface, self.dt, self.game_time, self.c_fps)
 
         # In Game User Interface.
-        self.game_ui.update(self.screen_surface, self.state_name, self.state.game_info, self.state.game_info.item_gen_proc.drop)
+        self.game_ui.update(self.screen_surface, self.state_name, self.state.game_info)
 
         # End of frame. Do resets.
         self.state.game_info.inp.reset()
@@ -134,6 +135,7 @@ class State:
             game_time = 0,
             inp = binds.Input(),
             item_gen_proc = item.ItemGenerator(),
+            new_items = queue.Queue(),
         )
 
 

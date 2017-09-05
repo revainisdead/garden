@@ -1,4 +1,4 @@
-from typing import Optional, Callable, List, Tuple
+from typing import Optional, List, Tuple
 
 import pygame
 
@@ -395,12 +395,11 @@ class Inventory:
         self.slot_mesh.switch()
 
 
-    #def update(self, screen: pygame.Surface, inp: binds.Input) -> None:
-    def update(self, screen: pygame.Surface, inp: binds.Input, item_drop_cb: Callable[[], item.Item]) -> None:
+    def update(self, screen: pygame.Surface, inp: binds.Input, item: item.Item) -> None:
         self.handle_state(inp)
 
-        if item_drop_cb:
-            self.add_item(item_drop_cb())
+        if item:
+            self.add_item(item)
 
         if self.__open:
             self.__panel.update(screen)

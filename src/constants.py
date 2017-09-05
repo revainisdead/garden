@@ -8,6 +8,7 @@ CAPTION = "Garden"
 # Frames per second.
 FPS = 40
 PG_GET_PRESSED_LENGTH = 323
+CAMERA_BIGGER_SIZE = 100 # Represents increasing each side by this amount.
 
 
 # Debug flags.
@@ -146,7 +147,6 @@ FONT_SIZE_DICT = {
 # Full size(1) for tile_size = 64
 # Half size(0.5)  for tile_size = 32
 TILE_MULT = TILE_SIZE / 64
-
 
 
 speeds = {

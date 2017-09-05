@@ -545,12 +545,17 @@ class Map:
 
     def update(self, surface: pygame.Surface, camera: pygame.Rect) -> None:
         for tile in self.tiles:
-            if camera.colliderect(tile.rect):
+            camera_bigger = pygame.rect.Rect((camera.x - c.CAMERA_BIGGER_SIZE, camera.y), (camera.w + c.CAMERA_BIGGER_SIZE*2, camera.h + c.CAMERA_BIGGER_SIZE*2))
+            if tile.rect.colliderect(camera_bigger):
+                # Expand the camera slightly, because the threads that
+                # draw are sometimes behind. This is because it's no
+                # longer required to happen in order, so sometimes
+                # moving the camera, etc, gets ahead and shows black
+                # on the screen.
                 surface.blit(tile.image, (tile.rect.x, tile.rect.y), (0, 0, c.TILE_SIZE, c.TILE_SIZE))
 
-        self.water_corner_cut_group.draw(surface)
-
         tools.draw_visible(surface, camera, [
+                self.water_corner_cut_group,
                 self.bush_group, # Draw scenery after tiles
                 self.tree_shadow_group, # Draw tree shadows under the tree
                 self.tree_bottom_group,
