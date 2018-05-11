@@ -7,6 +7,7 @@ import random
 from . import helpers
 
 from .. import constants as c
+from .. import gameinfo
 from .. import setup
 
 
@@ -34,21 +35,8 @@ class TreeShadow(pygame.sprite.Sprite):
         self.rect.y = y
 
 
-class TreeBottom(pygame.sprite.Sprite):
-    def __init__(self, x, y, sprite_name) -> None:
-        super().__init__()
-        sprite = setup.GFX[sprite_name]
-
-
-        self.name = sprite_name
-        self.image = helpers.get_image(0, 0, c.TILE_SIZE, c.TILE_SIZE, sprite, mult=c.TILE_MULT)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-
-class TreeTop(pygame.sprite.Sprite):
-    def __init__(self, x, y, sprite_name) -> None:
+class _Tree(pygame.sprite.Sprite):
+    def __init__(self, x: int, y: int, sprite_name: str, other_half_id: int=None) -> None:
         super().__init__()
         sprite = setup.GFX[sprite_name]
 
@@ -57,26 +45,19 @@ class TreeTop(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.available_actions = [
+            c.Action.Cut,
+        ]
+
+        self.__other_half_id = other_half_id
         self.__last_groups = None # type: List[pygame.sprite.Group]
 
         self.dead = False
-        self.__kill_time = 0
-        self.__respawn_rate = 10000
-
-        # If treetop is harvested, kill it's shadow
-        # Not necessary, maybe, I also want to kill trees so that they
-        # can be walked through. Stumps should probably be walk-through
-        # able, and they maybe still have a shadow but certain not the
-        # same shadow as the whole tree.
-
-        # If treetop is harvested, how to know whether to draw it? Need public method to see if it needs to be drawn
+        self.__kill_time = None
+        self.__respawn_rate = 60
 
 
-    def update(self) -> None:
-        self.handle_state()
-
-
-    def destroy(self) -> None:
+    def destroy(self, game_time: int) -> None:
         """
         Destroy this sprite. Provides a chance to get an item.
 
@@ -84,27 +65,56 @@ class TreeTop(pygame.sprite.Sprite):
            be re-added to them after a certain timer.
         """
         self.__last_groups = self.groups()
-        self.__kill_time = self.game_time
+        self.__kill_time = game_info.game_time
         self.dead = True
         self.kill()
+
+
+class TreeBottom(_Tree):
+    def update(self, game_info: gameinfo.GameInfo) -> None:
+        """
+        Update will only be called on a collision, assume a collision was made.
+        """
+        #collided = pygame.sprite.spritecollideany(game_info.player, self.groups()[0])
+        #if collided:
+        if not game_info.action_attempts.empty():
+            if action in self.available_actions:
+                action = game_info.action_attempts.get()
+                self.activate_action(action, game_info)
+
+        self.handle_state(game_info.game_time)
+
+
+    def activate_action(self, action: c.Action, game_info: gameinfo.GameInfo) -> None:
+        if action == self.available_actions[0]:
+            if not self.dead:
+                self.destroy(game_info.game_time)
+                game_info.new_items.put(game_info.item_gen_proc.drop())
 
 
     def revive(self) -> None:
         for grp in self.__last_groups:
             grp.add(self)
 
-        self.__kill_time = 0
+        self.__kill_time = None
         self.dead = False
 
 
     def handle_state(self, game_time: int) -> None:
-        if self.dead:
-            self.__check_respawn(game_time)
+        self.__check_respawn(game_time)
 
 
     def __check_respawn(self, game_time) -> None:
-        if game_time - self.__kill_time > self.__respawn_rate:
-            self.revive()
+        if self.dead and self.__kill_time:
+            if game_time - self.__kill_time > self.__respawn_rate:
+                self.revive()
+
+
+
+class TreeTop(_Tree):
+    def update(self, tree_bottom_id: int=None) -> None:
+        if self.__other_half_id == tree_bottom_id:
+            self.destroy(game_time)
 
 
 class FenceLink(pygame.sprite.Sprite):

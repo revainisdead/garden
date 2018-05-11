@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 import random
+import queue
 
 import pygame
 
@@ -8,6 +9,7 @@ from . import helpers
 
 from .. import binds
 from .. import constants as c
+from .. import gameinfo
 from .. import phys
 from .. import setup
 from .. import tools
@@ -165,6 +167,7 @@ class Player(pygame.sprite.Sprite):
 
         new_x, new_y = tools.fix_edge_bounds(rect=self.rect, highest_x=setup.map_size.get_width(), highest_y=setup.map_size.get_height(), x_vel=self.x_vel, y_vel=self.y_vel)
 
+        # Set and then correct x and y one at a time.
         self.rect.x = new_x
         collided = self.get_closest_collisions()
         if collided is not None:
@@ -233,12 +236,15 @@ class Player(pygame.sprite.Sprite):
         #   and slide in that x or y direction until a wall is hit.
 
 
-    def update(self, dt: int, game_time: int, collidable_grid: List[List[int]], inp: binds.Input) -> None:
-        self.dt = dt
+    def update(self, game_info: gameinfo.GameInfo, collidable_grid: List[List[int]]) -> None:
         self.collidable_grid = collidable_grid
+        self.dt = game_info.dt
 
-        self.handle_state(inp)
-        self.animate_walk(game_time)
+        self.handle_state(game_info.inp)
+        self.animate_walk(game_info.game_time)
+
+        # Have player publish it's own sprite for spritecollideany checking of lootable objects.
+        game_info.player = self
 
 
     def animate_walk(self, game_time: int) -> None:

@@ -12,6 +12,9 @@ all: run
 run:
 	python3 -m src.main
 
+win_exe:
+	pyinstaller -y --windowed --onefile main.spec
+
 test:
 	python3 -m unittest
 

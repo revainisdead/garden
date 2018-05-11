@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Tuple
 from collections import OrderedDict
 from datetime import datetime
 import time
+import queue
 
 import pygame
 
@@ -24,12 +25,8 @@ menu_labels = {
 }
 
 
-button_binds = {
-    "wood_axe_icon": "cut",
-    "tree_icon": "tree",
-    "grabbers_icon": "search",
-    "flip_icon": "flip",
-}
+button_actions = {}
+button_binds = {}
 
 
 class MenuSelection(pygame.sprite.Sprite):
@@ -111,6 +108,7 @@ class Button(pygame.sprite.Sprite):
         #self.frames[1].get_rect().inflate_ip((-c.PRESSED_BUTTON_OFFSET, -c.PRESSED_BUTTON_OFFSET))
 
         self.name = name
+        self.action = button_actions[self.name]
         self.keybind = button_binds[self.name]
         # key: wood_axe_icon value: current keybind for action in binds file
 
@@ -127,12 +125,12 @@ class Button(pygame.sprite.Sprite):
         return frames
 
 
-    def update(self, game_time: int, inp: binds.Input) -> None:
+    def update(self, game_time: int, inp: binds.Input, action_q: queue.Queue) -> None:
         self.game_time = game_time
-        self.handle_state(inp)
+        self.handle_state(inp, action_q)
 
 
-    def handle_state(self, inp: binds.Input) -> None:
+    def handle_state(self, inp: binds.Input, action_q: queue.Queue) -> None:
         # Ex. if near_tree: cut.
         # Use * in a function call to unpack in one go.
         #if inp.pressed(self.keybind) or self.rect.collidepoint(*inp.last_mouse_click()):
@@ -142,13 +140,9 @@ class Button(pygame.sprite.Sprite):
             lmc = (0, 0)
         if inp.pressed(self.keybind) or self.rect.collidepoint(lmc):
             self.pressed_time = self.game_time
-            self.action()
+            action_q.put(self.action)
         else:
             self.pressed_animation()
-
-
-    def action(self) -> None:
-        pass
 
 
     def pressed_animation(self) -> None:
@@ -240,18 +234,25 @@ class GameUI:
     def __init__(self) -> None:
         # XXX Later can dynamically add or remove items depending on
         # which items are equipped (some items might give special power)
-        self.button_icon_and_color = OrderedDict([
-            ("wood_axe_icon", c.DARK_PALE),
-            ("tree_icon", c.FOREST_GREEN),
-            ("grabbers_icon", c.AUTUMN),
-            ("flip_icon", c.NICE_VIOLET),
-        ]) # Add the name of an icon and a color to create a new button.
+        self.button_icon_and_color = [] # type: List[Tuple[str, Tuple[int, int, int]]]
+
+        # Create base buttons list here
+        self.add_new_button("wood_axe_icon", c.DARK_PALE, "cut", c.Action.Cut)
+        self.add_new_button("tree_icon", c.FOREST_GREEN, "tree", c.Action.Grow)
+        self.add_new_button("grabbers_icon", c.AUTUMN, "search", c.Action.Search)
+        self.add_new_button("flip_icon", c.NICE_VIOLET, "flip", c.Action.SwapWorker)
 
         self.button_x = c.IMMUTABLE_BUTTON_X
         self.button_y = setup.screen_size.get_height() - c.IMMUTABLE_BUTTON_Y_OFFSET
         self.re_setup_buttons()
 
         self.inv = inventory.Inventory()
+
+
+    def add_new_button(self, icon_name: str, color: Tuple[int, int, int], bind: str, action: c.Action) -> None:
+        self.button_icon_and_color.append((icon_name, color))
+        button_actions[icon_name] = action
+        button_binds[icon_name] = bind
 
 
     def re_setup_buttons(self) -> None:
@@ -263,7 +264,8 @@ class GameUI:
         button_y = self.button_y
         button_separation = 0
 
-        for name, color in self.button_icon_and_color.items():
+        for entry in self.button_icon_and_color:
+            name, color = entry
             self.button_group.add(Button(self.button_x + button_separation, button_y, name, color))
             button_separation += c.BUTTON_OFFSET
 
@@ -271,14 +273,14 @@ class GameUI:
     def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo) -> None:
         item_tmp = None # type: item.Item
         if not game_info.new_items.empty():
-            item_tmp = game_info.new_items.pop()
+            item_tmp = game_info.new_items.get()
 
         self.handle_state(mainstate)
 
         if self.state == c.Switch.ON:
             self.inv.update(screen, game_info.inp, item_tmp)
             self.update_sizes()
-            self.button_group.update(game_info.game_time, game_info.inp)
+            self.button_group.update(game_info.game_time, game_info.inp, game_info.action_attempts)
             self.blit_images(screen)
 
 

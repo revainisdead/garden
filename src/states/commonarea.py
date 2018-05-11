@@ -44,7 +44,7 @@ class CommonArea(control.State):
         self.state = c.StateName.COMMONAREA
 
         self.game_info.tilemap = self.tilemap
-        self.game_info.thread_queue = queue.Queue() # type: queue.Queue[threading.Thread]
+        self.game_info.thread_queue = queue.Queue() # type: queue.Queue
 
         self.game_info.item_gen_proc = item.ItemGenerator()
         self.game_info.item_gen_proc.start()
@@ -201,9 +201,19 @@ class CommonArea(control.State):
 
 
     def update_sprites(self) -> None:
-        self.player_group.update(self.game_info.dt, self.game_info.game_time, self.collidable_grid, self.game_info.inp)
+        self.player_group.update(self.game_info, self.collidable_grid)
         self.npc_group.update(self.game_info.dt, self.game_info.game_time, self.collidable_grid)
         self.stairs_down_group.update(self.player.rect)
+
+        if not self.game_info.action_attempts.empty():
+            tree_bottom_collided = pygame.sprite.spritecollideany(self.game_info.player, self.tilemap.tree_bottom_group)
+            # The player sent an action and the player is colliding with a lootable object.
+            if tree_bottom_collided:
+                # Bottom collided, update top as well.
+                self.tilemap.tree_top_group.update(id(tree_bottom_collided))
+                tree_bottom_collided.update(self.game_info)
+        #self.tilemap.tree_bottom_group.update(self.game_info)
+        #self.tilemap.tree_top_group.update(self.game_info)
 
         # XXX separate into: def handle_biome(self)
         for stairs_down in self.stairs_down_group:

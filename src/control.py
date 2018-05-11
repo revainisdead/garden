@@ -136,6 +136,7 @@ class State:
             inp = binds.Input(),
             item_gen_proc = item.ItemGenerator(),
             new_items = queue.Queue(),
+            action_attempts = queue.Queue(),
         )
 
 

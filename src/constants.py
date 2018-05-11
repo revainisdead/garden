@@ -69,6 +69,13 @@ class Switch(enum.Enum):
     OFF = 1
 
 
+class Action(enum.Enum):
+    Cut = 0
+    Grow = 1
+    Search = 2
+    SwapWorker = 3
+
+
 # Extract colors using: labs.tineye.com/color/
 # (TIP: Uncheck "Exclude background color from extracted colors")
 # Convert hex color to r,g,b using: www.rapidtables.com/convert/color/

@@ -447,7 +447,7 @@ class Map:
         created = False
         if choice == 1:
             tree_bottom = scenery.TreeBottom(x, y, names[0])
-            tree_top = scenery.TreeTop(x, y - c.TILE_SIZE, names[1])
+            tree_top = scenery.TreeTop(x, y - c.TILE_SIZE, names[1], other_half_id=id(tree_bottom))
             self.tree_bottom_group.add(tree_bottom)
             self.tree_top_group.add(tree_top)
 
