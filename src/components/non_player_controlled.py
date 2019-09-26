@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import random
 
@@ -184,11 +184,22 @@ class Npc(pygame.sprite.Sprite):
             # bounds, then it hit the end of the map. Save for later.
             hit_edge = True
 
-        # Move the Rect.
-        self.rect.x = new_x
-        self.rect.y = new_y
+        hit_wall = False
 
-        hit_wall = tools.test_collide(sprite=self, x_vel=self.x_vel, y_vel=self.y_vel, collidable_group=self.collidable_group)
+        # Set and then correct x and y one at a time.
+        self.rect.x = new_x
+        collided = self.get_closest_collisions()
+        if collided is not None:
+            self.check_x_collisions(collided)
+            hit_wall = True
+
+        self.rect.y = new_y
+        collided = self.get_closest_collisions()
+        if collided is not None:
+            self.check_y_collisions(collided)
+            hit_wall = True
+
+        #hit_wall = tools.test_collide(sprite=self, x_vel=self.x_vel, y_vel=self.y_vel, collidable_group=self.collidable_grid)
 
         if hit_edge or hit_wall:
             # If the end of the map prevented the npc from moving,
@@ -196,16 +207,61 @@ class Npc(pygame.sprite.Sprite):
             self.direction = self.pick_new_direction(ran_into_wall=True)
 
 
+    def check_x_collisions(self, collided: pygame.rect.Rect) -> None:
+        if self.rect.x < collided.x:
+            self.rect.right = collided.left
+        elif self.rect.x > collided.x:
+            self.rect.left = collided.right
+        self.x_vel = 0
+
+
+    def check_y_collisions(self, collided: pygame.rect.Rect) -> None:
+        if self.rect.y > collided.y:
+            self.rect.y = collided.bottom
+        elif self.rect.y < collided.y:
+            self.rect.bottom = collided.top
+        self.y_vel = 0
+
+
+    def get_closest_collisions(self) -> Optional[pygame.rect.Rect]:
+        """
+        # XXX Later check for the collidable that is the closest to the player's
+        # center.
+        Inefficient method: return pygame.sprite.spritecollideany(self, self.collidable_group)
+        """
+        # Find the tiles around the current tile. Loop through (-1, 0, 1).
+        for i in range(-1, 2, 1):
+            for j in range(-1, 2, 1):
+                try:
+                    x = self.rect.x
+                    y = self.rect.y
+                    ts = c.TILE_SIZE
+
+                    # Get the nearest grid point. Truncate to the nearest
+                    # multiple of 64 (Eg. 130 - 130 % 64 => 128 / 64 => 2)
+                    grid_x = int((self.rect.x - (self.rect.x % ts)) / ts)
+                    grid_y = int((self.rect.y - (self.rect.y % ts)) / ts)
+
+                    if self.collidable_grid[grid_x + i][grid_y + j] > 0:
+                        # Expand grid_x and grid_y  back into normal
+                        # coords (*64), then add the current i and j.
+                        rect = pygame.rect.Rect((grid_x*64 + i*ts, grid_y*64 + j*ts), (c.TILE_SIZE, c.TILE_SIZE))
+                        if self.rect.colliderect(rect):
+                            return rect
+                except IndexError:
+                    pass
+
+
     def handle_state(self, game_time: int) -> None:
         self.animate_walk(game_time)
 
         # XXX Rework. Player should inherit from npc.
-        #self.auto_walk()
+        self.auto_walk()
 
 
-    def update(self, dt: int, game_time: int, collidable_group: pygame.sprite.Group) -> None:
+    def update(self, dt: int, game_time: int, collidable_grid: List[List[int]]) -> None:
         self.dt = dt
-        self.collidable_group = collidable_group
+        self.collidable_grid = collidable_grid
 
         self.handle_state(game_time)
 
