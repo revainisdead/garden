@@ -42,8 +42,10 @@ class Tooltip:
 
 
     def show(self, surface: pygame.surface.Surface) -> None:
-        pygame.draw.rect(surface, self.bg_color, self.rect)
-        self.render_description(surface)
+        # Also don't draw rect unless the slot item exists
+        if self.slot.item != None:
+            pygame.draw.rect(surface, self.bg_color, self.rect)
+            self.render_description(surface)
 
 
     def render_description(self, surface: pygame.surface.Surface) -> None:
@@ -52,17 +54,15 @@ class Tooltip:
         Split by new lines and create a surface per line.
         """
         texts = {} # type: Dict[pygame.surface.Surface, pygame.rect.Rect]
+        desc = self.slot.item.description.split("\n")
+        offset = 5
 
-        if self.slot.item != None:
-            desc = self.slot.item.description.split("\n")
-            offset = 5
+        for ea in desc:
+            text_surf = self.font.render(ea, True, self.slot.item.color)
+            text_rect = text_surf.get_rect(top=self.rect.top + offset, left=self.rect.left)
+            texts[text_surf] = text_rect
 
-            for ea in desc:
-                text_surf = self.font.render(ea, True, self.slot.item.color)
-                text_rect = text_surf.get_rect(top=self.rect.top + offset, left=self.rect.left)
-                texts[text_surf] = text_rect
+            offset += 10
 
-                offset += 10
-
-            for text_surf, text_rect in texts.items():
-                surface.blit(text_surf, text_rect)
+        for text_surf, text_rect in texts.items():
+            surface.blit(text_surf, text_rect)
