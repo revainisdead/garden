@@ -200,7 +200,6 @@ class SlotMesh:
                 if self.__drag_slot:
                     self.__drag_slot.reset()
 
-            if self.__drag_slot: self.__drag_slot.clear()
             # Always ensure the drag slot is reset to None on mouse up.
             self.__drag_slot = None
 
@@ -248,13 +247,13 @@ class SlotMesh:
 
     def refill_slot(self, item: item.Item, s_index: int) -> None:
         """ Fill the slot that is at the given index with the item. """
-        i = -1   # Count index because it's a 2D list.
+        i = 0   # Get index because it's a 2D list.
         for slot_list in self.__slots:
             for s in slot_list:
-                i += 1
                 if i == s_index:
                     s.drop(item)
                     return
+                i += 1
 
 
     def fill_next_slot(self, item: item.Item) -> None:
@@ -371,8 +370,6 @@ class Inventory:
             # I just need to loop over the slots
             # put the item that used to be in the last in the newly
             # created slot.
-            #
-            # I can put the self.__items into the game object soon.
             last_slot = self.last_flat_slots[i]
 
             # Only refill the slot if the slot has an item in it.

@@ -273,7 +273,7 @@ class GameUI:
     def update(self, screen: pygame.Surface, mainstate: c.StateName, game_info: gameinfo.GameInfo) -> None:
         item_tmp = None # type: item.Item
         if not game_info.new_items.empty():
-            print(list(game_info.new_items.queue))
+            #print(list(game_info.new_items.queue))
             item_tmp = game_info.new_items.get()
 
         self.handle_state(mainstate)

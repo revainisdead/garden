@@ -83,7 +83,6 @@ class TreeBottom(_Tree):
         #collided = pygame.sprite.spritecollideany(game_info.player, self.groups()[0])
         #if collided:
         if not game_info.action_attempts.empty():
-            print('action attempt')
             action = game_info.action_attempts.get()
             if action in self.available_actions:
                 self.activate_action(action, game_info)
