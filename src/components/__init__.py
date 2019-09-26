@@ -53,15 +53,16 @@ class Tooltip:
         """
         texts = {} # type: Dict[pygame.surface.Surface, pygame.rect.Rect]
 
-        desc = self.slot.item.description.split("\n")
-        offset = 5
+        if self.slot.item != None:
+            desc = self.slot.item.description.split("\n")
+            offset = 5
 
-        for ea in desc:
-            text_surf = self.font.render(ea, True, self.slot.item.color)
-            text_rect = text_surf.get_rect(top=self.rect.top + offset, left=self.rect.left)
-            texts[text_surf] = text_rect
+            for ea in desc:
+                text_surf = self.font.render(ea, True, self.slot.item.color)
+                text_rect = text_surf.get_rect(top=self.rect.top + offset, left=self.rect.left)
+                texts[text_surf] = text_rect
 
-            offset += 10
+                offset += 10
 
-        for text_surf, text_rect in texts.items():
-            surface.blit(text_surf, text_rect)
+            for text_surf, text_rect in texts.items():
+                surface.blit(text_surf, text_rect)

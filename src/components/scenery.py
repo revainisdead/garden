@@ -65,12 +65,17 @@ class _Tree(pygame.sprite.Sprite):
            be re-added to them after a certain timer.
         """
         self.__last_groups = self.groups()
-        self.__kill_time = game_info.game_time
+        #self.__kill_time = game_info.game_time
+        # worry about respawn later
         self.dead = True
         self.kill()
 
 
 class TreeBottom(_Tree):
+    def __init__(self, x, y, sprite_name, other_half_id=None) -> None:
+        super().__init__(x, y, sprite_name, other_half_id)
+        self.__other_half_id = 0
+
     def update(self, game_info: gameinfo.GameInfo) -> None:
         """
         Update will only be called on a collision, assume a collision was made.
@@ -78,8 +83,9 @@ class TreeBottom(_Tree):
         #collided = pygame.sprite.spritecollideany(game_info.player, self.groups()[0])
         #if collided:
         if not game_info.action_attempts.empty():
+            print('action attempt')
+            action = game_info.action_attempts.get()
             if action in self.available_actions:
-                action = game_info.action_attempts.get()
                 self.activate_action(action, game_info)
 
         self.handle_state(game_info.game_time)
@@ -101,7 +107,8 @@ class TreeBottom(_Tree):
 
 
     def handle_state(self, game_time: int) -> None:
-        self.__check_respawn(game_time)
+        #self.__check_respawn(game_time)
+        pass
 
 
     def __check_respawn(self, game_time) -> None:
@@ -112,6 +119,11 @@ class TreeBottom(_Tree):
 
 
 class TreeTop(_Tree):
+    def __init__(self, x, y, sprite_name, other_half_id=None) -> None:
+        super().__init__(x, y, sprite_name, other_half_id)
+        self.__other_half_id = 0
+
+
     def update(self, tree_bottom_id: int=None) -> None:
         if self.__other_half_id == tree_bottom_id:
             self.destroy(game_time)

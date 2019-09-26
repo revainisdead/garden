@@ -212,8 +212,8 @@ class CommonArea(control.State):
                 # Bottom collided, update top as well.
                 self.tilemap.tree_top_group.update(id(tree_bottom_collided))
                 tree_bottom_collided.update(self.game_info)
-        #self.tilemap.tree_bottom_group.update(self.game_info)
-        #self.tilemap.tree_top_group.update(self.game_info)
+        self.tilemap.tree_bottom_group.update(self.game_info)
+        self.tilemap.tree_top_group.update(self.game_info)
 
         # XXX separate into: def handle_biome(self)
         for stairs_down in self.stairs_down_group:
